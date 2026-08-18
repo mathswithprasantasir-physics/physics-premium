@@ -57,7 +57,7 @@
         const post = posts[postId];
         if(post) {
             document.getElementById('postTitle').textContent = post.title;
-            document.querySelector('.price').innerHTML = `৳${post.price} <small>/-</small>`;
+            document.querySelector('.price').innerHTML = `₹${post.price} <small>/-</small>`;
             document.getElementById('paymentLink').href = `https://sandbox.sslcommerz.com/EasyPay/checkout/${postId}`;
         }
     </script>
