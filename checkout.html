@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:Arial,sans-serif;background:#f0f2f5;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
+        .container{max-width:450px;width:100%;background:#fff;padding:35px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+        h1{font-size:22px;color:#1a1a2e;margin:15px 0;}
+        .price{font-size:36px;color:#e53935;font-weight:bold;}
+        .price small{font-size:18px;color:#888;}
+        .features{list-style:none;margin:20px 0;}
+        .features li{padding:10px 0;border-bottom:1px solid #eee;}
+        .features li:before{content:"✅ ";margin-right:8px;}
+        .btn-pay{display:block;width:100%;padding:16px;background:#e53935;color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:bold;cursor:pointer;transition:0.3s;text-decoration:none;text-align:center;}
+        .btn-pay:hover{background:#c62828;}
+        .back{color:#666;text-decoration:none;}
+        .bkash-info{background:#f8f9fa;padding:15px;border-radius:10px;margin:15px 0;text-align:center;}
+        .bkash-info .number{font-size:20px;font-weight:bold;color:#1a1a2e;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back">← Back</a>
+        
+        <h1 id="postTitle">Magnetic Effects of Current</h1>
+        <div class="price">₹1 <small>/-</small></div>
+        
+        <ul class="features">
+            <li>Complete chapter with all topics</li>
+            <li>All formulas and diagrams</li>
+            <li>Practice questions with solutions</li>
+            <li>Lifetime access</li>
+        </ul>
+
+        <!-- SSLCommerz / Payment Gateway -->
+        <a href="#" id="paymentLink" class="btn-pay">💳 Pay Now</a>
+        
+        <div class="bkash-info">
+            <p style="color:#666;">Or Send Money to:</p>
+            <div class="number">📱 017XXXXXXXX (bKash/Nagad)</div>
+            <p style="font-size:13px;color:#888;margin-top:8px;">After payment, you'll receive the access link via email</p>
+        </div>
+    </div>
+
+    <script>
+        // Get post ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('post') || 'magnetic-effects';
+        
+        // Dynamic post data
+        const posts = {
+            'magnetic-effects': { title: 'Magnetic Effects of Current', price: 1 },
+            'electrostatics': { title: 'Electrostatics', price: 79 }
+        };
+        
+        const post = posts[postId];
+        if(post) {
+            document.getElementById('postTitle').textContent = post.title;
+            document.querySelector('.price').innerHTML = `৳${post.price} <small>/-</small>`;
+            document.getElementById('paymentLink').href = `https://sandbox.sslcommerz.com/EasyPay/checkout/${postId}`;
+        }
+    </script>
+</body>
+</html>
