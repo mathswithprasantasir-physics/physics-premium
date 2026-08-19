@@ -27,16 +27,12 @@
         <div id="loadingMessage" style="text-align:center;padding:50px 0;color:#888;">⏳ Loading content...</div>
     </div>
     <script>
-        // =============================================
-        // ১. URL থেকে টোকেন নিন
-        // =============================================
+        // ===== URL থেকে টোকেন নিন =====
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
-        // =============================================
-        // ২. টোকেন ভেরিফিকেশন (সব prem_ টোকেন কাজ করবে)
-        // =============================================
+        // ===== টোকেন ভেরিফিকেশন - সব prem_ টোকেন কাজ করবে =====
         function isTokenValid(token) {
             if (!token) return false;
             
@@ -53,11 +49,8 @@
             return false;
         }
 
-        // =============================================
-        // ৩. কন্টেন্ট দেখান বা অ্যাক্সেস অস্বীকার করুন
-        // =============================================
+        // ===== কন্টেন্ট দেখান বা অ্যাক্সেস অস্বীকার করুন =====
         if (isTokenValid(token)) {
-            // ✅ বৈধ টোকেন → পুরো কন্টেন্ট দেখান
             container.innerHTML = `
                 <h1>PART I: Moving Charge and Magnetic Field</h1>
                 
@@ -162,7 +155,6 @@
                 <p style="text-align:center;margin-top:40px;color:#888;">© 2026 Learning Science - All Rights Reserved</p>
             `;
         } else {
-            // ❌ টোকেন অবৈধ → অ্যাক্সেস অস্বীকার
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
