@@ -3,52 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout</title>
+    <title>Checkout - Premium Learning Notes</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .order-summary {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin: 16px 0;
+            border-left: 4px solid #6C63FF;
+        }
+        .order-summary .label { font-size: 13px; color: #888; }
+        .order-summary .value { font-size: 18px; font-weight: 700; color: var(--dark); }
+        .order-summary .price-tag { font-size: 24px; font-weight: 700; color: #6C63FF; }
+        .order-summary .sub { font-size: 13px; color: #888; margin-top: 4px; }
+
+        .items-list {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            border: 1px solid #e0e0e0;
+        }
+        .items-list .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        .items-list .item:last-child { border-bottom: none; }
+        .items-list .item .emoji { margin-right: 8px; }
+
+        .highlight-box {
+            background: #FFF8E1;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #555;
+            border-left: 4px solid #FFA000;
+            margin: 16px 0;
+        }
+        .highlight-box strong { color: #E65100; }
+    </style>
 </head>
 <body>
-    <div class="container" style="max-width:560px;margin:40px auto;">
-        <a href="/" class="btn btn-secondary" style="margin-bottom:20px;">← Back</a>
+    <div class="container" style="max-width:560px;margin:30px auto;">
+        <a href="/" class="btn btn-secondary" style="margin-bottom:16px;padding:10px 24px;font-size:14px;">← Back</a>
 
         <div class="glass-card">
+            <!-- ===== লোডিং ===== -->
             <div id="loadingState" style="text-align:center;padding:40px 0;">
                 <div class="spinner" style="margin:0 auto;"></div>
                 <p style="color:var(--gray);margin-top:12px;">Loading...</p>
             </div>
 
+            <!-- ===== কন্টেন্ট ===== -->
             <div id="content" style="display:none;">
-                <!-- ইমেইল ডিসপ্লে -->
+
+                <!-- ইমেইল -->
                 <div style="background:var(--light-gray);padding:12px 16px;border-radius:12px;margin-bottom:16px;text-align:center;">
                     📧 <strong>Email:</strong> <span id="userEmailDisplay" style="color:var(--primary);"></span>
                 </div>
 
-                <!-- প্যাকেজ ডিটেইলস -->
-                <div style="text-align:center;padding:10px 0;">
-                    <span id="packageEmoji" style="font-size:48px;">📦</span>
-                    <h1 id="packageTitle" style="font-size:24px;margin:8px 0;">Package Name</h1>
-                    <p id="packageDesc" style="color:var(--gray);font-size:14px;">Package description</p>
+                <!-- অর্ডার সারাংশ -->
+                <div style="text-align:center;">
+                    <span id="orderEmoji" style="font-size:48px;">📦</span>
+                    <h1 id="orderTitle" style="font-size:22px;margin:6px 0;">Order Summary</h1>
+                    <p id="orderDesc" style="color:var(--gray);font-size:14px;">Package details</p>
                 </div>
 
-                <!-- দাম -->
-                <div style="background:var(--light-gray);border-radius:12px;padding:18px;text-align:center;margin:16px 0;">
-                    <span style="font-size:32px;font-weight:700;color:var(--primary);" id="packagePrice">₹49</span>
-                    <div style="font-size:13px;color:var(--gray);margin-top:4px;">⚡ Lifetime access • One-time payment</div>
+                <!-- আইটেম লিস্ট -->
+                <div class="order-summary">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                        <div>
+                            <div class="label">📦 Type</div>
+                            <div class="value" id="orderType">Package</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="label">💰 Total</div>
+                            <div class="price-tag" id="orderPrice">₹49</div>
+                            <div class="sub">Lifetime access • One-time payment</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- আইটেম ডিটেইলস -->
+                <div class="items-list" id="itemsList">
+                    <!-- JavaScript দিয়ে লোড হবে -->
                 </div>
 
                 <!-- ফিচার -->
-                <ul style="list-style:none;margin:16px 0;" id="featureList">
-                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);">✅ Complete chapters with all topics</li>
-                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);">✅ All formulas, derivations & diagrams</li>
-                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);">✅ Practice questions with solutions</li>
-                    <li style="padding:10px 0;">✅ Lifetime access & future updates</li>
+                <ul style="list-style:none;margin:16px 0;">
+                    <li style="padding:8px 0;border-bottom:1px solid var(--light-gray);display:flex;align-items:center;gap:10px;">✅ Complete chapters with all topics</li>
+                    <li style="padding:8px 0;border-bottom:1px solid var(--light-gray);display:flex;align-items:center;gap:10px;">✅ All formulas, derivations & diagrams</li>
+                    <li style="padding:8px 0;border-bottom:1px solid var(--light-gray);display:flex;align-items:center;gap:10px;">✅ Practice questions with solutions</li>
+                    <li style="padding:8px 0;display:flex;align-items:center;gap:10px;">✅ Lifetime access & future updates</li>
                 </ul>
 
-                <!-- Payment Section -->
-                <div style="background:var(--light-gray);border-radius:14px;padding:24px;text-align:center;border:2px dashed var(--gray);margin:20px 0;">
-                    <h3 style="font-size:16px;margin-bottom:12px;">📱 Complete Payment to Unlock</h3>
+                <!-- ===== পেমেন্ট সেকশন ===== -->
+                <div style="background:var(--light-gray);border-radius:14px;padding:24px;text-align:center;border:2px dashed var(--gray);margin:16px 0;">
+                    <h3 style="font-size:16px;margin-bottom:12px;">📱 Complete Payment</h3>
 
                     <div style="background:var(--white);padding:15px;border-radius:12px;display:inline-block;margin:5px auto 12px;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980608289@jio&pn=Prasanta%20Naskar&am=1&cu=INR" alt="QR" width="180" height="180" loading="lazy">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980608289@jio&pn=Prasanta%20Naskar&am=1&cu=INR" 
+                             alt="QR Code" width="180" height="180" loading="lazy">
                     </div>
 
                     <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:12px 0;">
@@ -56,17 +115,17 @@
                         <span style="background:var(--white);padding:8px 16px;border-radius:8px;border:1px solid #e0e0e0;">💳 <strong>UPI:</strong> 7980608289@jio</span>
                     </div>
 
-                    <div style="font-size:13px;color:var(--gray);text-align:left;background:#FFF8E1;padding:12px 16px;border-radius:8px;">
-                        <strong style="color:#E65100;">📌 How to complete:</strong><br>
-                        1️⃣ Scan QR Code or send the amount to UPI/mobile above.<br>
+                    <div class="highlight-box">
+                        <strong>📌 How to complete:</strong><br>
+                        1️⃣ Scan QR Code or send <strong id="payAmount">₹49</strong> to UPI/mobile above.<br>
                         2️⃣ Take screenshot of payment confirmation.<br>
                         3️⃣ Send screenshot on WhatsApp (button below).<br>
                         4️⃣ We'll send your access link within 5-10 minutes. ✅
                     </div>
 
-                    <a href="https://wa.me/917980608289?text=Hi%2C%20I%20have%20paid%20for%20the%20package.%20Please%20send%20the%20access%20link." 
-                       class="btn btn-success" style="width:100%;margin-top:16px;" target="_blank">
-                        💬 Send Payment Screenshot
+                    <a href="https://wa.me/917980608289?text=Hi%2C%20I%20have%20paid%20for%20my%20order.%20Please%20send%20the%20access%20link." 
+                       class="btn btn-success" style="width:100%;margin-top:12px;" target="_blank">
+                        💬 Send Payment Screenshot on WhatsApp
                     </a>
                 </div>
 
@@ -76,8 +135,10 @@
                 </div>
             </div>
 
+            <!-- ===== এরর ===== -->
             <div id="notFound" style="display:none;text-align:center;padding:40px 0;">
-                <h2 style="color:var(--danger);">⚠️ Invalid Package</h2>
+                <h2 style="color:var(--danger);">⚠️ Invalid Order</h2>
+                <p style="color:var(--gray);">Something went wrong. Please try again.</p>
                 <a href="/" class="btn btn-secondary" style="margin-top:16px;">← Go back home</a>
             </div>
         </div>
@@ -85,49 +146,120 @@
 
     <script src="/js/main.js"></script>
     <script>
+        // =============================================
+        // ইউআরএল থেকে ডেটা নিন
+        // =============================================
         const urlParams = new URLSearchParams(window.location.search);
-        const packageType = urlParams.get('package') || 'all';
+        const type = urlParams.get('type') || 'package';
+        const id = urlParams.get('id') || 'all';
+        const amount = parseInt(urlParams.get('amount')) || 49;
         const email = urlParams.get('email') || localStorage.getItem('userEmail') || 'Not provided';
 
-        // ===== প্যাকেজ ডেটা =====
+        // =============================================
+        // প্যাকেজ ডেটা
+        // =============================================
         const PACKAGES = {
             'physics': {
                 title: '⚛️ Physics Pack',
                 desc: 'All Physics chapters — Magnetic Effects, Thermodynamics, Optics & more',
                 price: 49,
                 emoji: '⚛️',
-                posts: ['magnetic-effects', 'thermodynamics', 'optics']
+                items: ['🧲 Magnetic Effects', '🔥 Thermodynamics', '🔦 Ray Optics', '⚡ Electrostatics', '🌊 Waves']
             },
             'maths': {
                 title: '📐 Maths Pack',
                 desc: 'All Maths chapters — Calculus, Algebra, Trigonometry & more',
                 price: 39,
                 emoji: '📐',
-                posts: ['calculus', 'algebra', 'trigonometry']
+                items: ['📐 Calculus', '📊 Algebra', '📏 Trigonometry', '📈 Statistics', '📍 Coordinate Geometry']
             },
             'all': {
                 title: '🌟 All Access',
                 desc: 'Everything — Physics + Maths + PYQs',
                 price: 79,
                 emoji: '🌟',
-                posts: ['magnetic-effects', 'thermodynamics', 'calculus', 'pyqs-physics', 'optics', 'algebra']
+                items: ['🧲 Magnetic Effects', '🔥 Thermodynamics', '📐 Calculus', '📊 Algebra', '📝 PYQs Physics', '📝 PYQs Maths']
             }
         };
 
+        // =============================================
+        // সিঙ্গেল আইটেম ডেটা
+        // =============================================
+        const SINGLE_ITEMS = {
+            'magnetic-effects': { title: '🧲 Magnetic Effects', price: 1 },
+            'thermodynamics': { title: '🔥 Thermodynamics', price: 1 },
+            'optics': { title: '🔦 Ray Optics', price: 1 },
+            'electrostatics': { title: '⚡ Electrostatics', price: 1 },
+            'calculus': { title: '📐 Calculus', price: 1 },
+            'algebra': { title: '📊 Algebra', price: 1 },
+            'trigonometry': { title: '📏 Trigonometry', price: 1 },
+            'pyqs-physics': { title: '📝 PYQs Physics', price: 1 },
+            'pyqs-maths': { title: '📝 PYQs Maths', price: 1 }
+        };
+
+        // =============================================
+        // পেজ লোড
+        // =============================================
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('userEmailDisplay').textContent = email;
 
-        const pkg = PACKAGES[packageType];
-        if (!pkg) {
-            document.getElementById('notFound').style.display = 'block';
+        let orderData = null;
+
+        if (type === 'package') {
+            // ===== প্যাকেজ =====
+            orderData = PACKAGES[id];
+            if (!orderData) {
+                document.getElementById('notFound').style.display = 'block';
+                return;
+            }
+            document.getElementById('orderEmoji').textContent = orderData.emoji;
+            document.getElementById('orderTitle').textContent = orderData.title;
+            document.getElementById('orderDesc').textContent = orderData.desc;
+            document.getElementById('orderType').textContent = '📦 Package';
+            document.getElementById('orderPrice').textContent = `₹${orderData.price}`;
+            document.getElementById('payAmount').textContent = `₹${orderData.price}`;
+
+            // আইটেম লিস্ট
+            let itemsHtml = `<div style="font-weight:600;font-size:14px;margin-bottom:8px;">📄 Included Items:</div>`;
+            orderData.items.forEach(item => {
+                itemsHtml += `<div class="item"><span>${item}</span><span>✅</span></div>`;
+            });
+            document.getElementById('itemsList').innerHTML = itemsHtml;
+
         } else {
-            document.getElementById('content').style.display = 'block';
-            document.getElementById('packageEmoji').textContent = pkg.emoji;
-            document.getElementById('packageTitle').textContent = pkg.title;
-            document.getElementById('packageDesc').textContent = pkg.desc;
-            document.getElementById('packagePrice').innerHTML = `₹${pkg.price} <small>/-</small>`;
-            document.title = `Checkout - ${pkg.title}`;
+            // ===== সিঙ্গেল =====
+            orderData = SINGLE_ITEMS[id];
+            if (!orderData) {
+                document.getElementById('notFound').style.display = 'block';
+                return;
+            }
+            document.getElementById('orderEmoji').textContent = '📄';
+            document.getElementById('orderTitle').textContent = 'Single Item';
+            document.getElementById('orderDesc').textContent = orderData.title;
+            document.getElementById('orderType').textContent = '📄 Single Item';
+            document.getElementById('orderPrice').textContent = `₹${orderData.price}`;
+            document.getElementById('payAmount').textContent = `₹${orderData.price}`;
+
+            // আইটেম লিস্ট
+            document.getElementById('itemsList').innerHTML = `
+                <div class="item"><span>${orderData.title}</span><span>✅</span></div>
+            `;
         }
+
+        // ===== কন্টেন্ট দেখান =====
+        document.getElementById('content').style.display = 'block';
+        document.title = `Checkout - ${orderData.title}`;
+
+        // =============================================
+        //  localStorage-এ অর্ডার ডেটা সেভ (admin-এর জন্য)
+        // =============================================
+        localStorage.setItem('lastOrder', JSON.stringify({
+            type: type,
+            id: id,
+            amount: amount,
+            email: email,
+            timestamp: new Date().toISOString()
+        }));
     </script>
 </body>
 </html>
