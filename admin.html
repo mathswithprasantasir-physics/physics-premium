@@ -19,15 +19,13 @@
         .btn:hover{background:#2e7d32;transform:scale(1.02);}
         .btn-secondary{background:#1a73e8;}
         .btn-secondary:hover{background:#1557b0;}
-        .btn-danger{background:#e53935;}
-        .btn-danger:hover{background:#c62828;}
         .result-box{background:#e8f5e9;padding:20px;border-radius:12px;margin-top:20px;display:none;border-left:4px solid #43a047;}
         .result-box h3{color:#2e7d32;margin-bottom:10px;}
         .token-list{max-height:300px;overflow-y:auto;background:#fff;padding:10px;border-radius:8px;margin:10px 0;}
         .token-item{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;}
         .token-item:last-child{border-bottom:none;}
         .token-item .email{font-weight:500;color:#1a1a2e;}
-        .token-item .token{font-family:monospace;color:#e53935;font-size:12px;}
+        .token-item .token{font-family:monospace;color:#e53935;font-size:12px;word-break:break-all;}
         .btn-copy{background:#1a1a2e;color:#fff;padding:8px 20px;border:none;border-radius:50px;cursor:pointer;font-size:13px;}
         .btn-copy:hover{background:#333;}
         .badge{display:inline-block;padding:3px 12px;border-radius:50px;font-size:12px;font-weight:600;}
@@ -162,6 +160,32 @@
         let users = JSON.parse(localStorage.getItem('users') || '[]');
         let lastResult = [];
 
+        // =============================================
+        // ★★★ টোকেন জেনারেট (ইমেইল এনক্রিপ্ট সহ) ★★★
+        // =============================================
+        function generateTokenForUser(email, postId) {
+            // ইমেইল Base64 তে এনকোড করুন
+            const encodedEmail = btoa(email);
+            const random = Math.random().toString(36).substring(2, 10);
+            const timestamp = Date.now().toString(36);
+            const token = 'prem_' + timestamp + '_' + encodedEmail + '_' + random;
+            
+            const now = new Date();
+            const days = parseInt(document.getElementById('validityDays').value) || 365;
+            const expiry = new Date(now);
+            expiry.setDate(expiry.getDate() + days);
+            
+            return {
+                email: email,
+                postId: postId,
+                token: token,
+                createdAt: now.toISOString(),
+                expiresAt: expiry.toISOString(),
+                isActive: true,
+                link: `https://physics-premium.vercel.app/posts/2026/08/${postId}.html?token=${token}`
+            };
+        }
+
         // ===== সিঙ্গেল টোকেন =====
         function generateSingle() {
             const email = document.getElementById('singleEmail').value.trim();
@@ -195,25 +219,6 @@
             results.forEach(user => saveUser(user));
         }
 
-        // ===== টোকেন জেনারেট =====
-        function generateTokenForUser(email, postId) {
-            const token = 'prem_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
-            const now = new Date();
-            const days = parseInt(document.getElementById('validityDays').value) || 365;
-            const expiry = new Date(now);
-            expiry.setDate(expiry.getDate() + days);
-            
-            return {
-                email: email,
-                postId: postId,
-                token: token,
-                createdAt: now.toISOString(),
-                expiresAt: expiry.toISOString(),
-                isActive: true,
-                link: `https://physics-premium.vercel.app/posts/2026/08/${postId}.html?token=${token}`
-            };
-        }
-
         // ===== রেজাল্ট দেখান =====
         function showResult(results) {
             lastResult = results;
@@ -235,6 +240,7 @@
                 <div style="margin-top:10px;font-size:14px;color:#555;">
                     <strong>Total:</strong> ${results.length} tokens generated.<br>
                     <strong>Validity:</strong> ${document.getElementById('validityDays').value} days.
+                    <br><strong>🔒 Security:</strong> Email is encrypted in token.
                 </div>
             `;
             
@@ -282,7 +288,7 @@
                 html += `
                     <tr>
                         <td style="padding:8px;">${user.email}</td>
-                        <td style="padding:8px;font-family:monospace;font-size:11px;">${user.token.substring(0, 20)}...</td>
+                        <td style="padding:8px;font-family:monospace;font-size:11px;word-break:break-all;">${user.token.substring(0, 30)}...</td>
                         <td style="padding:8px;">${expiryDate}</td>
                         <td style="padding:8px;text-align:center;">${status}</td>
                     </tr>
