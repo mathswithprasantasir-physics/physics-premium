@@ -17,7 +17,6 @@
         .price-box{background:#f8f9fa;border-radius:12px;padding:18px 20px;text-align:center;margin:15px 0 20px;}
         .price-box .price{font-size:32px;color:#e53935;font-weight:700;}
         .price-box .price small{font-size:16px;color:#888;font-weight:400;}
-        .price-box .original-price{color:#999;text-decoration:line-through;font-size:16px;margin-left:10px;}
         .price-box .sub-text{font-size:13px;color:#888;margin-top:4px;}
         .features{list-style:none;margin:15px 0 20px;}
         .features li{padding:10px 0;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:12px;font-size:14px;color:#333;}
@@ -36,6 +35,7 @@
         .btn-whatsapp:hover{background:#1da851;transform:scale(1.02);box-shadow:0 4px 15px rgba(37,211,102,0.3);}
         .note-box{background:#e3f2fd;border-radius:10px;padding:14px 16px;margin:15px 0 5px;font-size:13px;color:#444;border-left:4px solid #1a73e8;}
         .note-box strong{color:#0d47a1;}
+        .email-display{background:#f0f4f8;padding:10px 16px;border-radius:8px;margin:10px 0;font-size:14px;color:#333;text-align:center;}
         @media(max-width:480px){.container{padding:22px 16px;} h1{font-size:19px;} .price-box .price{font-size:28px;} .payment-section .qr-container img{max-width:150px;} .payment-section .payment-details{flex-direction:column;align-items:center;}}
     </style>
 </head>
@@ -44,12 +44,17 @@
         <a href="/" class="back-link">← Back to all posts</a>
         <div id="loadingState" style="text-align:center;padding:30px 0;color:#888;">⏳ Loading...</div>
         <div id="content" style="display:none;">
+            <!-- ===== ইউজারের ইমেইল দেখান ===== -->
+            <div class="email-display">
+                📧 <strong>Registered Email:</strong> <span id="userEmailDisplay">Loading...</span>
+            </div>
+            
             <span class="post-emoji" id="postEmoji">📘</span>
             <div class="post-category" id="postCategory">Physics</div>
             <h1 id="postTitle">Post Title</h1>
             <p class="post-description" id="postDescription">Complete chapter with detailed explanations.</p>
             <div class="price-box">
-                <div><span class="price" id="postPrice">₹1 <small>/-</small></span><span class="original-price" id="originalPrice"></span></div>
+                <div><span class="price" id="postPrice">₹1 <small>/-</small></span></div>
                 <div class="sub-text">⚡ Lifetime access • One-time payment</div>
             </div>
             <ul class="features">
@@ -78,7 +83,7 @@
             </div>
             <div class="note-box">
                 <strong>⏰ Timing:</strong> We'll send your access link within 5-10 minutes after payment verification.<br>
-                <strong>🔒 Secure:</strong> Your link is unique and valid for 1 year.
+                <strong>🔒 Secure:</strong> Your link is unique and tied to your email.
             </div>
         </div>
         <div id="notFound" style="display:none;text-align:center;padding:30px 0;">
@@ -88,23 +93,38 @@
         </div>
     </div>
     <script>
+        // =============================================
+        // URL ও localStorage থেকে ইমেইল নিন
+        // =============================================
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('post') || 'magnetic-effects';
+        const email = urlParams.get('email') || localStorage.getItem('userEmail') || 'Not provided';
+        
+        // =============================================
+        // পোস্ট ডেটা
+        // =============================================
         const POSTS = {
-            'magnetic-effects': { title: 'Magnetic Effects of Current', category: 'Physics', emoji: '🧲', price: 1, originalPrice: null, description: 'Complete chapter on Magnetic Effects of Current with all formulas, derivations, and practice questions.' },
-            'electrostatics': { title: 'Electrostatics - Electric Charges', category: 'Physics', emoji: '⚡', price: 1, originalPrice: null, description: 'Complete chapter on Electric Charges and Fields with detailed explanations.' },
-            'optics': { title: 'Ray Optics & Instruments', category: 'Physics', emoji: '🔦', price: 1, originalPrice: null, description: 'Complete chapter on Ray Optics with diagrams, formulas, and solved examples.' }
+            'magnetic-effects': { title: 'Magnetic Effects of Current', category: 'Physics', emoji: '🧲', price: 1, description: 'Complete chapter on Magnetic Effects of Current with all formulas, derivations, and practice questions.' },
+            'electrostatics': { title: 'Electrostatics - Electric Charges', category: 'Physics', emoji: '⚡', price: 1, description: 'Complete chapter on Electric Charges and Fields with detailed explanations.' },
+            'optics': { title: 'Ray Optics & Instruments', category: 'Physics', emoji: '🔦', price: 1, description: 'Complete chapter on Ray Optics with diagrams, formulas, and solved examples.' }
         };
+        
+        // =============================================
+        // পেজ লোড করুন
+        // =============================================
         document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('userEmailDisplay').textContent = email;
+        
         const post = POSTS[postId];
-        if (!post) { document.getElementById('notFound').style.display = 'block'; } else {
+        if (!post) { 
+            document.getElementById('notFound').style.display = 'block'; 
+        } else {
             document.getElementById('content').style.display = 'block';
             document.getElementById('postEmoji').textContent = post.emoji || '📘';
             document.getElementById('postCategory').textContent = post.category || 'Physics';
             document.getElementById('postTitle').textContent = post.title;
             document.getElementById('postDescription').textContent = post.description;
             document.getElementById('postPrice').innerHTML = `₹${post.price} <small>/-</small>`;
-            if (post.originalPrice) { document.getElementById('originalPrice').textContent = `₹${post.originalPrice}`; }
             document.title = `Checkout - ${post.title}`;
         }
     </script>
