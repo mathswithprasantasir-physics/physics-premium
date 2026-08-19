@@ -16,6 +16,7 @@
         input:focus,select:focus{outline:none;border-color:#1a73e8;}
         .btn{width:100%;padding:14px;background:#43a047;color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:600;cursor:pointer;transition:0.3s;}
         .btn:hover{background:#2e7d32;}
+        .note{text-align:center;font-size:13px;color:#888;margin-top:15px;}
     </style>
 </head>
 <body>
@@ -37,15 +38,26 @@
             </div>
             <button type="submit" class="btn">🚀 Continue to Payment</button>
         </form>
+        <p class="note">🔒 Your email will be used to verify your access link.</p>
     </div>
     <script>
+        // =============================================
+        // রেজিস্টার ফর্ম - ইমেইল localStorage-এ সেভ করুন
+        // =============================================
         document.getElementById('registerForm').onsubmit = function(e) {
             e.preventDefault();
             const email = document.getElementById('userEmail').value.trim();
             const postId = document.getElementById('postSelect').value;
-            if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+            
+            if (!email || !email.includes('@')) { 
+                alert('Please enter a valid email.'); 
+                return; 
+            }
+            
+            // ★★★ ইমেইল localStorage-এ সেভ করুন ★★★
             localStorage.setItem('userEmail', email);
             localStorage.setItem('postId', postId);
+            
             window.location.href = `/checkout.html?post=${postId}&email=${encodeURIComponent(email)}`;
         };
     </script>
