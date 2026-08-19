@@ -6,16 +6,48 @@
     <title>Register - Get Access</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        /* ===== টগল গ্রুপ ===== */
+        .mode-toggle {
+            display: flex;
+            background: var(--light-gray);
+            border-radius: 50px;
+            padding: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        .mode-toggle .mode-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 50px;
+            background: transparent;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: var(--gray);
+        }
+        .mode-toggle .mode-btn.active {
+            background: #6C63FF;
+            color: #fff;
+            box-shadow: 0 2px 12px rgba(108,99,255,0.3);
+        }
+        .mode-toggle .mode-btn:hover:not(.active) {
+            color: var(--dark);
+        }
+
+        /* ===== প্যাকেজ কার্ড ===== */
         .package-card {
             border: 2px solid #e0e0e0;
             border-radius: 12px;
-            padding: 18px 20px;
+            padding: 16px 18px;
             margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--white);
         }
         .package-card:hover {
             border-color: #6C63FF;
@@ -24,40 +56,104 @@
         .package-card.selected {
             border-color: #6C63FF;
             background: #f0eeff;
-            box-shadow: 0 0 0 3px rgba(108,99,255,0.2);
+            box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
         }
-        .package-card .name { font-weight: 600; font-size: 18px; }
-        .package-card .price { font-weight: 700; color: #6C63FF; font-size: 20px; }
-        .package-card .desc { font-size: 14px; color: #888; }
+        .package-card .info { flex: 1; margin-left: 12px; }
+        .package-card .name { font-weight: 600; font-size: 17px; }
+        .package-card .desc { font-size: 13px; color: #888; }
+        .package-card .price { font-weight: 700; color: #6C63FF; font-size: 18px; }
         .package-card input[type="radio"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             accent-color: #6C63FF;
             cursor: pointer;
             flex-shrink: 0;
         }
-        .package-card .info { flex: 1; margin-left: 14px; }
+
+        /* ===== সিঙ্গেল আইটেম লিস্ট ===== */
+        .single-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .single-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--white);
+        }
+        .single-item:hover {
+            border-color: #6C63FF;
+            background: #f8f7ff;
+        }
+        .single-item.selected {
+            border-color: #6C63FF;
+            background: #f0eeff;
+            box-shadow: 0 0 0 3px rgba(108,99,255,0.12);
+        }
+        .single-item .emoji { font-size: 22px; }
+        .single-item .title { font-size: 14px; font-weight: 500; flex: 1; }
+        .single-item .s-price { font-weight: 600; color: #6C63FF; font-size: 14px; }
+        .single-item input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #6C63FF;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 2px dashed #e0e0e0;
+            margin: 20px 0;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .single-list { grid-template-columns: 1fr; }
+            .package-card { flex-wrap: wrap; gap: 8px; }
+            .package-card .price { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container" style="max-width:560px;margin:40px auto;">
+    <div class="container" style="max-width:600px;margin:30px auto;">
         <div class="glass-card">
+
+            <!-- ===== হেডার ===== -->
             <div style="text-align:center;">
                 <div style="font-size:48px;">📚</div>
-                <h1 style="font-size:28px;margin-top:10px;">Choose Your <span class="highlight">Plan</span></h1>
-                <p style="color:var(--gray);margin-bottom:24px;">Select a package and enter your email to get started</p>
+                <h1 style="font-size:26px;margin-top:8px;">Get <span class="highlight">Access</span></h1>
+                <p style="color:var(--gray);margin-bottom:20px;">Choose a package or a single item</p>
             </div>
 
+            <!-- ===== মোড টগল (প্যাকেজ / সিঙ্গেল) ===== -->
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="modePackage" onclick="switchMode('package')">📦 Package</button>
+                <button class="mode-btn" id="modeSingle" onclick="switchMode('single')">📄 Single Item</button>
+            </div>
+
+            <!-- ===== ফর্ম ===== -->
             <form id="registerForm">
-                <!-- ===== প্যাকেজ সিলেক্ট ===== -->
-                <div class="form-group">
-                    <label>📦 Select Package</label>
-                    
+
+                <!-- ===== প্যাকেজ সেকশন ===== -->
+                <div id="packageSection">
+                    <label style="font-weight:600;font-size:15px;display:block;margin-bottom:10px;">Choose a Package</label>
+
                     <label class="package-card" id="pkg-physics" onclick="selectPackage('physics')">
                         <input type="radio" name="package" value="physics" checked>
                         <span class="info">
                             <span class="name">⚛️ Physics Pack</span>
-                            <span class="desc">All Physics chapters (Magnetic, Thermodynamics, etc.)</span>
+                            <span class="desc">All Physics chapters (Magnetic, Thermodynamics, Optics, etc.)</span>
                         </span>
                         <span class="price">₹49</span>
                     </label>
@@ -66,7 +162,7 @@
                         <input type="radio" name="package" value="maths">
                         <span class="info">
                             <span class="name">📐 Maths Pack</span>
-                            <span class="desc">All Maths chapters (Calculus, Algebra, etc.)</span>
+                            <span class="desc">All Maths chapters (Calculus, Algebra, Trigonometry, etc.)</span>
                         </span>
                         <span class="price">₹39</span>
                     </label>
@@ -81,12 +177,23 @@
                     </label>
                 </div>
 
+                <!-- ===== সিঙ্গেল আইটেম সেকশন ===== -->
+                <div id="singleSection" class="hidden">
+                    <label style="font-weight:600;font-size:15px;display:block;margin-bottom:10px;">Select a Single Item</label>
+                    <div class="single-list" id="singleList">
+                        <!-- JavaScript দিয়ে লোড হবে -->
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
                 <!-- ===== ইমেইল ===== -->
                 <div class="form-group">
                     <label>📧 Email Address</label>
                     <input type="email" id="userEmail" placeholder="student@example.com" required>
                 </div>
 
+                <!-- ===== সাবমিট ===== -->
                 <button type="submit" class="btn btn-primary" style="width:100%;">🚀 Continue to Payment</button>
             </form>
 
@@ -96,36 +203,134 @@
         </div>
     </div>
 
+    <script src="/js/main.js"></script>
     <script>
+        // =============================================
+        // সিঙ্গেল আইটেম ডেটা
+        // =============================================
+        const SINGLE_ITEMS = [
+            { id: 'magnetic-effects', title: 'Magnetic Effects', emoji: '🧲', price: '₹1' },
+            { id: 'thermodynamics', title: 'Thermodynamics', emoji: '🔥', price: '₹1' },
+            { id: 'optics', title: 'Ray Optics', emoji: '🔦', price: '₹1' },
+            { id: 'electrostatics', title: 'Electrostatics', emoji: '⚡', price: '₹1' },
+            { id: 'calculus', title: 'Calculus', emoji: '📐', price: '₹1' },
+            { id: 'algebra', title: 'Algebra', emoji: '📊', price: '₹1' },
+            { id: 'trigonometry', title: 'Trigonometry', emoji: '📏', price: '₹1' },
+            { id: 'pyqs-physics', title: 'PYQs Physics', emoji: '📝', price: '₹1' },
+            { id: 'pyqs-maths', title: 'PYQs Maths', emoji: '📝', price: '₹1' }
+        ];
+
+        // =============================================
+        // স্টেট
+        // =============================================
+        let currentMode = 'package'; // 'package' বা 'single'
+        let selectedPackage = 'physics';
+        let selectedSingle = null;
+
+        // =============================================
+        // সিঙ্গেল আইটেম লোড
+        // =============================================
+        function loadSingleItems() {
+            const container = document.getElementById('singleList');
+            container.innerHTML = SINGLE_ITEMS.map(item => `
+                <label class="single-item" id="single-${item.id}" onclick="selectSingle('${item.id}')">
+                    <input type="radio" name="singleItem" value="${item.id}">
+                    <span class="emoji">${item.emoji}</span>
+                    <span class="title">${item.title}</span>
+                    <span class="s-price">${item.price}</span>
+                </label>
+            `).join('');
+        }
+
+        // =============================================
+        // মোড সুইচ
+        // =============================================
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('modePackage').classList.toggle('active', mode === 'package');
+            document.getElementById('modeSingle').classList.toggle('active', mode === 'single');
+            document.getElementById('packageSection').classList.toggle('hidden', mode === 'single');
+            document.getElementById('singleSection').classList.toggle('hidden', mode === 'package');
+        }
+
+        // =============================================
+        // প্যাকেজ সিলেক্ট
+        // =============================================
         function selectPackage(pkg) {
-            // সব কার্ড থেকে selected ক্লাস সরান
+            selectedPackage = pkg;
             document.querySelectorAll('.package-card').forEach(el => el.classList.remove('selected'));
-            // নির্বাচিত কার্ডে selected ক্লাস যোগ করুন
             document.getElementById('pkg-' + pkg).classList.add('selected');
-            // রেডিও বাটন চেক করুন
             document.querySelector(`input[name="package"][value="${pkg}"]`).checked = true;
         }
 
-        // ডিফল্ট: physics সিলেক্টেড
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('pkg-physics').classList.add('selected');
-        });
+        // =============================================
+        // সিঙ্গেল সিলেক্ট
+        // =============================================
+        function selectSingle(id) {
+            selectedSingle = id;
+            document.querySelectorAll('.single-item').forEach(el => el.classList.remove('selected'));
+            document.getElementById('single-' + id).classList.add('selected');
+            document.querySelector(`input[name="singleItem"][value="${id}"]`).checked = true;
+        }
 
+        // =============================================
+        // ফর্ম সাবমিট
+        // =============================================
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const email = document.getElementById('userEmail').value.trim();
-            const selectedPackage = document.querySelector('input[name="package"]:checked').value;
 
+            const email = document.getElementById('userEmail').value.trim();
             if (!isValidEmail(email)) {
                 Toast.show('Please enter a valid email address.', 'error');
                 return;
             }
 
-            // ইউজার ডেটা localStorage-এ সেভ করুন
-            setUserData(email, selectedPackage);
-            window.location.href = `/checkout.html?package=${selectedPackage}&email=${encodeURIComponent(email)}`;
+            let purchaseType, purchaseId, amount;
+
+            if (currentMode === 'package') {
+                purchaseType = 'package';
+                purchaseId = selectedPackage;
+                const prices = { physics: 49, maths: 39, all: 79 };
+                amount = prices[selectedPackage] || 49;
+            } else {
+                purchaseType = 'single';
+                purchaseId = selectedSingle;
+                if (!purchaseId) {
+                    Toast.show('Please select a single item.', 'error');
+                    return;
+                }
+                amount = 1;
+            }
+
+            // ডেটা localStorage-এ সেভ
+            setUserData(email, purchaseType, purchaseId, amount);
+
+            // চেকআউট পেজে যান
+            window.location.href = `/checkout.html?type=${purchaseType}&id=${purchaseId}&amount=${amount}&email=${encodeURIComponent(email)}`;
         });
+
+        // =============================================
+        // ডিফল্ট সিলেক্ট
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSingleItems();
+            // ডিফল্ট: প্যাকেজ মোড, ফিজিক্স সিলেক্টেড
+            document.getElementById('pkg-physics').classList.add('selected');
+            // ডিফল্ট সিঙ্গেল: প্রথমটা সিলেক্ট
+            if (SINGLE_ITEMS.length > 0) {
+                selectSingle(SINGLE_ITEMS[0].id);
+            }
+        });
+
+        // =============================================
+        // main.js থেকে ফাংশন ওভাররাইড
+        // =============================================
+        function setUserData(email, type, id, amount) {
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('purchaseType', type);
+            localStorage.setItem('purchaseId', id);
+            localStorage.setItem('purchaseAmount', amount);
+        }
     </script>
-    <script src="/js/main.js"></script>
 </body>
 </html>
