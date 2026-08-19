@@ -6,56 +6,71 @@
     <title>Premium Learning Notes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        /* মোবাইলের জন্য বিশেষ ফিক্স */
+        /* ====== স্পেসিফিক মোবাইল ফিক্স ====== */
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            text-align: center;
+            padding: 50px 20px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .hero h1 .highlight {
+            color: #6C63FF;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .hero .badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .hero .badges span {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ====== মোবাইলের জন্য ====== */
         @media (max-width: 768px) {
-            .hero {
-                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
-                padding: 40px 16px !important;
-            }
             .hero h1 {
-                font-size: 1.8rem !important;
-                color: #ffffff !important;
-                text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                font-size: 1.8rem;
             }
             .hero p {
-                color: #e0e0e0 !important;
-                font-size: 1rem !important;
+                font-size: 1rem;
             }
-            .hero .gradient-text {
-                background: linear-gradient(135deg, #6C63FF, #FF6584) !important;
-                -webkit-background-clip: text !important;
-                -webkit-text-fill-color: transparent !important;
-            }
-            .hero span {
-                background: rgba(255,255,255,0.1) !important;
-                color: #ffffff !important;
-                border: 1px solid rgba(255,255,255,0.1);
-            }
-            .post-card .badge {
-                font-size: 11px !important;
-                padding: 3px 10px !important;
-            }
-            .post-card h2 {
-                font-size: 1.2rem !important;
-            }
-            .post-card .preview {
-                font-size: 0.9rem !important;
+            .hero .badges span {
+                font-size: 12px;
+                padding: 5px 14px;
             }
         }
-        
+
         @media (max-width: 480px) {
             .hero h1 {
-                font-size: 1.5rem !important;
+                font-size: 1.5rem;
             }
             .hero p {
-                font-size: 0.9rem !important;
-            }
-            .hero span {
-                font-size: 12px !important;
-                padding: 4px 12px !important;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -69,11 +84,11 @@
             </button>
         </div>
 
-        <!-- Hero Section (আপডেটেড) -->
+        <!-- Hero Section -->
         <section class="hero">
-            <h1>📚 <span class="gradient-text">Premium Learning Notes</span></h1>
+            <h1>📚 <span class="highlight">Premium Learning Notes</span></h1>
             <p>Complete notes, PYQs, and study materials for <strong>Maths & Science</strong></p>
-            <div style="margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <div class="badges">
                 <span>✅ 100+ Chapters</span>
                 <span>✅ ₹1 Only</span>
                 <span>✅ PYQs Included</span>
@@ -82,42 +97,36 @@
 
         <!-- Post Grid -->
         <div class="post-grid">
-            <!-- Post 1: Physics -->
+            <!-- Physics -->
             <div class="post-card">
                 <span class="badge premium">🔒 Premium</span>
                 <div class="emoji">🧲</div>
                 <h2>Magnetic Effects of Current</h2>
-                <p class="preview">
-                    Complete chapter with all formulas, derivations, and practice questions...
-                </p>
+                <p class="preview">Complete chapter with formulas, derivations, and practice questions.</p>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;">
                     <span class="price">₹1 <small>/-</small></span>
                     <a href="/register.html" class="btn btn-primary">🔓 Get Access</a>
                 </div>
             </div>
 
-            <!-- Post 2: Maths -->
+            <!-- Maths -->
             <div class="post-card">
                 <span class="badge premium">🔒 Premium</span>
                 <div class="emoji">📐</div>
                 <h2>Calculus - Complete Guide</h2>
-                <p class="preview">
-                    Differentiation, Integration, and Applications with solved examples...
-                </p>
+                <p class="preview">Differentiation, Integration, and Applications with solved examples.</p>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;">
                     <span class="price">₹1 <small>/-</small></span>
                     <a href="/register.html" class="btn btn-primary">🔓 Get Access</a>
                 </div>
             </div>
 
-            <!-- Post 3: PYQs -->
+            <!-- PYQs -->
             <div class="post-card">
                 <span class="badge premium">🔒 Premium</span>
                 <div class="emoji">📝</div>
                 <h2>PYQs - Class 12 Physics</h2>
-                <p class="preview">
-                    Previous Year Questions with detailed solutions and marking schemes...
-                </p>
+                <p class="preview">Previous Year Questions with detailed solutions and marking schemes.</p>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;">
                     <span class="price">₹1 <small>/-</small></span>
                     <a href="/register.html" class="btn btn-primary">🔓 Get Access</a>
