@@ -6,231 +6,67 @@
     <title>Checkout - Premium Physics Notes</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{
-            font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-            background:linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            padding:20px;
-        }
-        .container{
-            max-width:520px;
-            width:100%;
-            background:#fff;
-            border-radius:20px;
-            padding:35px;
-            box-shadow:0 20px 60px rgba(0,0,0,0.1);
-        }
-        .back-link{
-            display:inline-flex;
-            align-items:center;
-            gap:6px;
-            color:#666;
-            text-decoration:none;
-            font-size:14px;
-            margin-bottom:20px;
-            transition:color 0.2s;
-        }
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#f5f7fa,#c3cfe2);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
+        .container{max-width:520px;width:100%;background:#fff;border-radius:20px;padding:35px;box-shadow:0 20px 60px rgba(0,0,0,0.1);}
+        .back-link{display:inline-flex;align-items:center;gap:6px;color:#666;text-decoration:none;font-size:14px;margin-bottom:20px;}
         .back-link:hover{color:#1a1a2e;}
-        
         .post-emoji{font-size:48px;display:block;margin-bottom:5px;}
         .post-category{color:#888;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;}
         h1{font-size:22px;color:#1a1a2e;margin:5px 0 8px;line-height:1.3;}
         .post-description{color:#666;font-size:14px;margin-bottom:20px;}
-        
-        .price-box{
-            background:#f8f9fa;
-            border-radius:12px;
-            padding:18px 20px;
-            text-align:center;
-            margin:15px 0 20px;
-        }
-        .price-box .price{
-            font-size:32px;
-            color:#e53935;
-            font-weight:700;
-        }
-        .price-box .price small{
-            font-size:16px;
-            color:#888;
-            font-weight:400;
-        }
-        .price-box .original-price{
-            color:#999;
-            text-decoration:line-through;
-            font-size:16px;
-            margin-left:10px;
-        }
-        .price-box .sub-text{
-            font-size:13px;
-            color:#888;
-            margin-top:4px;
-        }
-
-        .features{
-            list-style:none;
-            margin:15px 0 20px;
-        }
-        .features li{
-            padding:10px 0;
-            border-bottom:1px solid #f0f0f0;
-            display:flex;
-            align-items:center;
-            gap:12px;
-            font-size:14px;
-            color:#333;
-        }
+        .price-box{background:#f8f9fa;border-radius:12px;padding:18px 20px;text-align:center;margin:15px 0 20px;}
+        .price-box .price{font-size:32px;color:#e53935;font-weight:700;}
+        .price-box .price small{font-size:16px;color:#888;font-weight:400;}
+        .price-box .original-price{color:#999;text-decoration:line-through;font-size:16px;margin-left:10px;}
+        .price-box .sub-text{font-size:13px;color:#888;margin-top:4px;}
+        .features{list-style:none;margin:15px 0 20px;}
+        .features li{padding:10px 0;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:12px;font-size:14px;color:#333;}
         .features li:last-child{border-bottom:none;}
         .features li:before{content:"✅";font-size:16px;}
-
-        /* ===== QR Code & Payment Section ===== */
-        .payment-section{
-            background:#f8f9fa;
-            border-radius:14px;
-            padding:25px 20px;
-            margin:20px 0;
-            text-align:center;
-            border:2px dashed #ddd;
-        }
-        .payment-section h3{
-            color:#1a1a2e;
-            font-size:16px;
-            margin-bottom:12px;
-        }
-        .payment-section .qr-container{
-            background:#fff;
-            padding:15px;
-            border-radius:12px;
-            display:inline-block;
-            margin:5px auto 12px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.05);
-        }
-        .payment-section .qr-container img{
-            max-width:200px;
-            height:auto;
-        }
-        .payment-section .payment-details{
-            display:flex;
-            flex-wrap:wrap;
-            justify-content:center;
-            gap:10px 20px;
-            margin:12px 0 8px;
-        }
-        .payment-section .payment-details .item{
-            background:#fff;
-            padding:8px 16px;
-            border-radius:8px;
-            border:1px solid #e0e0e0;
-            font-size:14px;
-            color:#333;
-        }
-        .payment-section .payment-details .item strong{
-            color:#1a1a2e;
-        }
-        .payment-section .instruction{
-            font-size:13px;
-            color:#666;
-            line-height:1.6;
-            margin-top:10px;
-            background:#fff8e1;
-            padding:12px 16px;
-            border-radius:8px;
-            text-align:left;
-        }
+        .payment-section{background:#f8f9fa;border-radius:14px;padding:25px 20px;margin:20px 0;text-align:center;border:2px dashed #ddd;}
+        .payment-section h3{color:#1a1a2e;font-size:16px;margin-bottom:12px;}
+        .payment-section .qr-container{background:#fff;padding:15px;border-radius:12px;display:inline-block;margin:5px auto 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+        .payment-section .qr-container img{max-width:200px;height:auto;}
+        .payment-section .payment-details{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 20px;margin:12px 0 8px;}
+        .payment-section .payment-details .item{background:#fff;padding:8px 16px;border-radius:8px;border:1px solid #e0e0e0;font-size:14px;color:#333;}
+        .payment-section .payment-details .item strong{color:#1a1a2e;}
+        .payment-section .instruction{font-size:13px;color:#666;line-height:1.6;margin-top:10px;background:#fff8e1;padding:12px 16px;border-radius:8px;text-align:left;}
         .payment-section .instruction strong{color:#e65100;}
-
-        .btn-whatsapp{
-            display:block;
-            width:100%;
-            padding:14px;
-            background:#25D366;
-            color:#fff;
-            border:none;
-            border-radius:50px;
-            font-size:16px;
-            font-weight:600;
-            cursor:pointer;
-            transition:all 0.3s;
-            text-decoration:none;
-            text-align:center;
-            margin-top:15px;
-        }
-        .btn-whatsapp:hover{
-            background:#1da851;
-            transform:scale(1.02);
-            box-shadow:0 4px 15px rgba(37,211,102,0.3);
-        }
-
-        .note-box{
-            background:#e3f2fd;
-            border-radius:10px;
-            padding:14px 16px;
-            margin:15px 0 5px;
-            font-size:13px;
-            color:#444;
-            border-left:4px solid #1a73e8;
-        }
+        .btn-whatsapp{display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:50px;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.3s;text-decoration:none;text-align:center;margin-top:15px;}
+        .btn-whatsapp:hover{background:#1da851;transform:scale(1.02);box-shadow:0 4px 15px rgba(37,211,102,0.3);}
+        .note-box{background:#e3f2fd;border-radius:10px;padding:14px 16px;margin:15px 0 5px;font-size:13px;color:#444;border-left:4px solid #1a73e8;}
         .note-box strong{color:#0d47a1;}
-
-        @media(max-width:480px){
-            .container{padding:22px 16px;}
-            h1{font-size:19px;}
-            .price-box .price{font-size:28px;}
-            .payment-section .qr-container img{max-width:150px;}
-            .payment-section .payment-details{flex-direction:column;align-items:center;}
-        }
+        @media(max-width:480px){.container{padding:22px 16px;} h1{font-size:19px;} .price-box .price{font-size:28px;} .payment-section .qr-container img{max-width:150px;} .payment-section .payment-details{flex-direction:column;align-items:center;}}
     </style>
 </head>
 <body>
-    <div class="container" id="app">
+    <div class="container">
         <a href="/" class="back-link">← Back to all posts</a>
-
-        <!-- লোডিং স্টেট -->
         <div id="loadingState" style="text-align:center;padding:30px 0;color:#888;">⏳ Loading...</div>
-
-        <!-- কন্টেন্ট (লোড হয়ে গেলে দেখাবে) -->
         <div id="content" style="display:none;">
             <span class="post-emoji" id="postEmoji">📘</span>
             <div class="post-category" id="postCategory">Physics</div>
             <h1 id="postTitle">Post Title</h1>
             <p class="post-description" id="postDescription">Complete chapter with detailed explanations.</p>
-
             <div class="price-box">
-                <div>
-                    <span class="price" id="postPrice">₹1 <small>/-</small></span>
-                    <span class="original-price" id="originalPrice"></span>
-                </div>
+                <div><span class="price" id="postPrice">₹1 <small>/-</small></span><span class="original-price" id="originalPrice"></span></div>
                 <div class="sub-text">⚡ Lifetime access • One-time payment</div>
             </div>
-
             <ul class="features">
                 <li>Complete chapter explanation with all topics</li>
                 <li>All formulas, derivations & diagrams</li>
                 <li>Practice questions with step-by-step solutions</li>
                 <li>Lifetime access & future updates</li>
             </ul>
-
-            <!-- ====== QR CODE & PAYMENT SECTION ====== -->
             <div class="payment-section">
                 <h3>📱 Complete Payment to Unlock</h3>
-
-                <!-- QR Code -->
                 <div class="qr-container">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980608289@jio&pn=Prasanta%20Naskar&am=1&cu=INR" 
-                         alt="UPI QR Code" 
-                         width="200" 
-                         height="200">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980608289@jio&pn=Prasanta%20Naskar&am=1&cu=INR" alt="UPI QR Code" width="200" height="200">
                 </div>
-
-                <!-- Payment Details -->
                 <div class="payment-details">
                     <span class="item">📞 <strong>Mobile:</strong> 7980608289</span>
                     <span class="item">💳 <strong>UPI:</strong> 7980608289@jio</span>
                 </div>
-
-                <!-- Instruction -->
                 <div class="instruction">
                     <strong>📌 How to complete payment:</strong><br>
                     1️⃣ Scan the QR Code or send ₹1 to the UPI/mobile number above.<br>
@@ -238,89 +74,37 @@
                     3️⃣ Send the screenshot to us on WhatsApp (button below).<br>
                     4️⃣ We'll send you the access link within 5-10 minutes. ✅
                 </div>
-
-                <!-- WhatsApp Button -->
-                <a href="https://wa.me/917980608289?text=Hi%2C%20I%20have%20paid%20₹1%20for%20the%20physics%20notes.%20Please%20send%20the%20access%20link." 
-                   class="btn-whatsapp" 
-                   target="_blank">
-                    💬 Send Payment Screenshot on WhatsApp
-                </a>
+                <a href="https://wa.me/917980608289?text=Hi%2C%20I%20have%20paid%20₹1%20for%20the%20physics%20notes.%20Please%20send%20the%20access%20link." class="btn-whatsapp" target="_blank">💬 Send Payment Screenshot on WhatsApp</a>
             </div>
-
             <div class="note-box">
-                <strong>⏰ Timing:</strong> We'll send your access link within 5-10 minutes after payment verification.
-                <br><strong>🔒 Secure:</strong> Your link is unique and valid for 7 days.
+                <strong>⏰ Timing:</strong> We'll send your access link within 5-10 minutes after payment verification.<br>
+                <strong>🔒 Secure:</strong> Your link is unique and valid for 1 year.
             </div>
         </div>
-
-        <!-- পোস্ট পাওয়া না গেলে -->
         <div id="notFound" style="display:none;text-align:center;padding:30px 0;">
             <h2 style="color:#e53935;">⚠️ Post Not Found</h2>
             <p style="color:#888;margin-top:10px;">The post you're looking for doesn't exist.</p>
             <a href="/" style="display:inline-block;margin-top:15px;color:#1a73e8;text-decoration:underline;">← Go back home</a>
         </div>
     </div>
-
     <script>
-        // ==========================================
-        // URL থেকে পোস্ট আইডি নিন
-        // ==========================================
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('post') || 'magnetic-effects';
-
-        // ==========================================
-        // পোস্ট ডেটা
-        // ==========================================
         const POSTS = {
-            'magnetic-effects': {
-                title: 'Magnetic Effects of Current',
-                category: 'Physics',
-                emoji: '🧲',
-                price: 1,
-                originalPrice: null,
-                description: 'Complete chapter on Magnetic Effects of Current with all formulas, derivations, and practice questions.'
-            },
-            'electrostatics': {
-                title: 'Electrostatics - Electric Charges',
-                category: 'Physics',
-                emoji: '⚡',
-                price: 1,
-                originalPrice: null,
-                description: 'Complete chapter on Electric Charges and Fields with detailed explanations.'
-            },
-            'optics': {
-                title: 'Ray Optics & Instruments',
-                category: 'Physics',
-                emoji: '🔦',
-                price: 1,
-                originalPrice: null,
-                description: 'Complete chapter on Ray Optics with diagrams, formulas, and solved examples.'
-            }
+            'magnetic-effects': { title: 'Magnetic Effects of Current', category: 'Physics', emoji: '🧲', price: 1, originalPrice: null, description: 'Complete chapter on Magnetic Effects of Current with all formulas, derivations, and practice questions.' },
+            'electrostatics': { title: 'Electrostatics - Electric Charges', category: 'Physics', emoji: '⚡', price: 1, originalPrice: null, description: 'Complete chapter on Electric Charges and Fields with detailed explanations.' },
+            'optics': { title: 'Ray Optics & Instruments', category: 'Physics', emoji: '🔦', price: 1, originalPrice: null, description: 'Complete chapter on Ray Optics with diagrams, formulas, and solved examples.' }
         };
-
-        // ==========================================
-        // ডেটা লোড করুন
-        // ==========================================
         document.getElementById('loadingState').style.display = 'none';
-
         const post = POSTS[postId];
-
-        if (!post) {
-            document.getElementById('notFound').style.display = 'block';
-        } else {
+        if (!post) { document.getElementById('notFound').style.display = 'block'; } else {
             document.getElementById('content').style.display = 'block';
             document.getElementById('postEmoji').textContent = post.emoji || '📘';
             document.getElementById('postCategory').textContent = post.category || 'Physics';
             document.getElementById('postTitle').textContent = post.title;
             document.getElementById('postDescription').textContent = post.description;
             document.getElementById('postPrice').innerHTML = `₹${post.price} <small>/-</small>`;
-
-            // অরিজিনাল প্রাইস (ডিসকাউন্ট দেখাতে)
-            if (post.originalPrice) {
-                document.getElementById('originalPrice').textContent = `₹${post.originalPrice}`;
-            }
-
-            // পেজ টাইটেল আপডেট
+            if (post.originalPrice) { document.getElementById('originalPrice').textContent = `₹${post.originalPrice}`; }
             document.title = `Checkout - ${post.title}`;
         }
     </script>
