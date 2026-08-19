@@ -19,6 +19,7 @@
         .access-denied{text-align:center;padding:80px 20px;}
         .access-denied h1{color:#e53935;font-size:2.5rem;}
         .access-denied .btn{display:inline-block;background:#1a1a2e;color:#fff;padding:12px 40px;border-radius:50px;text-decoration:none;margin-top:20px;}
+        .access-denied .sub-text{color:#666;font-size:16px;margin:10px 0;}
         @media(max-width:600px){.container{padding:15px;} table th,table td{padding:6px;font-size:14px;}}
     </style>
 </head>
@@ -28,36 +29,80 @@
     </div>
     <script>
         // =============================================
-        // URL থেকে টোকেন নিন
+        // ১. URL থেকে টোকেন নিন
         // =============================================
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
         // =============================================
-        // টোকেন ভেরিফিকেশন - সব prem_ টোকেন কাজ করবে
+        // ২. টোকেন থেকে ইমেইল বের করুন
+        // =============================================
+        function extractEmailFromToken(token) {
+            if (!token || !token.startsWith('prem_')) return null;
+            
+            try {
+                const parts = token.split('_');
+                if (parts.length >= 3) {
+                    // দ্বিতীয় অংশটি হলো এনকোডেড ইমেইল
+                    const encodedEmail = parts[2];
+                    const email = atob(encodedEmail);
+                    return email;
+                }
+            } catch (e) {
+                return null;
+            }
+            return null;
+        }
+
+        // =============================================
+        // ৩. ইউজারের ব্রাউজার থেকে ইমেইল নিন
+        // =============================================
+        function getUserEmail() {
+            // প্রথমে localStorage চেক করুন
+            const storedEmail = localStorage.getItem('userEmail');
+            if (storedEmail) return storedEmail;
+            
+            // URL থেকে ইমেইল নিন
+            const urlEmail = urlParams.get('email');
+            if (urlEmail) return urlEmail;
+            
+            return null;
+        }
+
+        // =============================================
+        // ৪. টোকেন ভেরিফিকেশন (টোকেন + ইমেইল)
         // =============================================
         function isTokenValid(token) {
             if (!token) return false;
-            
-            // ★★★★★ এই লাইনটি সবচেয়ে গুরুত্বপূর্ণ ★★★★★
-            // যেকোনো 'prem_' দিয়ে শুরু হওয়া টোকেনকে বৈধ ধরে
-            if (token.startsWith('prem_')) {
-                return true;
-            }
             
             // টেস্ট টোকেন (ডেভেলপমেন্টের জন্য)
             if (token === 'test-token-2026') {
                 return true;
             }
             
-            return false;
+            // prem_ টোকেন চেক করুন
+            if (!token.startsWith('prem_')) {
+                return false;
+            }
+            
+            // টোকেন থেকে ইমেইল বের করুন
+            const tokenEmail = extractEmailFromToken(token);
+            if (!tokenEmail) return false;
+            
+            // ইউজারের ইমেইল নিন
+            const userEmail = getUserEmail();
+            if (!userEmail) return false;
+            
+            // দুটি ইমেইল মিলিয়ে দেখুন (case-insensitive)
+            return tokenEmail.toLowerCase() === userEmail.toLowerCase();
         }
 
         // =============================================
-        // কন্টেন্ট দেখান বা অ্যাক্সেস অস্বীকার করুন
+        // ৫. কন্টেন্ট দেখান বা অ্যাক্সেস অস্বীকার করুন
         // =============================================
         if (isTokenValid(token)) {
+            // ✅ বৈধ টোকেন → পুরো কন্টেন্ট দেখান
             container.innerHTML = `
                 <h1>PART I: Moving Charge and Magnetic Field</h1>
                 
@@ -162,11 +207,18 @@
                 <p style="text-align:center;margin-top:40px;color:#888;">© 2026 Learning Science - All Rights Reserved</p>
             `;
         } else {
+            // ❌ টোকেন অবৈধ → অ্যাক্সেস অস্বীকার
+            const userEmail = getUserEmail() || 'unknown';
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p style="color:#666;font-size:18px;margin:15px 0;">You need to purchase this content.</p>
-                    <p style="color:#999;font-size:14px;">Please contact the admin for access.</p>
+                    <p class="sub-text">This link is not valid for your email.</p>
+                    <p class="sub-text" style="font-size:14px;color:#888;">
+                        Registered email: <strong>${userEmail}</strong>
+                    </p>
+                    <p class="sub-text" style="font-size:14px;color:#888;margin-top:5px;">
+                        Please use the email address you registered with.
+                    </p>
                     <a href="/" class="btn">← Go back</a>
                 </div>
             `;
