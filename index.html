@@ -3,11 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Physics Notes</title>
+    <title>Premium Learning Notes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* মোবাইলের জন্য বিশেষ ফিক্স */
+        @media (max-width: 768px) {
+            .hero {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+                padding: 40px 16px !important;
+            }
+            .hero h1 {
+                font-size: 1.8rem !important;
+                color: #ffffff !important;
+                text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            }
+            .hero p {
+                color: #e0e0e0 !important;
+                font-size: 1rem !important;
+            }
+            .hero .gradient-text {
+                background: linear-gradient(135deg, #6C63FF, #FF6584) !important;
+                -webkit-background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+            }
+            .hero span {
+                background: rgba(255,255,255,0.1) !important;
+                color: #ffffff !important;
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+            .post-card .badge {
+                font-size: 11px !important;
+                padding: 3px 10px !important;
+            }
+            .post-card h2 {
+                font-size: 1.2rem !important;
+            }
+            .post-card .preview {
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.5rem !important;
+            }
+            .hero p {
+                font-size: 0.9rem !important;
+            }
+            .hero span {
+                font-size: 12px !important;
+                padding: 4px 12px !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -18,26 +69,26 @@
             </button>
         </div>
 
-        <!-- Hero Section -->
+        <!-- Hero Section (আপডেটেড) -->
         <section class="hero">
-            <h1>📚 Premium <span class="gradient-text">Physics Notes</span></h1>
-            <p>Complete chapter-wise notes with detailed explanations & practice questions</p>
+            <h1>📚 <span class="gradient-text">Premium Learning Notes</span></h1>
+            <p>Complete notes, PYQs, and study materials for <strong>Maths & Science</strong></p>
             <div style="margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-                <span style="background:rgba(255,255,255,0.15);padding:6px 16px;border-radius:50px;font-size:14px;">✅ 8+ Chapters</span>
-                <span style="background:rgba(255,255,255,0.15);padding:6px 16px;border-radius:50px;font-size:14px;">✅ ₹1 Only</span>
-                <span style="background:rgba(255,255,255,0.15);padding:6px 16px;border-radius:50px;font-size:14px;">✅ Lifetime Access</span>
+                <span>✅ 100+ Chapters</span>
+                <span>✅ ₹1 Only</span>
+                <span>✅ PYQs Included</span>
             </div>
         </section>
 
         <!-- Post Grid -->
         <div class="post-grid">
-            <!-- Post 1 -->
+            <!-- Post 1: Physics -->
             <div class="post-card">
                 <span class="badge premium">🔒 Premium</span>
                 <div class="emoji">🧲</div>
                 <h2>Magnetic Effects of Current</h2>
                 <p class="preview">
-                    Understanding how electricity and magnetism are deeply connected is one of the most fascinating parts of Physics...
+                    Complete chapter with all formulas, derivations, and practice questions...
                 </p>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;">
                     <span class="price">₹1 <small>/-</small></span>
@@ -45,13 +96,13 @@
                 </div>
             </div>
 
-            <!-- Post 2 -->
+            <!-- Post 2: Maths -->
             <div class="post-card">
                 <span class="badge premium">🔒 Premium</span>
-                <div class="emoji">⚡</div>
-                <h2>Electrostatics</h2>
+                <div class="emoji">📐</div>
+                <h2>Calculus - Complete Guide</h2>
                 <p class="preview">
-                    Electric charge is the fundamental property of matter that causes it to experience a force...
+                    Differentiation, Integration, and Applications with solved examples...
                 </p>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;">
                     <span class="price">₹1 <small>/-</small></span>
@@ -59,13 +110,13 @@
                 </div>
             </div>
 
-            <!-- Post 3 -->
+            <!-- Post 3: PYQs -->
             <div class="post-card">
                 <span class="badge premium">🔒 Premium</span>
-                <div class="emoji">🔦</div>
-                <h2>Ray Optics</h2>
+                <div class="emoji">📝</div>
+                <h2>PYQs - Class 12 Physics</h2>
                 <p class="preview">
-                    Ray optics is the study of light as rays, including reflection, refraction, and optical instruments...
+                    Previous Year Questions with detailed solutions and marking schemes...
                 </p>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;">
                     <span class="price">₹1 <small>/-</small></span>
