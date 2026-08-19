@@ -4,62 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Get Access</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#f5f7fa,#c3cfe2);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
-        .container{max-width:450px;width:100%;background:#fff;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.1);}
-        h1{color:#1a1a2e;font-size:28px;text-align:center;}
-        .subtitle{text-align:center;color:#666;margin:10px 0 25px;}
-        .form-group{margin-bottom:20px;}
-        label{display:block;font-weight:600;color:#333;margin-bottom:6px;}
-        input,select{width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;}
-        input:focus,select:focus{outline:none;border-color:#1a73e8;}
-        .btn{width:100%;padding:14px;background:#43a047;color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:600;cursor:pointer;transition:0.3s;}
-        .btn:hover{background:#2e7d32;}
-        .note{text-align:center;font-size:13px;color:#888;margin-top:15px;}
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>📚 Get Access</h1>
-        <p class="subtitle">Enter your email to get started</p>
-        <form id="registerForm">
-            <div class="form-group">
-                <label>📧 Email Address</label>
-                <input type="email" id="userEmail" placeholder="student@example.com" required>
+    <div class="container" style="max-width:520px;margin:40px auto;">
+        <div class="glass-card">
+            <div style="text-align:center;">
+                <div style="font-size:48px;">📚</div>
+                <h1 style="font-size:28px;margin-top:10px;">Get <span class="gradient-text">Access</span></h1>
+                <p style="color:var(--gray);margin-bottom:24px;">Enter your email to get started</p>
             </div>
-            <div class="form-group">
-                <label>📖 Select Post</label>
-                <select id="postSelect">
-                    <option value="magnetic-effects">Magnetic Effects of Current (₹1)</option>
-                    <option value="electrostatics">Electrostatics (₹1)</option>
-                    <option value="optics">Ray Optics (₹1)</option>
-                </select>
-            </div>
-            <button type="submit" class="btn">🚀 Continue to Payment</button>
-        </form>
-        <p class="note">🔒 Your email will be used to verify your access link.</p>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>📧 Email Address</label>
+                    <input type="email" id="userEmail" placeholder="student@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>📖 Select Post</label>
+                    <select id="postSelect">
+                        <option value="magnetic-effects">Magnetic Effects of Current</option>
+                        <option value="electrostatics">Electrostatics</option>
+                        <option value="optics">Ray Optics</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width:100%;">
+                    🚀 Continue to Payment
+                </button>
+            </form>
+
+            <p style="text-align:center;font-size:13px;color:var(--gray);margin-top:16px;">
+                🔒 Your email will be used to verify your access link
+            </p>
+        </div>
     </div>
+
+    <script src="/js/main.js"></script>
     <script>
-        // =============================================
-        // রেজিস্টার ফর্ম - ইমেইল localStorage-এ সেভ করুন
-        // =============================================
-        document.getElementById('registerForm').onsubmit = function(e) {
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('userEmail').value.trim();
             const postId = document.getElementById('postSelect').value;
-            
-            if (!email || !email.includes('@')) { 
-                alert('Please enter a valid email.'); 
-                return; 
+
+            if (!isValidEmail(email)) {
+                Toast.show('Please enter a valid email address.', 'error');
+                return;
             }
-            
-            // ★★★ ইমেইল localStorage-এ সেভ করুন ★★★
-            localStorage.setItem('userEmail', email);
-            localStorage.setItem('postId', postId);
-            
+
+            setUserData(email, postId);
             window.location.href = `/checkout.html?post=${postId}&email=${encodeURIComponent(email)}`;
-        };
+        });
     </script>
 </body>
 </html>
