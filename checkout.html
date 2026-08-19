@@ -17,7 +17,6 @@
         .order-summary .value { font-size: 18px; font-weight: 700; color: var(--dark); }
         .order-summary .price-tag { font-size: 24px; font-weight: 700; color: #6C63FF; }
         .order-summary .sub { font-size: 13px; color: #888; margin-top: 4px; }
-
         .items-list {
             background: var(--white);
             border-radius: 10px;
@@ -34,7 +33,6 @@
         }
         .items-list .item:last-child { border-bottom: none; }
         .items-list .item .emoji { margin-right: 8px; }
-
         .highlight-box {
             background: #FFF8E1;
             border-radius: 10px;
@@ -45,6 +43,16 @@
             margin: 16px 0;
         }
         .highlight-box strong { color: #E65100; }
+        .hidden { display: none !important; }
+        .error-box {
+            background: #FFEBEE;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border-left: 4px solid #E53935;
+        }
+        .error-box h2 { color: #C62828; font-size: 20px; }
+        .error-box p { color: #666; margin: 8px 0; }
     </style>
 </head>
 <body>
@@ -59,8 +67,7 @@
             </div>
 
             <!-- ===== কন্টেন্ট ===== -->
-            <div id="content" style="display:none;">
-
+            <div id="content" class="hidden">
                 <!-- ইমেইল -->
                 <div style="background:var(--light-gray);padding:12px 16px;border-radius:12px;margin-bottom:16px;text-align:center;">
                     📧 <strong>Email:</strong> <span id="userEmailDisplay" style="color:var(--primary);"></span>
@@ -89,9 +96,7 @@
                 </div>
 
                 <!-- আইটেম ডিটেইলস -->
-                <div class="items-list" id="itemsList">
-                    <!-- JavaScript দিয়ে লোড হবে -->
-                </div>
+                <div class="items-list" id="itemsList"></div>
 
                 <!-- ফিচার -->
                 <ul style="list-style:none;margin:16px 0;">
@@ -136,27 +141,28 @@
             </div>
 
             <!-- ===== এরর ===== -->
-            <div id="notFound" style="display:none;text-align:center;padding:40px 0;">
-                <h2 style="color:var(--danger);">⚠️ Invalid Order</h2>
-                <p style="color:var(--gray);">Something went wrong. Please try again.</p>
-                <a href="/" class="btn btn-secondary" style="margin-top:16px;">← Go back home</a>
+            <div id="notFound" class="hidden">
+                <div class="error-box">
+                    <h2>⚠️ Invalid Order</h2>
+                    <p>We couldn't find your order details. Please try again.</p>
+                    <a href="/" class="btn btn-primary" style="margin-top:12px;display:inline-block;">← Go back home</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="/js/main.js"></script>
     <script>
         // =============================================
-        // ইউআরএল থেকে ডেটা নিন
+        // ১. URL থেকে ডেটা নিন
         // =============================================
         const urlParams = new URLSearchParams(window.location.search);
         const type = urlParams.get('type') || 'package';
         const id = urlParams.get('id') || 'all';
-        const amount = parseInt(urlParams.get('amount')) || 49;
+        const amount = parseInt(urlParams.get('amount')) || 0;
         const email = urlParams.get('email') || localStorage.getItem('userEmail') || 'Not provided';
 
         // =============================================
-        // প্যাকেজ ডেটা
+        // ২. প্যাকেজ ডেটা
         // =============================================
         const PACKAGES = {
             'physics': {
@@ -183,7 +189,7 @@
         };
 
         // =============================================
-        // সিঙ্গেল আইটেম ডেটা
+        // ৩. সিঙ্গেল আইটেম ডেটা
         // =============================================
         const SINGLE_ITEMS = {
             'magnetic-effects': { title: '🧲 Magnetic Effects', price: 1 },
@@ -198,68 +204,66 @@
         };
 
         // =============================================
-        // পেজ লোড
+        // ৪. লোডিং শেষ
         // =============================================
         document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('userEmailDisplay').textContent = email;
 
+        // =============================================
+        // ৫. ডেটা প্রসেস
+        // =============================================
         let orderData = null;
 
         if (type === 'package') {
-            // ===== প্যাকেজ =====
             orderData = PACKAGES[id];
-            if (!orderData) {
-                document.getElementById('notFound').style.display = 'block';
-                return;
+            if (orderData) {
+                document.getElementById('orderEmoji').textContent = orderData.emoji;
+                document.getElementById('orderTitle').textContent = orderData.title;
+                document.getElementById('orderDesc').textContent = orderData.desc;
+                document.getElementById('orderType').textContent = '📦 Package';
+                document.getElementById('orderPrice').textContent = `₹${orderData.price}`;
+                document.getElementById('payAmount').textContent = `₹${orderData.price}`;
+
+                let itemsHtml = `<div style="font-weight:600;font-size:14px;margin-bottom:8px;">📄 Included Items:</div>`;
+                orderData.items.forEach(item => {
+                    itemsHtml += `<div class="item"><span>${item}</span><span>✅</span></div>`;
+                });
+                document.getElementById('itemsList').innerHTML = itemsHtml;
             }
-            document.getElementById('orderEmoji').textContent = orderData.emoji;
-            document.getElementById('orderTitle').textContent = orderData.title;
-            document.getElementById('orderDesc').textContent = orderData.desc;
-            document.getElementById('orderType').textContent = '📦 Package';
-            document.getElementById('orderPrice').textContent = `₹${orderData.price}`;
-            document.getElementById('payAmount').textContent = `₹${orderData.price}`;
-
-            // আইটেম লিস্ট
-            let itemsHtml = `<div style="font-weight:600;font-size:14px;margin-bottom:8px;">📄 Included Items:</div>`;
-            orderData.items.forEach(item => {
-                itemsHtml += `<div class="item"><span>${item}</span><span>✅</span></div>`;
-            });
-            document.getElementById('itemsList').innerHTML = itemsHtml;
-
         } else {
-            // ===== সিঙ্গেল =====
             orderData = SINGLE_ITEMS[id];
-            if (!orderData) {
-                document.getElementById('notFound').style.display = 'block';
-                return;
+            if (orderData) {
+                document.getElementById('orderEmoji').textContent = '📄';
+                document.getElementById('orderTitle').textContent = 'Single Item';
+                document.getElementById('orderDesc').textContent = orderData.title;
+                document.getElementById('orderType').textContent = '📄 Single Item';
+                document.getElementById('orderPrice').textContent = `₹${orderData.price}`;
+                document.getElementById('payAmount').textContent = `₹${orderData.price}`;
+                document.getElementById('itemsList').innerHTML = `
+                    <div class="item"><span>${orderData.title}</span><span>✅</span></div>
+                `;
             }
-            document.getElementById('orderEmoji').textContent = '📄';
-            document.getElementById('orderTitle').textContent = 'Single Item';
-            document.getElementById('orderDesc').textContent = orderData.title;
-            document.getElementById('orderType').textContent = '📄 Single Item';
-            document.getElementById('orderPrice').textContent = `₹${orderData.price}`;
-            document.getElementById('payAmount').textContent = `₹${orderData.price}`;
-
-            // আইটেম লিস্ট
-            document.getElementById('itemsList').innerHTML = `
-                <div class="item"><span>${orderData.title}</span><span>✅</span></div>
-            `;
         }
 
-        // ===== কন্টেন্ট দেখান =====
-        document.getElementById('content').style.display = 'block';
-        document.title = `Checkout - ${orderData.title}`;
+        // =============================================
+        // ৬. কন্টেন্ট বা এরর দেখান
+        // =============================================
+        document.getElementById('userEmailDisplay').textContent = email;
 
-        // =============================================
-        //  localStorage-এ অর্ডার ডেটা সেভ (admin-এর জন্য)
-        // =============================================
-        localStorage.setItem('lastOrder', JSON.stringify({
-            type: type,
-            id: id,
-            amount: amount,
-            email: email,
-            timestamp: new Date().toISOString()
-        }));
+        if (orderData) {
+            document.getElementById('content').classList.remove('hidden');
+            document.title = `Checkout - ${orderData.title}`;
+            // localStorage-এ সেভ
+            localStorage.setItem('lastOrder', JSON.stringify({
+                type: type,
+                id: id,
+                amount: orderData.price || 1,
+                email: email,
+                timestamp: new Date().toISOString()
+            }));
+        } else {
+            document.getElementById('notFound').classList.remove('hidden');
+            console.error('Invalid order:', { type, id, amount, email });
+        }
     </script>
 </body>
 </html>
