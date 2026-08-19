@@ -3,79 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Batch Token Generator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <title>Admin - Package Token Generator</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;padding:20px;}
+        .container{max-width:1000px;margin:0 auto;background:#fff;padding:30px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06);}
+        h1{color:#1a1a2e;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+        .section{background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:25px;border:1px solid #e0e0e0;}
+        .section h2{font-size:18px;color:#1a1a2e;margin-bottom:15px;}
+        label{display:block;font-weight:600;color:#333;margin-bottom:6px;font-size:14px;}
+        select,input,textarea{width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:14px;font-family:inherit;}
+        textarea{min-height:120px;resize:vertical;}
+        select:focus,input:focus,textarea:focus{outline:none;border-color:#1a73e8;}
+        .btn{background:#43a047;color:#fff;padding:12px 30px;border:none;border-radius:50px;font-size:16px;font-weight:600;cursor:pointer;transition:0.3s;}
+        .btn:hover{background:#2e7d32;transform:scale(1.02);}
+        .btn-secondary{background:#1a73e8;}
+        .btn-secondary:hover{background:#1557b0;}
+        .btn-danger{background:#e53935;}
+        .btn-danger:hover{background:#c62828;}
+        .result-box{background:#e8f5e9;padding:20px;border-radius:12px;margin-top:20px;display:none;border-left:4px solid #43a047;}
+        .result-box h3{color:#2e7d32;margin-bottom:10px;}
+        .token-list{max-height:300px;overflow-y:auto;background:#fff;padding:10px;border-radius:8px;margin:10px 0;}
+        .token-item{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;flex-wrap:wrap;gap:5px;}
+        .token-item:last-child{border-bottom:none;}
+        .token-item .email{font-weight:500;color:#1a1a2e;}
+        .token-item .token{font-family:monospace;color:#e53935;font-size:12px;word-break:break-all;}
+        .token-item .links{font-size:11px;color:#666;width:100%;}
+        .btn-copy{background:#1a1a2e;color:#fff;padding:8px 20px;border:none;border-radius:50px;cursor:pointer;font-size:13px;}
+        .btn-copy:hover{background:#333;}
+        .badge{display:inline-block;padding:3px 12px;border-radius:50px;font-size:12px;font-weight:600;}
+        .badge-success{background:#e8f5e9;color:#2e7d32;}
+        .badge-danger{background:#ffebee;color:#c62828;}
+        .row{display:flex;gap:15px;flex-wrap:wrap;}
+        .row .col{flex:1;min-width:200px;}
+        .header-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#f8f9fa;border-radius:10px;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+        .header-bar .user{font-weight:600;color:#1a1a2e;}
+        .header-bar .time{font-size:13px;color:#888;}
+        .btn-logout{background:#e53935;color:#fff;padding:8px 24px;border:none;border-radius:50px;cursor:pointer;font-weight:600;transition:0.3s;}
+        .btn-logout:hover{background:#c62828;}
+        .package-badge{display:inline-block;padding:2px 12px;border-radius:50px;font-size:11px;font-weight:600;margin-left:8px;}
+        .pkg-physics{background:#e3f2fd;color:#0d47a1;}
+        .pkg-maths{background:#e8f5e9;color:#1b5e20;}
+        .pkg-all{background:#fff3e0;color:#e65100;}
+        @media(max-width:600px){.container{padding:15px;}.row{flex-direction:column;}}
+    </style>
 </head>
 <body>
-    <div class="container" style="max-width:900px;margin:40px auto;">
-        <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--light-gray);border-radius:12px;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
+    <div class="container">
+        <!-- ===== লগআউট হেডার ===== -->
+        <div class="header-bar">
             <div>
-                <span style="font-weight:600;">👋 Welcome, Admin!</span>
-                <span style="font-size:13px;color:var(--gray);margin-left:10px;">Logged in: <span id="loginTimeDisplay"></span></span>
+                <span class="user">👋 Welcome, Admin!</span>
+                <span class="time" style="margin-left:10px;">Logged in: <span id="loginTimeDisplay"></span></span>
             </div>
-            <button onclick="handleLogout()" class="btn btn-danger" style="padding:8px 24px;font-size:14px;">🚪 Logout</button>
+            <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
         </div>
 
-        <h1 style="font-size:28px;margin-bottom:24px;">🔑 Batch Token Generator</h1>
-
-        <!-- Single Token -->
-        <div class="glass-card" style="margin-bottom:24px;">
-            <h2 style="font-size:18px;margin-bottom:16px;">📌 Single Token</h2>
-            <div style="display:flex;gap:16px;flex-wrap:wrap;">
-                <div style="flex:1;min-width:200px;">
-                    <label style="display:block;font-weight:600;font-size:14px;margin-bottom:6px;">Email</label>
-                    <input type="email" id="singleEmail" placeholder="student@example.com" style="width:100%;padding:12px 16px;border:2px solid #E5E7EB;border-radius:12px;">
+        <h1>🔑 Package Token Generator</h1>
+        
+        <!-- ===== সেকশন ১: একক টোকেন ===== -->
+        <div class="section">
+            <h2>📌 Single Token</h2>
+            <div class="row">
+                <div class="col">
+                    <label>📧 Email</label>
+                    <input type="email" id="singleEmail" placeholder="student@example.com">
                 </div>
-                <div style="flex:1;min-width:150px;">
-                    <label style="display:block;font-weight:600;font-size:14px;margin-bottom:6px;">Post</label>
-                    <select id="postSelect" style="width:100%;padding:12px 16px;border:2px solid #E5E7EB;border-radius:12px;">
-                        <option value="magnetic-effects">Magnetic Effects</option>
-                        <option value="electrostatics">Electrostatics</option>
-                        <option value="optics">Ray Optics</option>
+                <div class="col">
+                    <label>📦 Package</label>
+                    <select id="packageSelect">
+                        <option value="physics">⚛️ Physics Pack (₹49)</option>
+                        <option value="maths">📐 Maths Pack (₹39)</option>
+                        <option value="all">🌟 All Access (₹79)</option>
                     </select>
                 </div>
             </div>
-            <button onclick="generateSingle()" class="btn btn-primary" style="margin-top:12px;">🔓 Generate Single Token</button>
-        </div>
-
-        <!-- Bulk Token -->
-        <div class="glass-card" style="margin-bottom:24px;">
-            <h2 style="font-size:18px;margin-bottom:16px;">📦 Batch Tokens</h2>
-            <label style="display:block;font-weight:600;font-size:14px;margin-bottom:6px;">Enter Emails (one per line)</label>
-            <textarea id="bulkEmails" placeholder="student1@gmail.com&#10;student2@gmail.com&#10;student3@gmail.com" style="width:100%;padding:12px 16px;border:2px solid #E5E7EB;border-radius:12px;min-height:120px;"></textarea>
-            <div style="margin-top:12px;">
-                <label style="display:block;font-weight:600;font-size:14px;margin-bottom:6px;">Validity (days)</label>
-                <input type="number" id="validityDays" value="365" min="1" max="3650" style="width:100%;padding:12px 16px;border:2px solid #E5E7EB;border-radius:12px;">
+            <div class="row" style="margin-top:10px;">
+                <div class="col">
+                    <label>📅 Validity (days)</label>
+                    <input type="number" id="validityDays" value="365" min="1" max="3650">
+                </div>
             </div>
-            <button onclick="generateBulk()" class="btn btn-secondary" style="margin-top:12px;">📦 Generate Bulk Tokens</button>
+            <button class="btn" onclick="generateSingle()" style="margin-top:10px;">🔓 Generate Single Token</button>
         </div>
 
-        <!-- Result -->
-        <div id="result" class="glass-card" style="display:none;border-left:4px solid var(--success);">
-            <h3 style="color:var(--success);margin-bottom:12px;">✅ Tokens Generated!</h3>
+        <!-- ===== সেকশন ২: বাল্ক টোকেন ===== -->
+        <div class="section">
+            <h2>📦 Batch Tokens (Multiple Users)</h2>
+            <label>Enter Emails (one per line)</label>
+            <textarea id="bulkEmails" placeholder="student1@gmail.com&#10;student2@gmail.com&#10;student3@gmail.com"></textarea>
+            <div class="row" style="margin-top:10px;">
+                <div class="col">
+                    <label>📦 Package</label>
+                    <select id="bulkPackageSelect">
+                        <option value="physics">⚛️ Physics Pack</option>
+                        <option value="maths">📐 Maths Pack</option>
+                        <option value="all">🌟 All Access</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>📅 Validity (days)</label>
+                    <input type="number" id="bulkValidityDays" value="365" min="1" max="3650">
+                </div>
+            </div>
+            <button class="btn btn-secondary" onclick="generateBulk()" style="margin-top:10px;">📦 Generate Bulk Tokens</button>
+        </div>
+
+        <!-- ===== রেজাল্ট ===== -->
+        <div id="result" class="result-box">
+            <h3>✅ Tokens Generated!</h3>
             <div id="resultContent"></div>
-            <button onclick="copyResult()" class="btn btn-primary" style="padding:8px 20px;font-size:14px;">📋 Copy All</button>
-            <button onclick="downloadCSV()" class="btn btn-secondary" style="padding:8px 20px;font-size:14px;margin-left:10px;">📥 Download CSV</button>
+            <button class="btn-copy" onclick="copyResult()">📋 Copy All</button>
+            <button class="btn-copy" onclick="downloadCSV()" style="margin-left:10px;">📥 Download CSV</button>
         </div>
 
-        <!-- User List -->
-        <div class="glass-card" style="margin-top:24px;">
-            <h2 style="font-size:18px;margin-bottom:16px;">📊 User List</h2>
+        <!-- ===== ইউজার লিস্ট ===== -->
+        <div class="section" style="margin-top:20px;">
+            <h2>📊 User List</h2>
             <div id="userList" style="max-height:400px;overflow-y:auto;">
-                <p style="color:var(--gray);">No users yet. Generate tokens to see them here.</p>
+                <p style="color:#888;">No users yet. Generate tokens to see them here.</p>
             </div>
         </div>
     </div>
 
-    <script src="/js/main.js"></script>
     <script>
-        // ===== AUTH CHECK =====
-        if (!checkAuth()) { /* redirect handled in checkAuth */ }
+        // =============================================
+        // লগইন চেক
+        // =============================================
+        (function checkAuth() {
+            const isLoggedIn = localStorage.getItem('adminLoggedIn');
+            if (isLoggedIn !== 'true') {
+                window.location.href = '/admin-login.html';
+                return;
+            }
+            const loginTime = localStorage.getItem('adminLoginTime');
+            if (loginTime) {
+                const hours = (new Date() - new Date(loginTime)) / (1000 * 60 * 60);
+                if (hours > 24) {
+                    localStorage.removeItem('adminLoggedIn');
+                    localStorage.removeItem('adminLoginTime');
+                    window.location.href = '/admin-login.html';
+                    return;
+                }
+            }
+        })();
 
-        // ===== LOGOUT =====
+        // =============================================
+        // লগআউট
+        // =============================================
         function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
                 localStorage.removeItem('adminLoggedIn');
@@ -84,160 +159,273 @@
             }
         }
 
-        // ===== LOGIN TIME =====
-        document.addEventListener('DOMContentLoaded', () => {
+        // =============================================
+        // লগইন সময় দেখান
+        // =============================================
+        function showLoginTime() {
             const time = localStorage.getItem('adminLoginTime');
             if (time) {
                 document.getElementById('loginTimeDisplay').textContent = new Date(time).toLocaleString('en-IN');
             }
-        });
+        }
+        document.addEventListener('DOMContentLoaded', showLoginTime);
 
-        // ===== AUTO LOGOUT (15 min) =====
+        // =============================================
+        // অটো লগআউট (১৫ মিনিট)
+        // =============================================
         let inactivityTimer;
         function resetInactivityTimer() {
             clearTimeout(inactivityTimer);
             inactivityTimer = setTimeout(() => {
-                Toast.show('Session expired due to inactivity.', 'warning');
+                alert('Session expired due to inactivity. Please login again.');
                 handleLogout();
             }, 15 * 60 * 1000);
         }
-        ['click', 'keypress', 'scroll', 'mousemove'].forEach(event => {
-            document.addEventListener(event, resetInactivityTimer);
-        });
+        document.addEventListener('click', resetInactivityTimer);
+        document.addEventListener('keypress', resetInactivityTimer);
+        document.addEventListener('scroll', resetInactivityTimer);
+        document.addEventListener('mousemove', resetInactivityTimer);
         resetInactivityTimer();
 
-        // ===== DATA =====
+        // =============================================
+        // প্যাকেজ অনুযায়ী পোস্ট লিস্ট
+        // =============================================
+        const PACKAGE_POSTS = {
+            'physics': ['magnetic-effects', 'thermodynamics', 'optics', 'waves', 'electrostatics'],
+            'maths': ['calculus', 'algebra', 'trigonometry', 'statistics', 'coordinate-geometry'],
+            'all': ['magnetic-effects', 'thermodynamics', 'optics', 'waves', 'electrostatics', 
+                    'calculus', 'algebra', 'trigonometry', 'statistics', 'coordinate-geometry', 'pyqs-physics']
+        };
+
+        const PACKAGE_NAMES = {
+            'physics': '⚛️ Physics Pack',
+            'maths': '📐 Maths Pack',
+            'all': '🌟 All Access'
+        };
+
+        // =============================================
+        // ডেটা স্টোর
+        // =============================================
         let users = JSON.parse(localStorage.getItem('users') || '[]');
         let lastResult = [];
 
-        // ===== GENERATE TOKEN =====
-        function generateTokenForUser(email, postId) {
+        // =============================================
+        // টোকেন জেনারেট (প্যাকেজ সহ)
+        // =============================================
+        function generateTokenForUser(email, packageType, days) {
             const encodedEmail = btoa(email);
             const random = Math.random().toString(36).substring(2, 10);
             const timestamp = Date.now().toString(36);
             const token = 'prem_' + timestamp + '_' + encodedEmail + '_' + random;
+            
             const now = new Date();
-            const days = parseInt(document.getElementById('validityDays').value) || 365;
             const expiry = new Date(now);
-            expiry.setDate(expiry.getDate() + days);
+            expiry.setDate(expiry.getDate() + (days || 365));
+
+            const posts = PACKAGE_POSTS[packageType] || [];
+            const baseUrl = 'https://physics-premium.vercel.app'; // আপনার URL দিন
+
+            const links = posts.map(postId => ({
+                postId: postId,
+                link: `${baseUrl}/posts/2026/08/${postId}.html?token=${token}`
+            }));
+
             return {
-                email, postId, token,
+                email: email,
+                package: packageType,
+                packageName: PACKAGE_NAMES[packageType] || packageType,
+                token: token,
+                posts: posts,
+                links: links,
                 createdAt: now.toISOString(),
                 expiresAt: expiry.toISOString(),
                 isActive: true,
-                link: `https://physics-premium.vercel.app/posts/2026/08/${postId}.html?token=${token}`
+                // শুধু প্রথম লিংকটি দেখানোর জন্য (কপি করার সময় সব লিংক যায়)
+                primaryLink: links.length > 0 ? links[0].link : ''
             };
         }
 
-        // ===== GENERATE SINGLE =====
+        // =============================================
+        // সিঙ্গেল টোকেন
+        // =============================================
         function generateSingle() {
             const email = document.getElementById('singleEmail').value.trim();
-            const postId = document.getElementById('postSelect').value;
-            if (!email || !isValidEmail(email)) {
-                Toast.show('Please enter a valid email.', 'error');
+            const packageType = document.getElementById('packageSelect').value;
+            const days = parseInt(document.getElementById('validityDays').value) || 365;
+
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email.');
                 return;
             }
-            const result = generateTokenForUser(email, postId);
+
+            const result = generateTokenForUser(email, packageType, days);
             showResult([result]);
             saveUser(result);
-            Toast.show('✅ Token generated successfully!', 'success');
+            
+            // সাফল্যের বার্তা
+            const postCount = result.posts.length;
+            alert(`✅ Token generated for ${email}\n📦 Package: ${result.packageName}\n📄 ${postCount} posts included`);
         }
 
-        // ===== GENERATE BULK =====
+        // =============================================
+        // বাল্ক টোকেন
+        // =============================================
         function generateBulk() {
             const emails = document.getElementById('bulkEmails').value.split('\n')
                 .map(e => e.trim())
-                .filter(e => e && isValidEmail(e));
+                .filter(e => e && e.includes('@'));
+            
             if (emails.length === 0) {
-                Toast.show('Please enter at least one valid email.', 'error');
+                alert('Please enter at least one valid email.');
                 return;
             }
-            const postId = document.getElementById('postSelect').value;
-            const results = emails.map(email => generateTokenForUser(email, postId));
+
+            const packageType = document.getElementById('bulkPackageSelect').value;
+            const days = parseInt(document.getElementById('bulkValidityDays').value) || 365;
+
+            const results = emails.map(email => generateTokenForUser(email, packageType, days));
             showResult(results);
             results.forEach(user => saveUser(user));
-            Toast.show(`✅ ${results.length} tokens generated!`, 'success');
+
+            alert(`✅ ${results.length} tokens generated for ${packageType} package!`);
         }
 
-        // ===== SHOW RESULT =====
+        // =============================================
+        // রেজাল্ট দেখান
+        // =============================================
         function showResult(results) {
             lastResult = results;
             const container = document.getElementById('result');
             const content = document.getElementById('resultContent');
-            let html = `<div style="max-height:300px;overflow-y:auto;background:var(--white);padding:12px;border-radius:12px;">`;
+
+            let html = `<div class="token-list">`;
             results.forEach((user, i) => {
-                html += `<div style="display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;">
-                    <span style="font-weight:500;">${i+1}. ${user.email}</span>
-                    <span style="font-family:monospace;color:var(--secondary);font-size:12px;word-break:break-all;">${user.token}</span>
-                </div>`;
+                const postCount = user.posts.length;
+                const pkgClass = user.package === 'physics' ? 'pkg-physics' : 
+                                 user.package === 'maths' ? 'pkg-maths' : 'pkg-all';
+                html += `
+                    <div class="token-item">
+                        <span class="email">${i+1}. ${user.email}</span>
+                        <span class="token">${user.token}</span>
+                        <div class="links">
+                            <span class="package-badge ${pkgClass}">${user.packageName}</span>
+                            <span style="color:#888;font-size:11px;">📄 ${postCount} posts</span>
+                        </div>
+                    </div>
+                `;
             });
             html += `</div>`;
-            html += `<div style="margin-top:12px;font-size:14px;color:var(--gray);">
-                <strong>Total:</strong> ${results.length} tokens generated.<br>
-                <strong>Validity:</strong> ${document.getElementById('validityDays').value} days.
-                <br><strong>🔒 Security:</strong> Email is encrypted in token.
-            </div>`;
+
+            // সারাংশ
+            const totalPosts = results.reduce((sum, u) => sum + u.posts.length, 0);
+            html += `
+                <div style="margin-top:12px;font-size:14px;color:#555;">
+                    <strong>Total:</strong> ${results.length} users<br>
+                    <strong>Total Posts:</strong> ${totalPosts} posts<br>
+                    <strong>Validity:</strong> ${document.getElementById('validityDays')?.value || 365} days
+                </div>
+            `;
+
             content.innerHTML = html;
             container.style.display = 'block';
             renderUserList();
         }
 
-        // ===== SAVE USER =====
+        // =============================================
+        // ইউজার সেভ
+        // =============================================
         function saveUser(user) {
-            const existing = users.findIndex(u => u.email === user.email && u.postId === user.postId);
-            if (existing >= 0) users[existing] = user;
-            else users.push(user);
+            const existing = users.findIndex(u => u.email === user.email && u.package === user.package);
+            if (existing >= 0) {
+                users[existing] = user;
+            } else {
+                users.push(user);
+            }
             localStorage.setItem('users', JSON.stringify(users));
         }
 
-        // ===== RENDER USER LIST =====
+        // =============================================
+        // ইউজার লিস্ট রেন্ডার
+        // =============================================
         function renderUserList() {
             const container = document.getElementById('userList');
             if (users.length === 0) {
-                container.innerHTML = '<p style="color:var(--gray);">No users yet.</p>';
+                container.innerHTML = '<p style="color:#888;">No users yet.</p>';
                 return;
             }
+
             const sorted = [...users].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
             let html = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
-                <tr style="background:var(--light-gray);">
-                    <th style="padding:10px;text-align:left;">Email</th>
-                    <th style="padding:10px;text-align:left;">Token</th>
-                    <th style="padding:10px;text-align:left;">Expires</th>
-                    <th style="padding:10px;text-align:center;">Status</th>
+                <tr style="background:#f3f3f3;">
+                    <th style="padding:8px;text-align:left;">Email</th>
+                    <th style="padding:8px;text-align:left;">Package</th>
+                    <th style="padding:8px;text-align:left;">Posts</th>
+                    <th style="padding:8px;text-align:left;">Expires</th>
+                    <th style="padding:8px;text-align:center;">Status</th>
                 </tr>`;
+
             sorted.slice(0, 50).forEach(user => {
                 const isExpired = new Date(user.expiresAt) < new Date();
                 const status = isExpired ? 
-                    '<span style="background:#FCE4EC;color:#C62828;padding:3px 12px;border-radius:50px;font-size:12px;">Expired</span>' : 
-                    '<span style="background:#E8F5E9;color:#2E7D32;padding:3px 12px;border-radius:50px;font-size:12px;">Active</span>';
-                html += `<tr>
-                    <td style="padding:10px;">${user.email}</td>
-                    <td style="padding:10px;font-family:monospace;font-size:11px;word-break:break-all;">${user.token.substring(0, 30)}...</td>
-                    <td style="padding:10px;">${new Date(user.expiresAt).toLocaleDateString('en-IN')}</td>
-                    <td style="padding:10px;text-align:center;">${status}</td>
-                </tr>`;
+                    '<span class="badge badge-danger">Expired</span>' : 
+                    '<span class="badge badge-success">Active</span>';
+                const expiryDate = new Date(user.expiresAt).toLocaleDateString('en-IN');
+                const pkgClass = user.package === 'physics' ? 'pkg-physics' : 
+                                 user.package === 'maths' ? 'pkg-maths' : 'pkg-all';
+
+                html += `
+                    <tr>
+                        <td style="padding:8px;">${user.email}</td>
+                        <td style="padding:8px;">
+                            <span class="package-badge ${pkgClass}">${user.packageName || user.package}</span>
+                        </td>
+                        <td style="padding:8px;font-size:12px;">${user.posts ? user.posts.length : 0}</td>
+                        <td style="padding:8px;">${expiryDate}</td>
+                        <td style="padding:8px;text-align:center;">${status}</td>
+                    </tr>
+                `;
             });
+
             if (sorted.length > 50) {
-                html += `<tr><td colspan="4" style="padding:10px;text-align:center;color:var(--gray);">... and ${sorted.length - 50} more users</td></tr>`;
+                html += `<tr><td colspan="5" style="padding:8px;text-align:center;color:#888;">... and ${sorted.length - 50} more users</td></tr>`;
             }
+
             html += '</table>';
-            html += `<div style="margin-top:12px;font-size:13px;color:var(--gray);">Total: ${sorted.length} users</div>`;
+            html += `<div style="margin-top:10px;font-size:13px;color:#888;">Total: ${sorted.length} users</div>`;
+
             container.innerHTML = html;
         }
 
-        // ===== COPY =====
+        // =============================================
+        // কপি (সব লিংক সহ)
+        // =============================================
         function copyResult() {
             let text = '';
-            lastResult.forEach(user => text += `${user.email} → ${user.link}\n`);
-            copyToClipboard(text);
+            lastResult.forEach(user => {
+                text += `📧 ${user.email}\n`;
+                text += `📦 ${user.packageName}\n`;
+                user.links.forEach(link => {
+                    text += `  🔗 ${link.link}\n`;
+                });
+                text += '\n';
+            });
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Copied!');
+            });
         }
 
-        // ===== DOWNLOAD CSV =====
+        // =============================================
+        // CSV ডাউনলোড (সব লিংক সহ)
+        // =============================================
         function downloadCSV() {
-            let csv = 'Email,Post,Token,Link,Created,Expires\n';
+            let csv = 'Email,Package,Token,Posts,Link1,Link2,Link3,Link4,Link5,Created,Expires\n';
             lastResult.forEach(user => {
-                csv += `${user.email},${user.postId},${user.token},${user.link},${user.createdAt},${user.expiresAt}\n`;
+                const links = user.links.map(l => l.link).join('; ');
+                csv += `${user.email},${user.packageName},${user.token},"${user.posts.join('|')}","${links}",${user.createdAt},${user.expiresAt}\n`;
             });
+
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -247,7 +435,19 @@
             URL.revokeObjectURL(url);
         }
 
+        // =============================================
+        // পেজ লোড হলে ইউজার লিস্ট দেখান
+        // =============================================
         document.addEventListener('DOMContentLoaded', renderUserList);
+
+        // =============================================
+        // এন্টার কী প্রেস করলে জেনারেট হবে (সিঙ্গেল)
+        // =============================================
+        document.getElementById('singleEmail').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateSingle();
+            }
+        });
     </script>
 </body>
 </html>

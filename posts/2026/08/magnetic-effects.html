@@ -1,224 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Full Content - Magnetic Effects</title>
+    <title>Magnetic Effects of Current</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',sans-serif;background:#f5f7fa;padding:20px;}
-        .container{max-width:900px;margin:0 auto;background:#fff;padding:30px;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
-        h1{text-align:center;margin:20px 0;color:#1a1a2e;}
-        h2{color:#0d3b4f;border-left:4px solid #43a047;padding-left:12px;margin:25px 0 15px;}
-        .note-box{background:#fff8e1;border-left:4px solid #ff8f00;padding:12px 18px;border-radius:6px;margin:15px 0;}
-        .question-block{background:#fafcfe;border-radius:8px;padding:14px 16px;margin:16px 0;border:1px solid #e4eaef;}
-        .question-block details{background:#f4f8f4;padding:10px 14px;border-radius:8px;border-left:3px solid #43a047;margin-top:8px;}
-        .question-block details summary{cursor:pointer;color:#2e7d32;font-weight:bold;}
-        table{width:100%;border-collapse:collapse;margin:15px 0;}
-        table th,table td{border:1px solid #ddd;padding:10px;text-align:center;}
-        table th{background:#f3f3f3;}
-        .math{text-align:center;padding:10px 0;font-size:18px;}
-        .access-denied{text-align:center;padding:80px 20px;}
-        .access-denied h1{color:#e53935;font-size:2.5rem;}
-        .access-denied .btn{display:inline-block;background:#1a1a2e;color:#fff;padding:12px 40px;border-radius:50px;text-decoration:none;margin-top:20px;}
-        .access-denied .sub-text{color:#666;font-size:16px;margin:10px 0;}
-        @media(max-width:600px){.container{padding:15px;} table th,table td{padding:6px;font-size:14px;}}
+        body{font-family:Arial;background:#f5f7fa;padding:20px;}
+        .container{max-width:900px;margin:0 auto;background:#fff;padding:30px;border-radius:16px;}
+        h1{text-align:center;color:#1a1a2e;}
+        h2{color:#0d3b4f;border-left:4px solid #43a047;padding-left:12px;}
+        .note-box{background:#fff8e1;border-left:4px solid #ff8f00;padding:12px;border-radius:6px;}
+        .question-block{background:#fafcfe;padding:14px;border:1px solid #e4eaef;border-radius:8px;}
+        table{width:100%;border-collapse:collapse;}
+        th,td{border:1px solid #ddd;padding:10px;text-align:center;}
+        th{background:#f3f3f3;}
+        .math{text-align:center;padding:10px;font-size:18px;}
+        .access-denied{text-align:center;padding:80px;}
+        .access-denied h1{color:#e53935;}
+        .access-denied .btn{background:#1a1a2e;color:#fff;padding:12px 40px;border-radius:50px;text-decoration:none;}
     </style>
 </head>
 <body>
     <div class="container" id="contentContainer">
-        <div id="loadingMessage" style="text-align:center;padding:50px 0;color:#888;">⏳ Loading content...</div>
+        <div id="loadingMessage" style="text-align:center;padding:50px;color:#888;">⏳ Loading...</div>
     </div>
     <script>
-        // =============================================
-        // ১. URL থেকে টোকেন নিন
-        // =============================================
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
-        // =============================================
-        // ২. টোকেন থেকে ইমেইল বের করুন
-        // =============================================
         function extractEmailFromToken(token) {
             if (!token || !token.startsWith('prem_')) return null;
-            
             try {
                 const parts = token.split('_');
                 if (parts.length >= 3) {
-                    // দ্বিতীয় অংশটি হলো এনকোডেড ইমেইল
-                    const encodedEmail = parts[2];
-                    const email = atob(encodedEmail);
-                    return email;
+                    return atob(parts[2]);
                 }
-            } catch (e) {
-                return null;
-            }
+            } catch (e) { return null; }
             return null;
         }
 
-        // =============================================
-        // ৩. ইউজারের ব্রাউজার থেকে ইমেইল নিন
-        // =============================================
         function getUserEmail() {
-            // প্রথমে localStorage চেক করুন
-            const storedEmail = localStorage.getItem('userEmail');
-            if (storedEmail) return storedEmail;
-            
-            // URL থেকে ইমেইল নিন
-            const urlEmail = urlParams.get('email');
-            if (urlEmail) return urlEmail;
-            
-            return null;
+            return localStorage.getItem('userEmail') || urlParams.get('email') || null;
         }
 
-        // =============================================
-        // ৪. টোকেন ভেরিফিকেশন (টোকেন + ইমেইল)
-        // =============================================
         function isTokenValid(token) {
             if (!token) return false;
-            
-            // টেস্ট টোকেন (ডেভেলপমেন্টের জন্য)
-            if (token === 'test-token-2026') {
-                return true;
-            }
-            
-            // prem_ টোকেন চেক করুন
-            if (!token.startsWith('prem_')) {
-                return false;
-            }
-            
-            // টোকেন থেকে ইমেইল বের করুন
+            if (token === 'test-token-2026') return true;
+            if (!token.startsWith('prem_')) return false;
             const tokenEmail = extractEmailFromToken(token);
             if (!tokenEmail) return false;
-            
-            // ইউজারের ইমেইল নিন
             const userEmail = getUserEmail();
             if (!userEmail) return false;
-            
-            // দুটি ইমেইল মিলিয়ে দেখুন (case-insensitive)
             return tokenEmail.toLowerCase() === userEmail.toLowerCase();
         }
 
-        // =============================================
-        // ৫. কন্টেন্ট দেখান বা অ্যাক্সেস অস্বীকার করুন
-        // =============================================
         if (isTokenValid(token)) {
-            // ✅ বৈধ টোকেন → পুরো কন্টেন্ট দেখান
             container.innerHTML = `
-                <h1>PART I: Moving Charge and Magnetic Field</h1>
+                <h1>🧲 Magnetic Effects of Current</h1>
                 
-                <h2>1. Concept of Magnetic Field and Oersted's Experiment</h2>
-                <h3>Oersted's Experiment (The Accidental Discovery)</h3>
-                <p>In 1820, physicist Hans Christian Oersted noticed something amazing during a lecture: a compass needle deflected when placed near a wire carrying an electric current.</p>
-                <ul><li>When current flows from South to North, the North pole deflects towards West</li>
-                <li>If the direction is reversed, the deflection is also reversed</li></ul>
-                <div class="note-box"><strong>Memory Trick (SNOW Rule):</strong> South to North Over Wire → West</div>
+                <h2>1. Concept of Magnetic Field</h2>
+                <p>In 1820, Hans Christian Oersted discovered that a compass needle deflects when placed near a current-carrying wire.</p>
+                
+                <div class="note-box">
+                    <strong>Memory Trick (SNOW Rule):</strong> South to North Over Wire → West
+                </div>
 
                 <h2>2. Biot-Savart Law</h2>
                 <div class="math">dB = (μ₀/4π) × (I dl sinθ) / r²</div>
-                <p>Where μ₀ = 4π × 10⁻⁷ T m/A</p>
-                <h3>Applications</h3>
-                <p><strong>A. Straight conductor:</strong></p>
-                <div class="math">B = (μ₀I/4πa)(sinφ₁ + sinφ₂)</div>
-                <p><strong>B. Circular loop at center:</strong></p>
-                <div class="math">B = μ₀NI/2R</div>
-                <div class="question-block"><p><strong>Concept Check:</strong> If current is doubled and radius is halved, what happens to B?</p><details><summary>View Answer</summary><p>Becomes 4 times larger!</p></details></div>
+                
+                <div class="question-block">
+                    <p><strong>Concept Check:</strong> If current is doubled and radius is halved, what happens to B?</p>
+                    <details><summary>View Answer</summary><p>Becomes 4 times larger!</p></details>
+                </div>
 
                 <h2>3. Ampere's Circuital Law</h2>
                 <div class="math">∮ B·dl = μ₀I<sub>enclosed</sub></div>
-                <h3>Applications</h3>
-                <p><strong>Infinite straight wire:</strong></p>
-                <div class="math">B = μ₀I/2πr</div>
-                <p><strong>Solenoid:</strong></p>
-                <div class="math">B = μ₀nI</div>
-                <p>Where n = N/L (turns per unit length)</p>
 
                 <h2>4. Lorentz Force</h2>
                 <div class="math">F = qE + q(v × B)</div>
-                <ul><li>Electric force: F<sub>e</sub> = qE</li>
-                <li>Magnetic force: F<sub>m</sub> = qvB sinθ</li></ul>
 
                 <h2>5. Motion in Perpendicular B</h2>
-                <div class="math">qvB = mv²/r → r = mv/qB</div>
-                <p>Cyclotron frequency:</p>
+                <div class="math">r = mv/qB</div>
                 <div class="math">ν = qB/2πm</div>
 
                 <h2>6. Force on Current-Carrying Conductor</h2>
                 <div class="math">F = ILB sinθ</div>
-                <p><strong>Direction:</strong> Fleming's Left-Hand Rule</p>
 
                 <h2>7. Force Between Parallel Wires</h2>
                 <div class="math">F/L = μ₀I₁I₂/2πd</div>
-                <ul><li>Same direction: Attract</li>
-                <li>Opposite direction: Repel</li></ul>
-                <div class="note-box"><strong>Definition of 1 Ampere:</strong> Force of 2×10⁻⁷ N/m between two parallel wires 1m apart.</div>
+                
+                <div class="note-box">
+                    <strong>Definition of 1 Ampere:</strong> Force of 2×10⁻⁷ N/m between two parallel wires 1m apart.
+                </div>
 
                 <h2>8. Torque on a Loop</h2>
                 <div class="math">τ = NIAB sinθ</div>
-                <p>where m = NIA (magnetic moment)</p>
 
                 <h2>9. Moving Coil Galvanometer</h2>
                 <div class="math">I = (k/NAB)α</div>
-                <p>Current sensitivity: I<sub>s</sub> = NAB/k</p>
 
                 <h2>10. Conversion of Galvanometer</h2>
-                <table><tr><th>Device</th><th>Method</th><th>Formula</th></tr><tr><td>Ammeter</td><td>Shunt (S) in parallel</td><td>S = I<sub>g</sub>G/(I - I<sub>g</sub>)</td></tr><tr><td>Voltmeter</td><td>High resistance (R) in series</td><td>R = V/I<sub>g</sub> - G</td></tr></table>
+                <table>
+                    <tr><th>Device</th><th>Method</th><th>Formula</th></tr>
+                    <tr><td>Ammeter</td><td>Shunt (S) in parallel</td><td>S = I<sub>g</sub>G/(I - I<sub>g</sub>)</td></tr>
+                    <tr><td>Voltmeter</td><td>High resistance (R) in series</td><td>R = V/I<sub>g</sub> - G</td></tr>
+                </table>
 
-                <hr style="margin:50px 0;">
-
-                <h1>PART II: Magnetism and Matter</h1>
-                <h2>1. Current Loop as Magnetic Dipole</h2>
-                <div class="math">m = NIA</div>
-                <div class="note-box"><strong>Clock Rule:</strong> Clockwise → South, Counter-clockwise → North</div>
-
-                <h2>2. Revolving Electron</h2>
-                <div class="math">μ<sub>l</sub> = evr/2</div>
-                <p>Bohr magneton: μ<sub>B</sub> = eh/4πm<sub>e</sub> ≈ 9.27×10⁻²⁴ A m²</p>
-
-                <h2>3. Bar Magnet Field</h2>
-                <p><strong>Axial:</strong> B = (μ₀/4π)(2m/r³)</p>
-                <p><strong>Equatorial:</strong> B = (μ₀/4π)(m/r³)</p>
-
-                <h2>4. Torque on Dipole</h2>
-                <div class="math">τ = mB sinθ</div>
-
-                <h2>5. Magnetic Properties</h2>
-                <ul><li>Permeability: μ = B/H</li>
-                <li>Magnetization: I = m/V</li>
-                <li>Susceptibility: χ<sub>m</sub> = I/H</li></ul>
-
-                <h2>6. Hysteresis</h2>
-                <p>Lagging of B behind H. Area of loop = energy loss per cycle.</p>
-                <div class="note-box"><strong>Key points:</strong><ul><li>Retentivity: B remaining when H=0</li><li>Coercivity: H needed to make B=0</li><li>Permanent magnets: High retentivity & coercivity</li></ul></div>
-
-                <h2>7. Earth's Magnetism</h2>
-                <div class="math">B<sub>H</sub> = B cosδ, B<sub>V</sub> = B sinδ</div>
-                <p>tanδ = B<sub>V</sub>/B<sub>H</sub></p>
-
-                <h2>8. Magnetic Substances</h2>
-                <table><tr><th>Property</th><th>Diamagnetic</th><th>Paramagnetic</th><th>Ferromagnetic</th></tr><tr><td>Reaction</td><td>Repelled</td><td>Attracted</td><td>Strongly attracted</td></tr><tr><td>μ<sub>r</sub></td><td>< 1</td><td>> 1</td><td>>> 1</td></tr><tr><td>χ<sub>m</sub></td><td>Negative</td><td>Positive</td><td>Large positive</td></tr><tr><td>Examples</td><td>Water, Copper</td><td>Oxygen, Aluminum</td><td>Iron, Nickel</td></tr></table>
-
-                <h2>9. Electromagnets</h2>
-                <p>How to make stronger:</p>
-                <ul><li>More turns (N)</li>
-                <li>More current (I)</li>
-                <li>Soft iron core</li>
-                <li>Reduce air gap</li></ul>
-
-                <p style="text-align:center;margin-top:40px;color:#888;">© 2026 Learning Science - All Rights Reserved</p>
+                <p style="text-align:center;margin-top:40px;color:#888;">© 2026 Learning Science</p>
             `;
         } else {
-            // ❌ টোকেন অবৈধ → অ্যাক্সেস অস্বীকার
-            const userEmail = getUserEmail() || 'unknown';
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p class="sub-text">This link is not valid for your email.</p>
-                    <p class="sub-text" style="font-size:14px;color:#888;">
-                        Registered email: <strong>${userEmail}</strong>
-                    </p>
-                    <p class="sub-text" style="font-size:14px;color:#888;margin-top:5px;">
-                        Please use the email address you registered with.
-                    </p>
+                    <p>You need to purchase this content.</p>
                     <a href="/" class="btn">← Go back</a>
                 </div>
             `;

@@ -4,37 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Get Access</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .package-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .package-card:hover {
+            border-color: #6C63FF;
+            background: #f8f7ff;
+        }
+        .package-card.selected {
+            border-color: #6C63FF;
+            background: #f0eeff;
+            box-shadow: 0 0 0 3px rgba(108,99,255,0.2);
+        }
+        .package-card .name { font-weight: 600; font-size: 18px; }
+        .package-card .price { font-weight: 700; color: #6C63FF; font-size: 20px; }
+        .package-card .desc { font-size: 14px; color: #888; }
+        .package-card input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #6C63FF;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .package-card .info { flex: 1; margin-left: 14px; }
+    </style>
 </head>
 <body>
-    <div class="container" style="max-width:520px;margin:40px auto;">
+    <div class="container" style="max-width:560px;margin:40px auto;">
         <div class="glass-card">
             <div style="text-align:center;">
                 <div style="font-size:48px;">📚</div>
-                <h1 style="font-size:28px;margin-top:10px;">Get <span class="gradient-text">Access</span></h1>
-                <p style="color:var(--gray);margin-bottom:24px;">Enter your email to get started</p>
+                <h1 style="font-size:28px;margin-top:10px;">Choose Your <span class="highlight">Plan</span></h1>
+                <p style="color:var(--gray);margin-bottom:24px;">Select a package and enter your email to get started</p>
             </div>
 
             <form id="registerForm">
+                <!-- ===== প্যাকেজ সিলেক্ট ===== -->
+                <div class="form-group">
+                    <label>📦 Select Package</label>
+                    
+                    <label class="package-card" id="pkg-physics" onclick="selectPackage('physics')">
+                        <input type="radio" name="package" value="physics" checked>
+                        <span class="info">
+                            <span class="name">⚛️ Physics Pack</span>
+                            <span class="desc">All Physics chapters (Magnetic, Thermodynamics, etc.)</span>
+                        </span>
+                        <span class="price">₹49</span>
+                    </label>
+
+                    <label class="package-card" id="pkg-maths" onclick="selectPackage('maths')">
+                        <input type="radio" name="package" value="maths">
+                        <span class="info">
+                            <span class="name">📐 Maths Pack</span>
+                            <span class="desc">All Maths chapters (Calculus, Algebra, etc.)</span>
+                        </span>
+                        <span class="price">₹39</span>
+                    </label>
+
+                    <label class="package-card" id="pkg-all" onclick="selectPackage('all')">
+                        <input type="radio" name="package" value="all">
+                        <span class="info">
+                            <span class="name">🌟 All Access</span>
+                            <span class="desc">Everything — Physics + Maths + PYQs</span>
+                        </span>
+                        <span class="price">₹79</span>
+                    </label>
+                </div>
+
+                <!-- ===== ইমেইল ===== -->
                 <div class="form-group">
                     <label>📧 Email Address</label>
                     <input type="email" id="userEmail" placeholder="student@example.com" required>
                 </div>
 
-                <div class="form-group">
-                    <label>📖 Select Post</label>
-                    <select id="postSelect">
-                        <option value="magnetic-effects">Magnetic Effects of Current</option>
-                        <option value="electrostatics">Electrostatics</option>
-                        <option value="optics">Ray Optics</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="width:100%;">
-                    🚀 Continue to Payment
-                </button>
+                <button type="submit" class="btn btn-primary" style="width:100%;">🚀 Continue to Payment</button>
             </form>
 
             <p style="text-align:center;font-size:13px;color:var(--gray);margin-top:16px;">
@@ -43,21 +96,36 @@
         </div>
     </div>
 
-    <script src="/js/main.js"></script>
     <script>
+        function selectPackage(pkg) {
+            // সব কার্ড থেকে selected ক্লাস সরান
+            document.querySelectorAll('.package-card').forEach(el => el.classList.remove('selected'));
+            // নির্বাচিত কার্ডে selected ক্লাস যোগ করুন
+            document.getElementById('pkg-' + pkg).classList.add('selected');
+            // রেডিও বাটন চেক করুন
+            document.querySelector(`input[name="package"][value="${pkg}"]`).checked = true;
+        }
+
+        // ডিফল্ট: physics সিলেক্টেড
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('pkg-physics').classList.add('selected');
+        });
+
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('userEmail').value.trim();
-            const postId = document.getElementById('postSelect').value;
+            const selectedPackage = document.querySelector('input[name="package"]:checked').value;
 
             if (!isValidEmail(email)) {
                 Toast.show('Please enter a valid email address.', 'error');
                 return;
             }
 
-            setUserData(email, postId);
-            window.location.href = `/checkout.html?post=${postId}&email=${encodeURIComponent(email)}`;
+            // ইউজার ডেটা localStorage-এ সেভ করুন
+            setUserData(email, selectedPackage);
+            window.location.href = `/checkout.html?package=${selectedPackage}&email=${encodeURIComponent(email)}`;
         });
     </script>
+    <script src="/js/main.js"></script>
 </body>
 </html>

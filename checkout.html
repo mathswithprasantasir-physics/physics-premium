@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Premium Physics Notes</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Checkout</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -19,53 +17,56 @@
             </div>
 
             <div id="content" style="display:none;">
+                <!-- ইমেইল ডিসপ্লে -->
                 <div style="background:var(--light-gray);padding:12px 16px;border-radius:12px;margin-bottom:16px;text-align:center;">
-                    📧 <strong>Registered Email:</strong> <span id="userEmailDisplay" style="color:var(--primary);"></span>
+                    📧 <strong>Email:</strong> <span id="userEmailDisplay" style="color:var(--primary);"></span>
                 </div>
 
-                <div style="text-align:center;">
-                    <span class="post-emoji" id="postEmoji" style="font-size:48px;">📘</span>
-                    <div style="color:var(--gray);font-size:13px;text-transform:uppercase;letter-spacing:0.5px;" id="postCategory">Physics</div>
-                    <h1 id="postTitle" style="font-size:24px;margin:8px 0;">Post Title</h1>
-                    <p style="color:var(--gray);font-size:14px;" id="postDescription">Complete chapter with detailed explanations.</p>
+                <!-- প্যাকেজ ডিটেইলস -->
+                <div style="text-align:center;padding:10px 0;">
+                    <span id="packageEmoji" style="font-size:48px;">📦</span>
+                    <h1 id="packageTitle" style="font-size:24px;margin:8px 0;">Package Name</h1>
+                    <p id="packageDesc" style="color:var(--gray);font-size:14px;">Package description</p>
                 </div>
 
-                <div class="price-box" style="background:var(--light-gray);border-radius:12px;padding:18px;text-align:center;margin:16px 0;">
-                    <span class="price" style="font-size:32px;font-weight:700;color:var(--primary);" id="postPrice">₹1 <small>/-</small></span>
+                <!-- দাম -->
+                <div style="background:var(--light-gray);border-radius:12px;padding:18px;text-align:center;margin:16px 0;">
+                    <span style="font-size:32px;font-weight:700;color:var(--primary);" id="packagePrice">₹49</span>
                     <div style="font-size:13px;color:var(--gray);margin-top:4px;">⚡ Lifetime access • One-time payment</div>
                 </div>
 
-                <ul style="list-style:none;margin:16px 0;">
-                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);display:flex;align-items:center;gap:12px;">✅ Complete chapter with all topics</li>
-                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);display:flex;align-items:center;gap:12px;">✅ All formulas, derivations & diagrams</li>
-                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);display:flex;align-items:center;gap:12px;">✅ Practice questions with solutions</li>
-                    <li style="padding:10px 0;display:flex;align-items:center;gap:12px;">✅ Lifetime access & future updates</li>
+                <!-- ফিচার -->
+                <ul style="list-style:none;margin:16px 0;" id="featureList">
+                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);">✅ Complete chapters with all topics</li>
+                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);">✅ All formulas, derivations & diagrams</li>
+                    <li style="padding:10px 0;border-bottom:1px solid var(--light-gray);">✅ Practice questions with solutions</li>
+                    <li style="padding:10px 0;">✅ Lifetime access & future updates</li>
                 </ul>
 
                 <!-- Payment Section -->
                 <div style="background:var(--light-gray);border-radius:14px;padding:24px;text-align:center;border:2px dashed var(--gray);margin:20px 0;">
                     <h3 style="font-size:16px;margin-bottom:12px;">📱 Complete Payment to Unlock</h3>
 
-                    <div style="background:var(--white);padding:15px;border-radius:12px;display:inline-block;margin:5px auto 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980608289@jio&pn=Prasanta%20Naskar&am=1&cu=INR" alt="UPI QR Code" width="180" height="180" loading="lazy">
+                    <div style="background:var(--white);padding:15px;border-radius:12px;display:inline-block;margin:5px auto 12px;">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980608289@jio&pn=Prasanta%20Naskar&am=1&cu=INR" alt="QR" width="180" height="180" loading="lazy">
                     </div>
 
-                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px 20px;margin:12px 0;">
-                        <span style="background:var(--white);padding:8px 16px;border-radius:8px;border:1px solid #e0e0e0;font-size:14px;">📞 <strong>Mobile:</strong> 7980608289</span>
-                        <span style="background:var(--white);padding:8px 16px;border-radius:8px;border:1px solid #e0e0e0;font-size:14px;">💳 <strong>UPI:</strong> 7980608289@jio</span>
+                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:12px 0;">
+                        <span style="background:var(--white);padding:8px 16px;border-radius:8px;border:1px solid #e0e0e0;">📞 <strong>Mobile:</strong> 7980608289</span>
+                        <span style="background:var(--white);padding:8px 16px;border-radius:8px;border:1px solid #e0e0e0;">💳 <strong>UPI:</strong> 7980608289@jio</span>
                     </div>
 
-                    <div style="font-size:13px;color:var(--gray);text-align:left;background:#FFF8E1;padding:12px 16px;border-radius:8px;margin-top:10px;">
+                    <div style="font-size:13px;color:var(--gray);text-align:left;background:#FFF8E1;padding:12px 16px;border-radius:8px;">
                         <strong style="color:#E65100;">📌 How to complete:</strong><br>
-                        1️⃣ Scan QR Code or send ₹1 to UPI/mobile above.<br>
+                        1️⃣ Scan QR Code or send the amount to UPI/mobile above.<br>
                         2️⃣ Take screenshot of payment confirmation.<br>
                         3️⃣ Send screenshot on WhatsApp (button below).<br>
                         4️⃣ We'll send your access link within 5-10 minutes. ✅
                     </div>
 
-                    <a href="https://wa.me/917980608289?text=Hi%2C%20I%20have%20paid%20₹1%20for%20the%20physics%20notes.%20Please%20send%20the%20access%20link." 
+                    <a href="https://wa.me/917980608289?text=Hi%2C%20I%20have%20paid%20for%20the%20package.%20Please%20send%20the%20access%20link." 
                        class="btn btn-success" style="width:100%;margin-top:16px;" target="_blank">
-                        💬 Send Payment Screenshot on WhatsApp
+                        💬 Send Payment Screenshot
                     </a>
                 </div>
 
@@ -76,8 +77,7 @@
             </div>
 
             <div id="notFound" style="display:none;text-align:center;padding:40px 0;">
-                <h2 style="color:var(--danger);">⚠️ Post Not Found</h2>
-                <p style="color:var(--gray);margin-top:10px;">The post you're looking for doesn't exist.</p>
+                <h2 style="color:var(--danger);">⚠️ Invalid Package</h2>
                 <a href="/" class="btn btn-secondary" style="margin-top:16px;">← Go back home</a>
             </div>
         </div>
@@ -86,28 +86,47 @@
     <script src="/js/main.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const postId = urlParams.get('post') || 'magnetic-effects';
+        const packageType = urlParams.get('package') || 'all';
         const email = urlParams.get('email') || localStorage.getItem('userEmail') || 'Not provided';
 
-        const POSTS = {
-            'magnetic-effects': { title: 'Magnetic Effects of Current', category: 'Physics', emoji: '🧲', price: 1 },
-            'electrostatics': { title: 'Electrostatics', category: 'Physics', emoji: '⚡', price: 1 },
-            'optics': { title: 'Ray Optics', category: 'Physics', emoji: '🔦', price: 1 }
+        // ===== প্যাকেজ ডেটা =====
+        const PACKAGES = {
+            'physics': {
+                title: '⚛️ Physics Pack',
+                desc: 'All Physics chapters — Magnetic Effects, Thermodynamics, Optics & more',
+                price: 49,
+                emoji: '⚛️',
+                posts: ['magnetic-effects', 'thermodynamics', 'optics']
+            },
+            'maths': {
+                title: '📐 Maths Pack',
+                desc: 'All Maths chapters — Calculus, Algebra, Trigonometry & more',
+                price: 39,
+                emoji: '📐',
+                posts: ['calculus', 'algebra', 'trigonometry']
+            },
+            'all': {
+                title: '🌟 All Access',
+                desc: 'Everything — Physics + Maths + PYQs',
+                price: 79,
+                emoji: '🌟',
+                posts: ['magnetic-effects', 'thermodynamics', 'calculus', 'pyqs-physics', 'optics', 'algebra']
+            }
         };
 
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('userEmailDisplay').textContent = email;
 
-        const post = POSTS[postId];
-        if (!post) {
+        const pkg = PACKAGES[packageType];
+        if (!pkg) {
             document.getElementById('notFound').style.display = 'block';
         } else {
             document.getElementById('content').style.display = 'block';
-            document.getElementById('postEmoji').textContent = post.emoji;
-            document.getElementById('postCategory').textContent = post.category;
-            document.getElementById('postTitle').textContent = post.title;
-            document.getElementById('postPrice').innerHTML = `₹${post.price} <small>/-</small>`;
-            document.title = `Checkout - ${post.title}`;
+            document.getElementById('packageEmoji').textContent = pkg.emoji;
+            document.getElementById('packageTitle').textContent = pkg.title;
+            document.getElementById('packageDesc').textContent = pkg.desc;
+            document.getElementById('packagePrice').innerHTML = `₹${pkg.price} <small>/-</small>`;
+            document.title = `Checkout - ${pkg.title}`;
         }
     </script>
 </body>
