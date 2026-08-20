@@ -292,7 +292,7 @@
         }
 
         // =============================================
-        // ৭. Razorpay পেমেন্ট ফাংশন
+        // ৭. Razorpay পেমেন্ট ফাংশন (LIVE KEY)
         // =============================================
         async function makePayment() {
             const email = document.getElementById('userEmailDisplay').textContent;
@@ -325,9 +325,9 @@
                     return;
                 }
 
-                // Razorpay চেকআউট
+                // Razorpay চেকআউট (LIVE KEY)
                 const options = {
-                    key: 'rzp_live_TRxBIL4jJG7L84',
+                    key: 'rzp_live_TRxBIL4jJG7L84', // ← LIVE KEY
                     amount: order.amount,
                     currency: order.currency || 'INR',
                     name: 'Premium Learning Notes',
