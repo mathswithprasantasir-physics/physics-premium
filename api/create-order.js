@@ -19,14 +19,12 @@ export default async function handler(req, res) {
 
         console.log('📦 Creating order...', { amount, email, packageName });
 
-        // Environment Variables চেক
+        // ===== Environment Variables =====
         const keyId = process.env.RAZORPAY_KEY_ID;
         const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-        console.log('🔑 Keys available:', { 
-            keyId: keyId ? '✅ Yes' : '❌ No', 
-            keySecret: keySecret ? '✅ Yes' : '❌ No' 
-        });
+        console.log('🔑 Key ID:', keyId ? '✅ Present' : '❌ Missing');
+        console.log('🔑 Key Secret:', keySecret ? '✅ Present' : '❌ Missing');
 
         if (!keyId || !keySecret) {
             return res.status(500).json({ 
@@ -36,11 +34,13 @@ export default async function handler(req, res) {
             });
         }
 
+        // ===== Razorpay ইনিশিয়ালাইজ =====
         const razorpay = new Razorpay({
             key_id: keyId,
             key_secret: keySecret,
         });
 
+        // ===== অর্ডার তৈরি =====
         const order = await razorpay.orders.create({
             amount: amount * 100,
             currency: 'INR',
