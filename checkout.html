@@ -341,46 +341,43 @@
                         color: '#6C63FF'
                     },
                     handler: function(response) {
-                        // পেমেন্ট ভেরিফাই
-                        fetch('/api/verify-payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                orderId: response.razorpay_order_id,
-                                paymentId: response.razorpay_payment_id,
-                                signature: response.razorpay_signature
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('✅ Payment successful! We will send your access link.');
-                                window.location.href = '/payment-success.html';
-                            } else {
-                                alert('❌ Payment verification failed. Please contact support.');
-                            }
-                        })
-                        .catch(err => {
-                            alert('❌ Something went wrong. Please try again.');
-                        });
-                    },
-                    modal: {
-                        ondismiss: function() {
-                            btn.textContent = '💳 Pay with Razorpay';
-                            btn.disabled = false;
-                        }
-                    }
-                };
-
-                const rzp = new Razorpay(options);
-                rzp.open();
-
-            } catch (error) {
-                console.error('Payment error:', error);
-                alert('❌ Something went wrong. Please try again.');
-                btn.textContent = '💳 Pay with Razorpay';
-                btn.disabled = false;
-            }
+    // ===== পেমেন্ট ডেটা =====
+    console.log('🔹 Razorpay Response:', response);
+    
+    // ===== URL থেকে email নিন =====
+    const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get('email') || localStorage.getItem('userEmail') || 'unknown@email.com';
+    const userPackage = document.getElementById('orderTitle').textContent;
+    const userAmount = parseInt(document.getElementById('orderPrice').textContent.replace('₹', '').trim());
+    
+    console.log('📧 Sending email to verify:', userEmail);
+    
+    fetch('/api/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderId: response.razorpay_order_id,
+            paymentId: response.razorpay_payment_id,
+            signature: response.razorpay_signature,
+            email: userEmail,           // ← email পাঠানো হচ্ছে
+            packageName: userPackage,
+            amount: userAmount
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ Payment successful! We will send your access link.');
+            window.location.href = '/payment-success.html';
+        } else {
+            alert('❌ Payment verification failed. Please contact support.');
+        }
+    })
+    .catch(err => {
+        console.error('Verification error:', err);
+        alert('❌ Something went wrong. Please try again.');
+    });
+}
         }
     </script>
 </body>
