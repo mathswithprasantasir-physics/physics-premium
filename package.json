@@ -1,0 +1,15 @@
+{
+  "name": "physics-premium",
+  "version": "1.0.0",
+  "description": "Premium Learning Notes with Payment System",
+  "main": "index.html",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "razorpay": "^2.8.0"
+  },
+  "keywords": ["physics", "notes", "premium", "learning"],
+  "author": "Prasanta Naskar",
+  "license": "MIT"
+}
