@@ -126,9 +126,9 @@ async function sendEmailJS(email, token, packageName) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                service_id: 'service_27gemli',
-                template_id: 'template_ycce885',
-                user_id: 'hViHPsxs_BAdnj5_O',
+                service_id: 'service_27gemli',       // ← Service ID
+                template_id: 'template_ycce885',      // ← Template ID
+                user_id: 'hViHPsxs_BAdnj5_O',        // ← Public Key (এটাই সঠিক)
                 template_params: {
                     to_email: email,
                     access_link: accessLink,
