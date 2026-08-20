@@ -126,9 +126,9 @@ async function sendEmailJS(email, token, packageName) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                service_id: process.env.EMAILJS_SERVICE_ID,
-                template_id: process.env.EMAILJS_TEMPLATE_ID,
-                user_id: process.env.EMAILJS_USER_ID,
+                service_id: 'service_27gemli',
+                template_id: 'template_ycce885',
+                user_id: 'hViHPsxs_BAdnj5_O',
                 template_params: {
                     to_email: email,
                     access_link: accessLink,
