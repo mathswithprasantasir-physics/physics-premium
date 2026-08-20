@@ -3,558 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Token Generator</title>
+    <title>Admin - Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;padding:20px;}
-        .container{max-width:1000px;margin:0 auto;background:#fff;padding:30px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06);}
-        h1{color:#1a1a2e;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
-        .section{background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:25px;border:1px solid #e0e0e0;}
-        .section h2{font-size:18px;color:#1a1a2e;margin-bottom:15px;}
-        label{display:block;font-weight:600;color:#333;margin-bottom:6px;font-size:14px;}
-        select,input,textarea{width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:14px;font-family:inherit;}
-        textarea{min-height:120px;resize:vertical;}
-        select:focus,input:focus,textarea:focus{outline:none;border-color:#1a73e8;}
-        .btn{background:#43a047;color:#fff;padding:12px 30px;border:none;border-radius:50px;font-size:16px;font-weight:600;cursor:pointer;transition:0.3s;}
-        .btn:hover{background:#2e7d32;transform:scale(1.02);}
-        .btn-secondary{background:#1a73e8;}
-        .btn-secondary:hover{background:#1557b0;}
-        .btn-danger{background:#e53935;}
-        .btn-danger:hover{background:#c62828;}
-        .btn-warning{background:#f39c12;}
-        .btn-warning:hover{background:#d68910;}
-        .result-box{background:#e8f5e9;padding:20px;border-radius:12px;margin-top:20px;display:none;border-left:4px solid #43a047;}
-        .result-box h3{color:#2e7d32;margin-bottom:10px;}
-        .token-list{max-height:300px;overflow-y:auto;background:#fff;padding:10px;border-radius:8px;margin:10px 0;}
-        .token-item{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;flex-wrap:wrap;gap:5px;}
-        .token-item:last-child{border-bottom:none;}
-        .token-item .email{font-weight:500;color:#1a1a2e;}
-        .token-item .token{font-family:monospace;color:#e53935;font-size:12px;word-break:break-all;}
-        .token-item .links{font-size:11px;color:#666;width:100%;}
-        .btn-copy{background:#1a1a2e;color:#fff;padding:8px 20px;border:none;border-radius:50px;cursor:pointer;font-size:13px;}
-        .btn-copy:hover{background:#333;}
-        .badge{display:inline-block;padding:3px 12px;border-radius:50px;font-size:12px;font-weight:600;}
-        .badge-success{background:#e8f5e9;color:#2e7d32;}
-        .badge-danger{background:#ffebee;color:#c62828;}
-        .badge-warning{background:#fff3e0;color:#e65100;}
-        .row{display:flex;gap:15px;flex-wrap:wrap;}
-        .row .col{flex:1;min-width:200px;}
-        .header-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#f8f9fa;border-radius:10px;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-        .header-bar .user{font-weight:600;color:#1a1a2e;}
-        .header-bar .time{font-size:13px;color:#888;}
-        .btn-logout{background:#e53935;color:#fff;padding:8px 24px;border:none;border-radius:50px;cursor:pointer;font-weight:600;transition:0.3s;}
-        .btn-logout:hover{background:#c62828;}
-        .package-badge{display:inline-block;padding:2px 12px;border-radius:50px;font-size:11px;font-weight:600;margin-left:8px;}
-        .pkg-physics{background:#e3f2fd;color:#0d47a1;}
-        .pkg-maths{background:#e8f5e9;color:#1b5e20;}
-        .pkg-all{background:#fff3e0;color:#e65100;}
-        .pkg-single{background:#fce4ec;color:#c62828;}
-        .mode-toggle {
-            display: flex;
-            background: var(--light-gray, #f0f2f5);
-            border-radius: 50px;
-            padding: 4px;
-            margin-bottom: 16px;
-            border: 1px solid #e0e0e0;
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
-        .mode-toggle .mode-btn {
-            flex: 1;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 50px;
-            background: transparent;
+        .stat-card {
+            background: var(--white);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #6C63FF;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #888;
+        }
+        .table-wrap {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        th {
+            background: #f8f9fa;
             font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.3s;
-            color: #666;
         }
-        .mode-toggle .mode-btn.active {
+        .badge-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+        }
+        .badge-warning {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+        }
+        .btn-sm {
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .btn-sm.primary {
             background: #6C63FF;
             color: #fff;
-            box-shadow: 0 2px 12px rgba(108,99,255,0.3);
         }
-        .mode-toggle .mode-btn:hover:not(.active) {
-            color: #1a1a2e;
+        .btn-sm.primary:hover {
+            background: #5a52d5;
         }
-        .hidden { display: none !important; }
-        @media(max-width:600px){.container{padding:15px;}.row{flex-direction:column;}}
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- ===== লগআউট হেডার ===== -->
-        <div class="header-bar">
+    <div class="container" style="max-width:1000px;margin:30px auto;">
+        <div class="header-bar" style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#f8f9fa;border-radius:12px;margin-bottom:20px;">
             <div>
-                <span class="user">👋 Welcome, Admin!</span>
-                <span class="time" style="margin-left:10px;">Logged in: <span id="loginTimeDisplay"></span></span>
+                <span style="font-weight:600;">👋 Admin Dashboard</span>
+                <span style="font-size:13px;color:#888;margin-left:10px;">Logged in: <span id="loginTimeDisplay"></span></span>
             </div>
-            <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
+            <button onclick="handleLogout()" style="background:#e53935;color:#fff;padding:8px 24px;border:none;border-radius:50px;cursor:pointer;">🚪 Logout</button>
         </div>
 
-        <h1>🔑 Token Generator</h1>
+        <h1>📊 Dashboard</h1>
 
-        <!-- ===== মোড টগল ===== -->
-        <div class="mode-toggle">
-            <button class="mode-btn active" id="modePackage" onclick="switchMode('package')">📦 Package</button>
-            <button class="mode-btn" id="modeSingle" onclick="switchMode('single')">📄 Single Post</button>
-        </div>
-
-        <!-- ===== প্যাকেজ মোড ===== -->
-        <div id="packageSection">
-            <div class="section">
-                <h2>📦 Package Token</h2>
-                <div class="row">
-                    <div class="col">
-                        <label>📧 Email</label>
-                        <input type="email" id="pkgEmail" placeholder="student@example.com">
-                    </div>
-                    <div class="col">
-                        <label>📦 Package</label>
-                        <select id="pkgSelect">
-                            <option value="physics">⚛️ Physics Pack (₹49)</option>
-                            <option value="maths">📐 Maths Pack (₹39)</option>
-                            <option value="all">🌟 All Access (₹79)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row" style="margin-top:10px;">
-                    <div class="col">
-                        <label>📅 Validity (days)</label>
-                        <input type="number" id="pkgValidity" value="365" min="1" max="3650">
-                    </div>
-                </div>
-                <button class="btn" onclick="generatePackageToken()" style="margin-top:10px;">🔓 Generate Package Token</button>
+        <!-- Stats -->
+        <div class="stats" id="statsContainer">
+            <div class="stat-card">
+                <div class="number" id="totalUsers">0</div>
+                <div class="label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="totalRevenue">₹0</div>
+                <div class="label">Total Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="todayUsers">0</div>
+                <div class="label">Today's Users</div>
             </div>
         </div>
 
-        <!-- ===== সিঙ্গেল মোড ===== -->
-        <div id="singleSection" class="hidden">
-            <div class="section">
-                <h2>📄 Single Post Token</h2>
-                <div class="row">
-                    <div class="col">
-                        <label>📧 Email</label>
-                        <input type="email" id="singleEmail" placeholder="student@example.com">
-                    </div>
-                    <div class="col">
-                        <label>📄 Select Post</label>
-                        <select id="singlePostSelect">
-                            <option value="magnetic-effects">🧲 Magnetic Effects</option>
-                            <option value="thermodynamics">🔥 Thermodynamics</option>
-                            <option value="optics">🔦 Ray Optics</option>
-                            <option value="electrostatics">⚡ Electrostatics</option>
-                            <option value="calculus">📐 Calculus</option>
-                            <option value="algebra">📊 Algebra</option>
-                            <option value="trigonometry">📏 Trigonometry</option>
-                            <option value="pyqs-physics">📝 PYQs Physics</option>
-                            <option value="pyqs-maths">📝 PYQs Maths</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row" style="margin-top:10px;">
-                    <div class="col">
-                        <label>📅 Validity (days)</label>
-                        <input type="number" id="singleValidity" value="365" min="1" max="3650">
-                    </div>
-                </div>
-                <button class="btn btn-secondary" onclick="generateSingleToken()" style="margin-top:10px;">🔓 Generate Single Token</button>
-            </div>
-        </div>
-
-        <!-- ===== বাল্ক টোকেন (প্যাকেজ) ===== -->
-        <div class="section">
-            <h2>📦 Bulk Tokens (Package)</h2>
-            <label>Enter Emails (one per line)</label>
-            <textarea id="bulkEmails" placeholder="student1@gmail.com&#10;student2@gmail.com&#10;student3@gmail.com"></textarea>
-            <div class="row" style="margin-top:10px;">
-                <div class="col">
-                    <label>📦 Package</label>
-                    <select id="bulkPkgSelect">
-                        <option value="physics">⚛️ Physics Pack</option>
-                        <option value="maths">📐 Maths Pack</option>
-                        <option value="all">🌟 All Access</option>
-                    </select>
-                </div>
-                <div class="col">
-                    <label>📅 Validity (days)</label>
-                    <input type="number" id="bulkValidity" value="365" min="1" max="3650">
-                </div>
-            </div>
-            <button class="btn btn-warning" onclick="generateBulkPackage()" style="margin-top:10px;">📦 Generate Bulk Package Tokens</button>
-        </div>
-
-        <!-- ===== রেজাল্ট ===== -->
-        <div id="result" class="result-box">
-            <h3>✅ Tokens Generated!</h3>
-            <div id="resultContent"></div>
-            <button class="btn-copy" onclick="copyResult()">📋 Copy All</button>
-            <button class="btn-copy" onclick="downloadCSV()" style="margin-left:10px;">📥 Download CSV</button>
-        </div>
-
-        <!-- ===== ইউজার লিস্ট ===== -->
-        <div class="section" style="margin-top:20px;">
-            <h2>📊 User List</h2>
-            <div id="userList" style="max-height:400px;overflow-y:auto;">
-                <p style="color:#888;">No users yet. Generate tokens to see them here.</p>
+        <!-- User List -->
+        <div class="glass-card">
+            <h2 style="font-size:18px;margin-bottom:12px;">📋 Recent Users</h2>
+            <div class="table-wrap">
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Package</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr><td colspan="6" style="text-align:center;color:#888;">No users yet</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
     <script>
-        // =============================================
-        // লগইন চেক
-        // =============================================
-        (function checkAuth() {
-            const isLoggedIn = localStorage.getItem('adminLoggedIn');
-            if (isLoggedIn !== 'true') {
-                window.location.href = '/admin-login.html';
-                return;
-            }
-            const loginTime = localStorage.getItem('adminLoginTime');
-            if (loginTime) {
-                const hours = (new Date() - new Date(loginTime)) / (1000 * 60 * 60);
-                if (hours > 24) {
-                    localStorage.removeItem('adminLoggedIn');
-                    localStorage.removeItem('adminLoginTime');
-                    window.location.href = '/admin-login.html';
-                    return;
-                }
-            }
-        })();
+        // ===== লগইন চেক =====
+        if (localStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = '/admin-login.html';
+        }
 
-        // =============================================
-        // লগআউট
-        // =============================================
         function handleLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('adminLoggedIn');
-                localStorage.removeItem('adminLoginTime');
-                window.location.href = '/admin-login.html';
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminLoginTime');
+            window.location.href = '/admin-login.html';
+        }
+
+        document.getElementById('loginTimeDisplay').textContent = 
+            new Date(localStorage.getItem('adminLoginTime')).toLocaleString('en-IN');
+
+        // ===== ইউজার ডেটা লোড =====
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/get-users');
+                const data = await response.json();
+                
+                if (data.users && data.users.length > 0) {
+                    updateStats(data.users);
+                    renderTable(data.users);
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
             }
         }
 
-        // =============================================
-        // লগইন সময় দেখান
-        // =============================================
-        function showLoginTime() {
-            const time = localStorage.getItem('adminLoginTime');
-            if (time) {
-                document.getElementById('loginTimeDisplay').textContent = new Date(time).toLocaleString('en-IN');
-            }
-        }
-        document.addEventListener('DOMContentLoaded', showLoginTime);
-
-        // =============================================
-        // অটো লগআউট (১৫ মিনিট)
-        // =============================================
-        let inactivityTimer;
-        function resetInactivityTimer() {
-            clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(() => {
-                alert('Session expired due to inactivity. Please login again.');
-                handleLogout();
-            }, 15 * 60 * 1000);
-        }
-        document.addEventListener('click', resetInactivityTimer);
-        document.addEventListener('keypress', resetInactivityTimer);
-        document.addEventListener('scroll', resetInactivityTimer);
-        document.addEventListener('mousemove', resetInactivityTimer);
-        resetInactivityTimer();
-
-        // =============================================
-        // মোড সুইচ
-        // =============================================
-        function switchMode(mode) {
-            document.getElementById('modePackage').classList.toggle('active', mode === 'package');
-            document.getElementById('modeSingle').classList.toggle('active', mode === 'single');
-            document.getElementById('packageSection').classList.toggle('hidden', mode === 'single');
-            document.getElementById('singleSection').classList.toggle('hidden', mode === 'package');
-        }
-
-        // =============================================
-        // প্যাকেজ অনুযায়ী পোস্ট লিস্ট
-        // =============================================
-        const PACKAGE_POSTS = {
-            'physics': ['magnetic-effects', 'thermodynamics', 'optics', 'electrostatics'],
-            'maths': ['calculus', 'algebra', 'trigonometry'],
-            'all': ['magnetic-effects', 'thermodynamics', 'optics', 'electrostatics', 
-                    'calculus', 'algebra', 'trigonometry', 'pyqs-physics', 'pyqs-maths']
-        };
-
-        const PACKAGE_NAMES = {
-            'physics': '⚛️ Physics Pack',
-            'maths': '📐 Maths Pack',
-            'all': '🌟 All Access'
-        };
-
-        const SINGLE_NAMES = {
-            'magnetic-effects': '🧲 Magnetic Effects',
-            'thermodynamics': '🔥 Thermodynamics',
-            'optics': '🔦 Ray Optics',
-            'electrostatics': '⚡ Electrostatics',
-            'calculus': '📐 Calculus',
-            'algebra': '📊 Algebra',
-            'trigonometry': '📏 Trigonometry',
-            'pyqs-physics': '📝 PYQs Physics',
-            'pyqs-maths': '📝 PYQs Maths'
-        };
-
-        // =============================================
-        // ডেটা স্টোর
-        // =============================================
-        let users = JSON.parse(localStorage.getItem('users') || '[]');
-        let lastResult = [];
-
-        // =============================================
-        // টোকেন জেনারেট (কোর ফাংশন)
-        // =============================================
-        function generateTokenForUser(email, postIds, packageType, days) {
-            const encodedEmail = btoa(email);
-            const random = Math.random().toString(36).substring(2, 10);
-            const timestamp = Date.now().toString(36);
-            const token = 'prem_' + timestamp + '_' + encodedEmail + '_' + random;
+        function updateStats(users) {
+            document.getElementById('totalUsers').textContent = users.length;
             
-            const now = new Date();
-            const expiry = new Date(now);
-            expiry.setDate(expiry.getDate() + (days || 365));
-
-            const baseUrl = 'https://physics-premium.vercel.app';
-            const links = postIds.map(postId => ({
-                postId: postId,
-                link: `${baseUrl}/posts/2026/08/${postId}.html?token=${token}`
-            }));
-
-            const packageName = packageType === 'single' ? SINGLE_NAMES[postIds[0]] || 'Single Post' : PACKAGE_NAMES[packageType] || packageType;
-
-            return {
-                email: email,
-                package: packageType,
-                packageName: packageName,
-                token: token,
-                posts: postIds,
-                links: links,
-                createdAt: now.toISOString(),
-                expiresAt: expiry.toISOString(),
-                isActive: true,
-                primaryLink: links.length > 0 ? links[0].link : ''
-            };
-        }
-
-        // =============================================
-        // প্যাকেজ টোকেন জেনারেট
-        // =============================================
-        function generatePackageToken() {
-            const email = document.getElementById('pkgEmail').value.trim();
-            const packageType = document.getElementById('pkgSelect').value;
-            const days = parseInt(document.getElementById('pkgValidity').value) || 365;
-
-            if (!email || !email.includes('@')) {
-                alert('Please enter a valid email.');
-                return;
-            }
-
-            const postIds = PACKAGE_POSTS[packageType] || [];
-            const result = generateTokenForUser(email, postIds, packageType, days);
-            showResult([result]);
-            saveUser(result);
+            const totalRevenue = users.reduce((sum, u) => sum + (u.amount || 0), 0);
+            document.getElementById('totalRevenue').textContent = `₹${totalRevenue}`;
             
-            alert(`✅ Token generated for ${email}\n📦 ${result.packageName}\n📄 ${postIds.length} posts included`);
+            const today = new Date().toDateString();
+            const todayUsers = users.filter(u => new Date(u.createdAt).toDateString() === today);
+            document.getElementById('todayUsers').textContent = todayUsers.length;
         }
 
-        // =============================================
-        // সিঙ্গেল টোকেন জেনারেট
-        // =============================================
-        function generateSingleToken() {
-            const email = document.getElementById('singleEmail').value.trim();
-            const postId = document.getElementById('singlePostSelect').value;
-            const days = parseInt(document.getElementById('singleValidity').value) || 365;
-
-            if (!email || !email.includes('@')) {
-                alert('Please enter a valid email.');
-                return;
-            }
-
-            const result = generateTokenForUser(email, [postId], 'single', days);
-            showResult([result]);
-            saveUser(result);
-            
-            alert(`✅ Token generated for ${email}\n📄 ${SINGLE_NAMES[postId] || postId}`);
-        }
-
-        // =============================================
-        // বাল্ক প্যাকেজ টোকেন
-        // =============================================
-        function generateBulkPackage() {
-            const emails = document.getElementById('bulkEmails').value.split('\n')
-                .map(e => e.trim())
-                .filter(e => e && e.includes('@'));
-            
-            if (emails.length === 0) {
-                alert('Please enter at least one valid email.');
-                return;
-            }
-
-            const packageType = document.getElementById('bulkPkgSelect').value;
-            const days = parseInt(document.getElementById('bulkValidity').value) || 365;
-            const postIds = PACKAGE_POSTS[packageType] || [];
-
-            const results = emails.map(email => generateTokenForUser(email, postIds, packageType, days));
-            showResult(results);
-            results.forEach(user => saveUser(user));
-
-            alert(`✅ ${results.length} tokens generated for ${PACKAGE_NAMES[packageType]}`);
-        }
-
-        // =============================================
-        // রেজাল্ট দেখান
-        // =============================================
-        function showResult(results) {
-            lastResult = results;
-            const container = document.getElementById('result');
-            const content = document.getElementById('resultContent');
-
-            let html = `<div class="token-list">`;
-            results.forEach((user, i) => {
-                const pkgClass = user.package === 'physics' ? 'pkg-physics' : 
-                                 user.package === 'maths' ? 'pkg-maths' : 
-                                 user.package === 'all' ? 'pkg-all' : 'pkg-single';
-                html += `
-                    <div class="token-item">
-                        <span class="email">${i+1}. ${user.email}</span>
-                        <span class="token">${user.token}</span>
-                        <div class="links">
-                            <span class="package-badge ${pkgClass}">${user.packageName}</span>
-                            <span style="color:#888;font-size:11px;">📄 ${user.posts.length} posts</span>
-                        </div>
-                    </div>
-                `;
-            });
-            html += `</div>`;
-
-            const totalPosts = results.reduce((sum, u) => sum + u.posts.length, 0);
-            html += `
-                <div style="margin-top:12px;font-size:14px;color:#555;">
-                    <strong>Total:</strong> ${results.length} users<br>
-                    <strong>Total Posts:</strong> ${totalPosts} posts<br>
-                    <strong>Validity:</strong> ${document.getElementById('pkgValidity')?.value || 365} days
-                </div>
-            `;
-
-            content.innerHTML = html;
-            container.style.display = 'block';
-            renderUserList();
-        }
-
-        // =============================================
-        // ইউজার সেভ
-        // =============================================
-        function saveUser(user) {
-            const existing = users.findIndex(u => u.email === user.email && u.package === user.package);
-            if (existing >= 0) {
-                users[existing] = user;
-            } else {
-                users.push(user);
-            }
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-
-        // =============================================
-        // ইউজার লিস্ট রেন্ডার
-        // =============================================
-        function renderUserList() {
-            const container = document.getElementById('userList');
+        function renderTable(users) {
+            const tbody = document.getElementById('userTableBody');
             if (users.length === 0) {
-                container.innerHTML = '<p style="color:#888;">No users yet.</p>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;">No users yet</td></tr>';
                 return;
             }
-
-            const sorted = [...users].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-            let html = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
-                <tr style="background:#f3f3f3;">
-                    <th style="padding:8px;text-align:left;">Email</th>
-                    <th style="padding:8px;text-align:left;">Package</th>
-                    <th style="padding:8px;text-align:left;">Posts</th>
-                    <th style="padding:8px;text-align:left;">Expires</th>
-                    <th style="padding:8px;text-align:center;">Status</th>
-                </tr>`;
-
-            sorted.slice(0, 50).forEach(user => {
-                const isExpired = new Date(user.expiresAt) < new Date();
-                const status = isExpired ? 
-                    '<span class="badge badge-danger">Expired</span>' : 
-                    '<span class="badge badge-success">Active</span>';
-                const expiryDate = new Date(user.expiresAt).toLocaleDateString('en-IN');
-                const pkgClass = user.package === 'physics' ? 'pkg-physics' : 
-                                 user.package === 'maths' ? 'pkg-maths' : 
-                                 user.package === 'all' ? 'pkg-all' : 'pkg-single';
-
-                html += `
-                    <tr>
-                        <td style="padding:8px;">${user.email}</td>
-                        <td style="padding:8px;">
-                            <span class="package-badge ${pkgClass}">${user.packageName || user.package}</span>
-                        </td>
-                        <td style="padding:8px;font-size:12px;">${user.posts ? user.posts.length : 0}</td>
-                        <td style="padding:8px;">${expiryDate}</td>
-                        <td style="padding:8px;text-align:center;">${status}</td>
-                    </tr>
-                `;
-            });
-
-            if (sorted.length > 50) {
-                html += `<tr><td colspan="5" style="padding:8px;text-align:center;color:#888;">... and ${sorted.length - 50} more users</td></tr>`;
-            }
-
-            html += '</table>';
-            html += `<div style="margin-top:10px;font-size:13px;color:#888;">Total: ${sorted.length} users</div>`;
-
-            container.innerHTML = html;
-        }
-
-        // =============================================
-        // কপি
-        // =============================================
-        function copyResult() {
-            let text = '';
-            lastResult.forEach(user => {
-                text += `📧 ${user.email}\n`;
-                text += `📦 ${user.packageName}\n`;
-                user.links.forEach(link => {
-                    text += `  🔗 ${link.link}\n`;
-                });
-                text += '\n';
-            });
             
-            navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Copied!');
-            });
+            tbody.innerHTML = users.slice(0, 20).map(user => `
+                <tr>
+                    <td>${user.email}</td>
+                    <td>${user.package || 'Unknown'}</td>
+                    <td>₹${user.amount || 0}</td>
+                    <td>${new Date(user.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td>
+                        <span class="${user.isActive ? 'badge-success' : 'badge-warning'}">
+                            ${user.isActive ? 'Active' : 'Expired'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-sm primary" onclick="resendLink('${user.email}')">📧 Resend</button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        // =============================================
-        // CSV ডাউনলোড
-        // =============================================
-        function downloadCSV() {
-            let csv = 'Email,Package,Token,Posts,Link1,Link2,Link3,Link4,Link5,Created,Expires\n';
-            lastResult.forEach(user => {
-                const links = user.links.map(l => l.link).join('; ');
-                csv += `${user.email},${user.packageName},${user.token},"${user.posts.join('|')}","${links}",${user.createdAt},${user.expiresAt}\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `tokens_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
+        async function resendLink(email) {
+            if (!confirm(`Send new access link to ${email}?`)) return;
+            
+            try {
+                const response = await fetch('/api/send-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, packageName: 'Premium Notes' })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ New access link sent to email!');
+                } else {
+                    alert('❌ Failed to send link.');
+                }
+            } catch (error) {
+                alert('❌ Something went wrong.');
+            }
         }
 
-        // =============================================
-        // পেজ লোড হলে ইউজার লিস্ট দেখান
-        // =============================================
-        document.addEventListener('DOMContentLoaded', renderUserList);
+        loadUsers();
     </script>
 </body>
 </html>
