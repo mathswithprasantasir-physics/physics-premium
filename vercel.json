@@ -14,6 +14,18 @@
       "dest": "/admin.html"
     },
     {
+      "src": "/admin-login.html",
+      "dest": "/admin-login.html"
+    },
+    {
+      "src": "/register.html",
+      "dest": "/register.html"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
       "src": "/posts/(.*)",
       "dest": "/posts/$1"
     }
