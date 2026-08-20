@@ -73,11 +73,28 @@
         .btn-sm.primary:hover {
             background: #5a52d5;
         }
+        .btn-sm.copy {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .btn-sm.copy:hover {
+            background: #333;
+        }
+        .token-text {
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
-    <div class="container" style="max-width:1000px;margin:30px auto;">
-        <div class="header-bar" style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#f8f9fa;border-radius:12px;margin-bottom:20px;">
+    <div class="container" style="max-width:1100px;margin:30px auto;">
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#f8f9fa;border-radius:12px;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
             <div>
                 <span style="font-weight:600;">👋 Admin Dashboard</span>
                 <span style="font-size:13px;color:#888;margin-left:10px;">Logged in: <span id="loginTimeDisplay"></span></span>
@@ -88,7 +105,7 @@
         <h1>📊 Dashboard</h1>
 
         <!-- Stats -->
-        <div class="stats" id="statsContainer">
+        <div class="stats">
             <div class="stat-card">
                 <div class="number" id="totalUsers">0</div>
                 <div class="label">Total Users</div>
@@ -107,19 +124,20 @@
         <div class="glass-card">
             <h2 style="font-size:18px;margin-bottom:12px;">📋 Recent Users</h2>
             <div class="table-wrap">
-                <table id="userTable">
+                <table>
                     <thead>
                         <tr>
                             <th>Email</th>
                             <th>Package</th>
                             <th>Amount</th>
                             <th>Date</th>
+                            <th>Token</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="userTableBody">
-                        <tr><td colspan="6" style="text-align:center;color:#888;">No users yet</td></tr>
+                        <tr><td colspan="7" style="text-align:center;color:#888;">No users yet</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -170,49 +188,57 @@
         function renderTable(users) {
             const tbody = document.getElementById('userTableBody');
             if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;">No users yet</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888;">No users yet</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = users.slice(0, 20).map(user => `
-                <tr>
-                    <td>${user.email}</td>
-                    <td>${user.package || 'Unknown'}</td>
-                    <td>₹${user.amount || 0}</td>
-                    <td>${new Date(user.createdAt).toLocaleDateString('en-IN')}</td>
-                    <td>
-                        <span class="${user.isActive ? 'badge-success' : 'badge-warning'}">
-                            ${user.isActive ? 'Active' : 'Expired'}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn-sm primary" onclick="resendLink('${user.email}')">📧 Resend</button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = users.slice(0, 20).map(user => {
+                const isActive = new Date(user.expiresAt) > new Date();
+                const shortToken = user.token ? user.token.substring(0, 20) + '...' : 'N/A';
+                const fullLink = `https://physics-premium.vercel.app/posts/2026/08/magnetic-effects.html?token=${user.token}`;
+                
+                return `
+                    <tr>
+                        <td style="font-size:12px;">${user.email}</td>
+                        <td>${user.package || 'Unknown'}</td>
+                        <td>₹${user.amount || 0}</td>
+                        <td>${new Date(user.createdAt).toLocaleDateString('en-IN')}</td>
+                        <td>
+                            <span class="token-text" title="${fullLink}">${shortToken}</span>
+                        </td>
+                        <td>
+                            <span class="${isActive ? 'badge-success' : 'badge-warning'}">
+                                ${isActive ? '✅ Active' : '⏰ Expired'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-sm copy" onclick="copyLink('${user.token}')">📋 Copy</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        async function resendLink(email) {
-            if (!confirm(`Send new access link to ${email}?`)) return;
+        // ===== লিংক কপি =====
+        function copyLink(token) {
+            const link = `https://physics-premium.vercel.app/posts/2026/08/magnetic-effects.html?token=${token}`;
             
-            try {
-                const response = await fetch('/api/send-token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, packageName: 'Premium Notes' })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    alert('✅ New access link sent to email!');
-                } else {
-                    alert('❌ Failed to send link.');
-                }
-            } catch (error) {
-                alert('❌ Something went wrong.');
-            }
+            navigator.clipboard.writeText(link).then(() => {
+                alert('✅ Link copied to clipboard!\n\nPaste it to send to user.');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = link;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                textarea.remove();
+                alert('✅ Link copied to clipboard!\n\nPaste it to send to user.');
+            });
         }
 
-        loadUsers();
+        // ===== পেজ লোড হলে =====
+        document.addEventListener('DOMContentLoaded', loadUsers);
     </script>
 </body>
 </html>

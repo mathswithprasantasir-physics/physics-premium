@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
 export default async function handler(req, res) {
+    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -14,18 +15,14 @@ export default async function handler(req, res) {
     }
 
     try {
-        // ===== সমস্ত বডি ডেটা লগ করুন =====
-        console.log('📦 Full request body:', req.body);
-
         const { orderId, paymentId, signature, email, packageName, amount } = req.body;
 
-        // ===== email চেক করুন =====
-        console.log('📧 Email received in verify:', email);
-        console.log('📧 Type of email:', typeof email);
+        console.log('📦 Full request body:', { orderId, paymentId, email, packageName, amount });
 
         const secret = process.env.RAZORPAY_KEY_SECRET;
         
         if (!secret) {
+            console.error('❌ RAZORPAY_KEY_SECRET not configured');
             return res.status(500).json({ 
                 success: false, 
                 message: 'Razorpay secret not configured' 
@@ -38,29 +35,25 @@ export default async function handler(req, res) {
             .digest('hex');
 
         if (generatedSignature === signature) {
-            // ✅ পেমেন্ট ভেরিফাই
-            
-            // email যদি undefined হয়, তাহলে ডিফল্ট সেট করুন
-            const userEmail = email || req.body.email || 'unknown@email.com';
-            const userPackage = packageName || req.body.packageName || 'Unknown';
-            const userAmount = amount || req.body.amount || 0;
+            console.log('✅ Payment verified for:', email);
 
-            const token = generateToken(userEmail, userPackage);
-            
-            console.log('✅ Payment verified for:', userEmail);
-            console.log('🔑 Token:', token);
+            const token = generateToken(email, packageName);
+            console.log('🔑 Token generated:', token);
 
-            // Google Sheets-এ সেভ
-            await saveUserToGoogleSheets(userEmail, userPackage, token, paymentId, userAmount);
+            // ১. Google Sheets-এ সেভ
+            await saveUserToGoogleSheets(email, packageName, token, paymentId, amount);
+
+            // ২. অটো ইমেইল পাঠান (EmailJS)
+            await sendEmailJS(email, token, packageName);
 
             res.status(200).json({
                 success: true,
                 paymentId: paymentId,
                 token: token,
-                email: userEmail,
-                message: 'Payment verified!'
+                message: 'Payment verified! Email sent.'
             });
         } else {
+            console.error('❌ Invalid signature');
             res.status(400).json({
                 success: false,
                 message: 'Invalid signature'
@@ -87,13 +80,10 @@ function generateToken(email, packageName) {
 async function saveUserToGoogleSheets(email, packageName, token, paymentId, amount) {
     try {
         const SHEET_URL = process.env.GOOGLE_SHEETS_WEBHOOK;
-
         if (!SHEET_URL) {
             console.warn('⚠️ GOOGLE_SHEETS_WEBHOOK not configured');
             return;
         }
-
-        console.log('📤 Sending to Google Sheets:', SHEET_URL);
 
         const userData = {
             email: email,
@@ -112,7 +102,6 @@ async function saveUserToGoogleSheets(email, packageName, token, paymentId, amou
         });
 
         const result = await response.json();
-
         if (result.success) {
             console.log('✅ User saved to Google Sheets:', email);
         } else {
@@ -120,5 +109,38 @@ async function saveUserToGoogleSheets(email, packageName, token, paymentId, amou
         }
     } catch (error) {
         console.error('❌ Database save error:', error.message);
+    }
+}
+
+// ===== EmailJS দিয়ে অটো ইমেইল =====
+async function sendEmailJS(email, token, packageName) {
+    try {
+        const baseUrl = process.env.BASE_URL || 'https://physics-premium.vercel.app';
+        const accessLink = `${baseUrl}/posts/2026/08/magnetic-effects.html?token=${token}`;
+        const expiryDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN');
+
+        console.log('📧 Sending email to:', email);
+        console.log('🔗 Access link:', accessLink);
+
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                service_id: process.env.EMAILJS_SERVICE_ID,
+                template_id: process.env.EMAILJS_TEMPLATE_ID,
+                user_id: process.env.EMAILJS_USER_ID,
+                template_params: {
+                    to_email: email,
+                    access_link: accessLink,
+                    expiry_date: expiryDate,
+                    package_name: packageName || 'Premium Notes'
+                }
+            })
+        });
+
+        const result = await response.json();
+        console.log('✅ EmailJS Response:', result);
+    } catch (error) {
+        console.error('❌ EmailJS error:', error.message);
     }
 }
