@@ -52,7 +52,7 @@ export default async function handler(req, res) {
             // ১. Google Sheets-এ সেভ
             await saveUserToGoogleSheets(email, packageName, token, paymentId, amount);
 
-            // ২. অটো ইমেইল পাঠান (EmailJS)
+            // ২. অটো ইমেইল পাঠান (EmailJS) — সরাসরি Public Key দিয়ে
             await sendEmailJS(email, token, packageName);
 
             res.status(200).json({
@@ -123,7 +123,7 @@ async function saveUserToGoogleSheets(email, packageName, token, paymentId, amou
     }
 }
 
-// ===== EmailJS দিয়ে অটো ইমেইল (100% ফাংশনাল) =====
+// ===== EmailJS দিয়ে অটো ইমেইল (সরাসরি Public Key দিয়ে) =====
 async function sendEmailJS(email, token, packageName) {
     try {
         const baseUrl = process.env.BASE_URL || 'https://physics-premium.vercel.app';
@@ -142,14 +142,14 @@ async function sendEmailJS(email, token, packageName) {
         console.log('🔗 Access link:', accessLink);
         console.log('📅 Expiry date:', formattedExpiry);
 
-        // ===== EmailJS API কল =====
+        // ===== EmailJS API কল — সরাসরি Public Key হার্ডকোড =====
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                service_id: process.env.EMAILJS_SERVICE_ID,
-                template_id: process.env.EMAILJS_TEMPLATE_ID,
-                user_id: process.env.EMAILJS_USER_ID,
+                service_id: 'service_27gemli',
+                template_id: 'template_ycce885',
+                user_id: 'hViHPsxs_BAdnj5_O',  // ← সরাসরি Public Key
                 template_params: {
                     to_email: email,
                     access_link: accessLink,
@@ -159,7 +159,6 @@ async function sendEmailJS(email, token, packageName) {
             })
         });
 
-        // ===== রেসপন্স চেক =====
         const text = await response.text();
         console.log('📦 Raw EmailJS Response:', text);
 
@@ -170,10 +169,8 @@ async function sendEmailJS(email, token, packageName) {
         } catch (e) {
             console.error('❌ EmailJS JSON Parse Error:', e);
             console.error('❌ Raw Response:', text);
-            // EmailJS Error হলে লগ করলেও API fail করবে না
         }
 
-        // EmailJS Success চেক
         if (response.ok) {
             console.log('✅ Email sent successfully to:', email);
         } else {
@@ -182,6 +179,5 @@ async function sendEmailJS(email, token, packageName) {
 
     } catch (error) {
         console.error('❌ EmailJS error:', error.message);
-        // Email fail করলেও main process fail করবে না
     }
 }
