@@ -126,21 +126,21 @@ async function sendEmailJS(email, token, packageName) {
         console.log('📧 Sending email to:', email);
         console.log('🔗 Access link:', accessLink);
 
-        // ===== EmailJS API Call (সঠিক ফরম্যাট) =====
+        // ===== EmailJS API Call (Template-এর সাথে মিলিয়ে ডেটা পাঠানো) =====
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                service_id: process.env.EMAILJS_SERVICE_ID, // service_27gemli
-                template_id: process.env.EMAILJS_TEMPLATE_ID, // template_ycce885
+                service_id: 'service_27gemli', // আপনার Service ID
+                template_id: 'template_ycce885', // আপনার Template ID
                 user_id: 'hViHPsxs_BAdnj5_O',  // Public Key
                 template_params: {
-                    to_email: email,
-                    access_link: accessLink,
-                    expiry_date: formattedExpiry,
-                    package_name: packageName || 'Premium Notes'
+                    name: 'Learning Science Premium', // Template-এ {{name}} আছে
+                    email: email,                     // Template-এ {{email}} আছে
+                    access_link: accessLink,          // Template-এ {{access_link}} আছে
+                    expiry_date: formattedExpiry      // Template-এ {{expiry_date}} আছে
                 }
             })
         });
