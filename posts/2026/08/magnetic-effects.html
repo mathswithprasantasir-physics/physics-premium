@@ -1,58 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magnetic Effects of Current</title>
     <style>
-        body{font-family:Arial;background:#f5f7fa;padding:20px;}
-        .container{max-width:900px;margin:0 auto;background:#fff;padding:30px;border-radius:16px;}
-        h1{text-align:center;color:#1a1a2e;}
-        h2{color:#0d3b4f;border-left:4px solid #43a047;padding-left:12px;}
-        .note-box{background:#fff8e1;border-left:4px solid #ff8f00;padding:12px;border-radius:6px;}
-        .question-block{background:#fafcfe;padding:14px;border:1px solid #e4eaef;border-radius:8px;}
-        table{width:100%;border-collapse:collapse;}
-        th,td{border:1px solid #ddd;padding:10px;text-align:center;}
-        th{background:#f3f3f3;}
-        .math{text-align:center;padding:10px;font-size:18px;}
-        .access-denied{text-align:center;padding:80px;}
-        .access-denied h1{color:#e53935;}
-        .access-denied .btn{background:#1a1a2e;color:#fff;padding:12px 40px;border-radius:50px;text-decoration:none;}
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; padding: 20px; margin: 0; }
+        .container { max-width: 900px; margin: 30px auto; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+        
+        h1 { text-align: center; color: #1a1a2e; font-size: 2.2rem; margin-bottom: 30px; border-bottom: 2px solid #6C63FF; padding-bottom: 15px; }
+        h2 { color: #0d3b4f; border-left: 5px solid #43a047; padding-left: 15px; margin-top: 30px; }
+        
+        .note-box { background: #fff8e1; border-left: 5px solid #ff8f00; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .question-block { background: #fafcfe; padding: 18px; border: 1px solid #e4eaef; border-radius: 8px; margin: 15px 0; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background: #f3f3f3; font-weight: 600; }
+        
+        .math { text-align: center; padding: 15px; font-size: 20px; font-weight: 600; color: #1a1a2e; background: #f0eeff; border-radius: 8px; margin: 15px 0; }
+        
+        .access-denied { text-align: center; padding: 80px 20px; }
+        .access-denied h1 { color: #e53935; border-bottom: none; }
+        .access-denied p { font-size: 18px; color: #666; margin-bottom: 30px; }
+        .access-denied .btn { background: #1a1a2e; color: #fff; padding: 14px 50px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 16px; display: inline-block; transition: 0.3s; }
+        .access-denied .btn:hover { background: #6C63FF; transform: scale(1.05); }
+
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 20px; margin: 10px; }
+            h1 { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
     <div class="container" id="contentContainer">
-        <div id="loadingMessage" style="text-align:center;padding:50px;color:#888;">⏳ Loading...</div>
+        <div id="loadingMessage" style="text-align:center;padding:50px;color:#888;font-size:18px;">⏳ Loading...</div>
     </div>
+
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
+        // =============================================
+        // ১. Token থেকে Email বের করার ফাংশন
+        // =============================================
         function extractEmailFromToken(token) {
             if (!token || !token.startsWith('prem_')) return null;
             try {
                 const parts = token.split('_');
+                // Token Format: prem_timestamp_encodedEmail_random
                 if (parts.length >= 3) {
-                    return atob(parts[2]);
+                    return atob(parts[2]); // Decode the base64 email
                 }
-            } catch (e) { return null; }
+            } catch (e) { 
+                console.error('Token decode error:', e);
+                return null; 
+            }
             return null;
         }
 
-        function getUserEmail() {
-            return localStorage.getItem('userEmail') || urlParams.get('email') || null;
-        }
-
+        // =============================================
+        // ২. Token Valid কিনা চেক করা (শুধু Token-এর ভিত্তিতে)
+        // =============================================
         function isTokenValid(token) {
             if (!token) return false;
+            
+            // Test Mode এর জন্য (যদি কখনো টেস্ট করতে হয়)
             if (token === 'test-token-2026') return true;
+            
+            // Token অবশ্যই 'prem_' দিয়ে শুরু হতে হবে
             if (!token.startsWith('prem_')) return false;
+            
+            // Token-এর ভেতরে Email থাকলেই সেটি Valid
             const tokenEmail = extractEmailFromToken(token);
-            if (!tokenEmail) return false;
-            const userEmail = getUserEmail();
-            if (!userEmail) return false;
-            return tokenEmail.toLowerCase() === userEmail.toLowerCase();
+            if (tokenEmail) return true;
+            
+            return false;
         }
 
+        // =============================================
+        // ৩. পেজ লোড হওয়ার সময় Token চেক করুন
+        // =============================================
         if (isTokenValid(token)) {
             container.innerHTML = `
                 <h1>🧲 Magnetic Effects of Current</h1>
@@ -105,14 +135,15 @@
                     <tr><td>Voltmeter</td><td>High resistance (R) in series</td><td>R = V/I<sub>g</sub> - G</td></tr>
                 </table>
 
-                <p style="text-align:center;margin-top:40px;color:#888;">© 2026 Learning Science</p>
+                <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science. All rights reserved.</p>
             `;
         } else {
+            // Access Denied UI
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p>You need to purchase this content.</p>
-                    <a href="/" class="btn">← Go back</a>
+                    <p>You do not have permission to view this content.<br>Please purchase the content first to get your unique access link.</p>
+                    <a href="/" class="btn">← Go back to Home</a>
                 </div>
             `;
         }
