@@ -44,7 +44,7 @@
         const container = document.getElementById('contentContainer');
 
         // =============================================
-        // Token থেকে Email বের করার ফাংশন
+        // ১. Token থেকে Email বের করার ফাংশন
         // =============================================
         function extractEmailFromToken(token) {
             if (!token || !token.startsWith('prem_')) return null;
@@ -60,7 +60,7 @@
         }
 
         // =============================================
-        // সঠিক Validation Logic (Device Lock)
+        // ২. সঠিক Validation Logic (শেয়ার প্রুফ)
         // =============================================
         function isTokenValid(token) {
             if (!token) return false;
@@ -71,15 +71,15 @@
             // Token অবশ্যই 'prem_' দিয়ে শুরু হতে হবে
             if (!token.startsWith('prem_')) return false;
             
-            // ১. Token থেকে Email বের করুন
+            // Token থেকে Email বের করুন
             const tokenEmail = extractEmailFromToken(token);
             if (!tokenEmail) return false;
 
-            // ২. ব্রাউজারে (LocalStorage) আগে থেকে সেভ করা Email আছে কিনা দেখুন
+            // ===== সবচেয়ে গুরুত্বপূর্ণ =====
+            // ব্রাউজারে LocalStorage-এ আগে থেকে সেভ করা Email-এর সাথে মিলিয়ে দেখুন
             const storedEmail = localStorage.getItem('userEmail');
 
-            // ৩. Token-এর Email আর LocalStorage-এর Email পুরোপুরি মিলতে হবে
-            // (আগে যেহেতু আমরা setItem করছিলাম, সেটা বাদ দিয়েছি)
+            // Token-এর Email এবং LocalStorage-এর Email পুরোপুরি মিলতে হবে
             if (storedEmail && storedEmail.toLowerCase() === tokenEmail.toLowerCase()) {
                 return true;
             }
@@ -88,7 +88,7 @@
         }
 
         // =============================================
-        // পেজ লোড হওয়ার সময় Token চেক করুন
+        // ৩. পেজ লোড হওয়ার সময় Token চেক করুন
         // =============================================
         if (isTokenValid(token)) {
             container.innerHTML = `
