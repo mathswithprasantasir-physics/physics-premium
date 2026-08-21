@@ -5,30 +5,39 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { token, email } = req.body;
+        const { token } = req.body;
 
-        if (!token || !email) {
-            return res.status(400).json({ valid: false, error: 'Missing token or email' });
+        if (!token) {
+            return res.status(400).json({ valid: false, error: 'Missing token' });
         }
 
-        // ===== Token থেকে Email বের করা =====
-        let tokenEmail = null;
-        try {
-            if (token.startsWith('prem_')) {
-                const parts = token.split('_');
-                if (parts.length >= 3) {
-                    tokenEmail = atob(parts[2]); // Decode base64
+        // Token Valid কিনা চেক করা (শুধুমাত্র Token-এর ভিত্তিতে)
+        let isValid = false;
+
+        // Test Token
+        if (token === 'test-token-2026') {
+            isValid = true;
+        } 
+        // Real Token চেক
+        else if (token.startsWith('prem_')) {
+            const parts = token.split('_');
+            if (parts.length >= 3) {
+                try {
+                    // Base64 Decode করে Email বের করা
+                    const decodedEmail = atob(parts[2]);
+                    if (decodedEmail && decodedEmail.includes('@')) {
+                        isValid = true; // Token-এ সঠিক Email থাকলেই Valid
+                    }
+                } catch (e) {
+                    isValid = false;
                 }
             }
-        } catch (e) {
-            tokenEmail = null;
         }
 
-        // ===== Token এবং Email মিলছে কিনা চেক =====
-        if (tokenEmail && tokenEmail.toLowerCase() === email.toLowerCase()) {
+        if (isValid) {
             return res.status(200).json({ valid: true });
         } else {
-            return res.status(200).json({ valid: false, error: 'Token does not match email' });
+            return res.status(200).json({ valid: false, error: 'Invalid token structure' });
         }
 
     } catch (error) {
