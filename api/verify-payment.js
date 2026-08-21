@@ -123,7 +123,7 @@ async function saveUserToGoogleSheets(email, packageName, token, paymentId, amou
     }
 }
 
-// ===== EmailJS দিয়ে অটো ইমেইল (সরাসরি Public Key দিয়ে) =====
+// ===== EmailJS দিয়ে অটো ইমেইল (Private Key + Public Key) =====
 async function sendEmailJS(email, token, packageName) {
     try {
         const baseUrl = process.env.BASE_URL || 'https://physics-premium.vercel.app';
@@ -142,25 +142,25 @@ async function sendEmailJS(email, token, packageName) {
         console.log('🔗 Access link:', accessLink);
         console.log('📅 Expiry date:', formattedExpiry);
 
-       // ===== EmailJS API কল — Private Key দিয়ে =====
-const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-    method: 'POST',
-    headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.EMAILJS_PRIVATE_KEY}`
-    },
-    body: JSON.stringify({
-        service_id: process.env.EMAILJS_SERVICE_ID,
-        template_id: process.env.EMAILJS_TEMPLATE_ID,
-        // user_id বাদ দিন
-        template_params: {
-            to_email: email,
-            access_link: accessLink,
-            expiry_date: formattedExpiry,
-            package_name: packageName || 'Premium Notes'
-        }
-    })
-});
+        // ===== EmailJS API কল — Private Key + Public Key =====
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.EMAILJS_PRIVATE_KEY}`
+            },
+            body: JSON.stringify({
+                service_id: process.env.EMAILJS_SERVICE_ID,
+                template_id: process.env.EMAILJS_TEMPLATE_ID,
+                user_id: 'hViHPsxs_BAdnj5_O',  // ← Public Key
+                template_params: {
+                    to_email: email,
+                    access_link: accessLink,
+                    expiry_date: formattedExpiry,
+                    package_name: packageName || 'Premium Notes'
+                }
+            })
+        });
 
         const text = await response.text();
         console.log('📦 Raw EmailJS Response:', text);
