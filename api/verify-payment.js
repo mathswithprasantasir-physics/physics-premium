@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 
 export default async function handler(req, res) {
-    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -17,7 +16,7 @@ export default async function handler(req, res) {
     try {
         const { orderId, paymentId, signature, email, packageName, amount } = req.body;
 
-        console.log('📦 verify-payment Body:', { orderId, paymentId, email, packageName, amount });
+        console.log('📦 Full request body:', { orderId, paymentId, email, packageName, amount });
 
         if (!email) {
             console.error('❌ Email is missing from request');
@@ -31,7 +30,6 @@ export default async function handler(req, res) {
             return res.status(500).json({ success: false, message: 'Razorpay secret not configured' });
         }
 
-        // Signature Verify
         const generatedSignature = crypto
             .createHmac('sha256', secret)
             .update(orderId + '|' + paymentId)
@@ -43,10 +41,8 @@ export default async function handler(req, res) {
             const token = generateToken(email, packageName);
             console.log('🔑 Token generated:', token);
 
-            // ১. Google Sheets-এ সেভ
             await saveUserToGoogleSheets(email, packageName, token, paymentId, amount);
 
-            // ২. অটো ইমেইল পাঠান
             await sendEmailJS(email, token, packageName);
 
             res.status(200).json({
@@ -65,9 +61,9 @@ export default async function handler(req, res) {
     }
 }
 
-// ===== টোকেন জেনারেট =====
+// ===== টোকেন জেনারেট (Node.js Buffer ব্যবহার করে) =====
 function generateToken(email, packageName) {
-    const encodedEmail = btoa(email);
+    const encodedEmail = Buffer.from(email).toString('base64');
     const random = Math.random().toString(36).substring(2, 10);
     const timestamp = Date.now().toString(36);
     return 'prem_' + timestamp + '_' + encodedEmail + '_' + random;
@@ -111,7 +107,7 @@ async function saveUserToGoogleSheets(email, packageName, token, paymentId, amou
     }
 }
 
-// ===== EmailJS (সঠিকভাবে) =====
+// ===== EmailJS দিয়ে অটো ইমেইল =====
 async function sendEmailJS(email, token, packageName) {
     try {
         const baseUrl = process.env.BASE_URL || 'https://physics-premium.vercel.app';
@@ -125,22 +121,22 @@ async function sendEmailJS(email, token, packageName) {
 
         console.log('📧 Sending email to:', email);
         console.log('🔗 Access link:', accessLink);
+        console.log('📅 Expiry date:', formattedExpiry);
 
-        // ===== EmailJS API Call (Template-এর সাথে মিলিয়ে ডেটা পাঠানো) =====
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                service_id: 'service_27gemli', // আপনার Service ID
-                template_id: 'template_ycce885', // আপনার Template ID
-                user_id: 'hViHPsxs_BAdnj5_O',  // Public Key
+                service_id: 'service_27gemli', 
+                template_id: 'template_ycce885',
+                user_id: 'hViHPsxs_BAdnj5_O',
                 template_params: {
-                    name: 'Learning Science Premium', // Template-এ {{name}} আছে
-                    email: email,                     // Template-এ {{email}} আছে
-                    access_link: accessLink,          // Template-এ {{access_link}} আছে
-                    expiry_date: formattedExpiry      // Template-এ {{expiry_date}} আছে
+                    name: 'Learning Science Premium',
+                    email: email,
+                    access_link: accessLink,
+                    expiry_date: formattedExpiry
                 }
             })
         });
