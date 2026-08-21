@@ -6,65 +6,22 @@
     <title>Checkout - Premium Learning Notes</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        .order-summary {
-            background: var(--light-gray);
-            border-radius: 12px;
-            padding: 18px 20px;
-            margin: 16px 0;
-            border-left: 4px solid #6C63FF;
-        }
+        .order-summary { background: var(--light-gray); border-radius: 12px; padding: 18px 20px; margin: 16px 0; border-left: 4px solid #6C63FF; }
         .order-summary .label { font-size: 13px; color: #888; }
         .order-summary .value { font-size: 18px; font-weight: 700; color: var(--dark); }
         .order-summary .price-tag { font-size: 24px; font-weight: 700; color: #6C63FF; }
         .order-summary .sub { font-size: 13px; color: #888; margin-top: 4px; }
-        .items-list {
-            background: var(--white);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin: 10px 0;
-            border: 1px solid #e0e0e0;
-        }
-        .items-list .item {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-        }
+        .items-list { background: var(--white); border-radius: 10px; padding: 12px 16px; margin: 10px 0; border: 1px solid #e0e0e0; }
+        .items-list .item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
         .items-list .item:last-child { border-bottom: none; }
-        .highlight-box {
-            background: #FFF8E1;
-            border-radius: 10px;
-            padding: 14px 16px;
-            font-size: 13px;
-            color: #555;
-            border-left: 4px solid #FFA000;
-            margin: 16px 0;
-        }
+        .highlight-box { background: #FFF8E1; border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #555; border-left: 4px solid #FFA000; margin: 16px 0; }
         .highlight-box strong { color: #E65100; }
         .hidden { display: none !important; }
-        .error-box {
-            background: #FFEBEE;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            border-left: 4px solid #E53935;
-        }
+        .error-box { background: #FFEBEE; border-radius: 12px; padding: 20px; text-align: center; border-left: 4px solid #E53935; }
         .error-box h2 { color: #C62828; font-size: 20px; }
         .error-box p { color: #666; margin: 8px 0; }
-        .payment-divider {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            color: #ccc;
-            font-size: 14px;
-        }
-        .payment-divider::before,
-        .payment-divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #e0e0e0;
-        }
+        .payment-divider { display: flex; align-items: center; margin: 20px 0; color: #ccc; font-size: 14px; }
+        .payment-divider::before, .payment-divider::after { content: ''; flex: 1; border-bottom: 1px solid #e0e0e0; }
         .payment-divider::before { margin-right: 15px; }
         .payment-divider::after { margin-left: 15px; }
     </style>
@@ -74,27 +31,22 @@
         <a href="/" class="btn btn-secondary" style="margin-bottom:16px;padding:10px 24px;font-size:14px;">← Back</a>
 
         <div class="glass-card">
-            <!-- ===== লোডিং ===== -->
             <div id="loadingState" style="text-align:center;padding:40px 0;">
                 <div class="spinner" style="margin:0 auto;"></div>
                 <p style="color:var(--gray);margin-top:12px;">Loading...</p>
             </div>
 
-            <!-- ===== কন্টেন্ট ===== -->
             <div id="content" class="hidden">
-                <!-- ইমেইল -->
                 <div style="background:var(--light-gray);padding:12px 16px;border-radius:12px;margin-bottom:16px;text-align:center;">
                     📧 <strong>Email:</strong> <span id="userEmailDisplay" style="color:var(--primary);"></span>
                 </div>
 
-                <!-- অর্ডার সারাংশ -->
                 <div style="text-align:center;">
                     <span id="orderEmoji" style="font-size:48px;">📦</span>
                     <h1 id="orderTitle" style="font-size:22px;margin:6px 0;">Order Summary</h1>
                     <p id="orderDesc" style="color:var(--gray);font-size:14px;">Package details</p>
                 </div>
 
-                <!-- আইটেম লিস্ট -->
                 <div class="order-summary">
                     <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
                         <div>
@@ -109,10 +61,8 @@
                     </div>
                 </div>
 
-                <!-- আইটেম ডিটেইলস -->
                 <div class="items-list" id="itemsList"></div>
 
-                <!-- ফিচার -->
                 <ul style="list-style:none;margin:16px 0;">
                     <li style="padding:8px 0;border-bottom:1px solid var(--light-gray);display:flex;align-items:center;gap:10px;">✅ Complete chapters with all topics</li>
                     <li style="padding:8px 0;border-bottom:1px solid var(--light-gray);display:flex;align-items:center;gap:10px;">✅ All formulas, derivations & diagrams</li>
@@ -120,16 +70,11 @@
                     <li style="padding:8px 0;display:flex;align-items:center;gap:10px;">✅ Lifetime access & future updates</li>
                 </ul>
 
-                <!-- ===== পেমেন্ট সেকশন ===== -->
                 <div style="background:var(--light-gray);border-radius:14px;padding:24px;text-align:center;border:2px dashed var(--gray);margin:16px 0;">
                     <h3 style="font-size:16px;margin-bottom:12px;">📱 Complete Payment</h3>
-
-                    <!-- QR Code -->
                     <div style="background:var(--white);padding:15px;border-radius:12px;display:inline-block;margin:5px auto 12px;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980608289@jio&pn=Prasanta%20Naskar&am=1&cu=INR" 
-                             alt="QR Code" width="180" height="180" loading="lazy">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7980608289@jio&pn=Prasanta%20Naskar&am=1&cu=INR" alt="QR Code" width="180" height="180" loading="lazy">
                     </div>
-
                     <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:12px 0;">
                         <span style="background:var(--white);padding:8px 16px;border-radius:8px;border:1px solid #e0e0e0;">📞 <strong>Mobile:</strong> 7980608289</span>
                         <span style="background:var(--white);padding:8px 16px;border-radius:8px;border:1px solid #e0e0e0;">💳 <strong>UPI:</strong> 7980608289@jio</span>
@@ -143,15 +88,12 @@
                         4️⃣ We'll send your access link within 5-10 minutes. ✅
                     </div>
 
-                    <a href="https://wa.me/917980608289?text=Hi%2C%20I%20have%20paid%20for%20my%20order.%20Please%20send%20the%20access%20link." 
-                       class="btn btn-success" style="width:100%;margin-top:12px;" target="_blank">
+                    <a href="https://wa.me/917980608289?text=Hi%2C%20I%20have%20paid%20for%20my%20order.%20Please%20send%20the%20access%20link." class="btn btn-success" style="width:100%;margin-top:12px;" target="_blank">
                         💬 Send Payment Screenshot on WhatsApp
                     </a>
 
-                    <!-- ===== Divider ===== -->
                     <div class="payment-divider">OR</div>
 
-                    <!-- ===== Razorpay বাটন ===== -->
                     <button onclick="makePayment()" class="btn btn-primary" style="width:100%;margin-top:12px;" id="razorpayBtn">
                         💳 Pay with Razorpay
                     </button>
@@ -164,7 +106,6 @@
                 </div>
             </div>
 
-            <!-- ===== এরর ===== -->
             <div id="notFound" class="hidden">
                 <div class="error-box">
                     <h2>⚠️ Invalid Order</h2>
@@ -175,49 +116,22 @@
         </div>
     </div>
 
-    <!-- ===== Razorpay SDK ===== -->
+    <!-- Razorpay SDK (Test Mode) -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
-        // =============================================
-        // ১. URL থেকে ডেটা নিন
-        // =============================================
         const urlParams = new URLSearchParams(window.location.search);
         const type = urlParams.get('type') || 'package';
         const id = urlParams.get('id') || 'all';
         const amount = parseInt(urlParams.get('amount')) || 0;
         const email = urlParams.get('email') || localStorage.getItem('userEmail') || 'Not provided';
 
-        // =============================================
-        // ২. প্যাকেজ ডেটা
-        // =============================================
         const PACKAGES = {
-            'physics': {
-                title: '⚛️ Physics Pack',
-                desc: 'All Physics chapters — Magnetic Effects, Thermodynamics, Optics & more',
-                price: 49,
-                emoji: '⚛️',
-                items: ['🧲 Magnetic Effects', '🔥 Thermodynamics', '🔦 Ray Optics', '⚡ Electrostatics', '🌊 Waves']
-            },
-            'maths': {
-                title: '📐 Maths Pack',
-                desc: 'All Maths chapters — Calculus, Algebra, Trigonometry & more',
-                price: 39,
-                emoji: '📐',
-                items: ['📐 Calculus', '📊 Algebra', '📏 Trigonometry', '📈 Statistics', '📍 Coordinate Geometry']
-            },
-            'all': {
-                title: '🌟 All Access',
-                desc: 'Everything — Physics + Maths + PYQs',
-                price: 79,
-                emoji: '🌟',
-                items: ['🧲 Magnetic Effects', '🔥 Thermodynamics', '📐 Calculus', '📊 Algebra', '📝 PYQs Physics', '📝 PYQs Maths']
-            }
+            'physics': { title: '⚛️ Physics Pack', desc: 'All Physics chapters — Magnetic Effects, Thermodynamics, Optics & more', price: 49, emoji: '⚛️', items: ['🧲 Magnetic Effects', '🔥 Thermodynamics', '🔦 Ray Optics', '⚡ Electrostatics', '🌊 Waves'] },
+            'maths': { title: '📐 Maths Pack', desc: 'All Maths chapters — Calculus, Algebra, Trigonometry & more', price: 39, emoji: '📐', items: ['📐 Calculus', '📊 Algebra', '📏 Trigonometry', '📈 Statistics', '📍 Coordinate Geometry'] },
+            'all': { title: '🌟 All Access', desc: 'Everything — Physics + Maths + PYQs', price: 79, emoji: '🌟', items: ['🧲 Magnetic Effects', '🔥 Thermodynamics', '📐 Calculus', '📊 Algebra', '📝 PYQs Physics', '📝 PYQs Maths'] }
         };
 
-        // =============================================
-        // ৩. সিঙ্গেল আইটেম ডেটা
-        // =============================================
         const SINGLE_ITEMS = {
             'magnetic-effects': { title: '🧲 Magnetic Effects', price: 1 },
             'thermodynamics': { title: '🔥 Thermodynamics', price: 1 },
@@ -230,14 +144,7 @@
             'pyqs-maths': { title: '📝 PYQs Maths', price: 1 }
         };
 
-        // =============================================
-        // ৪. লোডিং শেষ
-        // =============================================
         document.getElementById('loadingState').style.display = 'none';
-
-        // =============================================
-        // ৫. ডেটা প্রসেস
-        // =============================================
         let orderData = null;
 
         if (type === 'package') {
@@ -249,11 +156,8 @@
                 document.getElementById('orderType').textContent = '📦 Package';
                 document.getElementById('orderPrice').textContent = `₹${orderData.price}`;
                 document.getElementById('payAmount').textContent = `₹${orderData.price}`;
-
                 let itemsHtml = `<div style="font-weight:600;font-size:14px;margin-bottom:8px;">📄 Included Items:</div>`;
-                orderData.items.forEach(item => {
-                    itemsHtml += `<div class="item"><span>${item}</span><span>✅</span></div>`;
-                });
+                orderData.items.forEach(item => { itemsHtml += `<div class="item"><span>${item}</span><span>✅</span></div>`; });
                 document.getElementById('itemsList').innerHTML = itemsHtml;
             }
         } else {
@@ -265,35 +169,21 @@
                 document.getElementById('orderType').textContent = '📄 Single Item';
                 document.getElementById('orderPrice').textContent = `₹${orderData.price}`;
                 document.getElementById('payAmount').textContent = `₹${orderData.price}`;
-                document.getElementById('itemsList').innerHTML = `
-                    <div class="item"><span>${orderData.title}</span><span>✅</span></div>
-                `;
+                document.getElementById('itemsList').innerHTML = `<div class="item"><span>${orderData.title}</span><span>✅</span></div>`;
             }
         }
 
-        // =============================================
-        // ৬. কন্টেন্ট বা এরর দেখান
-        // =============================================
         document.getElementById('userEmailDisplay').textContent = email;
 
         if (orderData) {
             document.getElementById('content').classList.remove('hidden');
             document.title = `Checkout - ${orderData.title}`;
-            localStorage.setItem('lastOrder', JSON.stringify({
-                type: type,
-                id: id,
-                amount: orderData.price || 1,
-                email: email,
-                timestamp: new Date().toISOString()
-            }));
+            localStorage.setItem('lastOrder', JSON.stringify({ type: type, id: id, amount: orderData.price || 1, email: email, timestamp: new Date().toISOString() }));
         } else {
             document.getElementById('notFound').classList.remove('hidden');
             console.error('Invalid order:', { type, id, amount, email });
         }
 
-        // =============================================
-        // ৭. Razorpay পেমেন্ট ফাংশন (LIVE KEY)
-        // =============================================
         async function makePayment() {
             const email = document.getElementById('userEmailDisplay').textContent;
             const priceText = document.getElementById('orderPrice').textContent;
@@ -310,7 +200,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: amount,
+                        amount: amount, // রুপি থেকে পয়সা (Server-এ হবে)
                         email: email,
                         packageName: orderTitle
                     })
@@ -325,10 +215,10 @@
                     return;
                 }
 
-                // Razorpay চেকআউট
+                // Razorpay চেকআউট (Test Mode Key)
                 const options = {
-                    key: 'rzp_live_TRxBIL4jJG7L84',
-                    amount: order.amount,
+                    key: 'rzp_test_1DP5mmOlF5G5ag', // <--- TEST KEY এখানে বসান
+                    amount: order.amount, // Server থেকে পাওয়া amount (which is in paise)
                     currency: order.currency || 'INR',
                     name: 'Learning Science Premium',
                     description: orderTitle || 'Access to premium content',
@@ -337,14 +227,10 @@
                         email: email,
                         contact: '7980608289'
                     },
-                    theme: {
-                        color: '#6C63FF'
-                    },
+                    theme: { color: '#6C63FF' },
                     handler: function(response) {
-                        // ===== পেমেন্ট ডেটা =====
                         console.log('🔹 Razorpay Response:', response);
                         
-                        // ===== URL থেকে email নিন =====
                         const urlParams = new URLSearchParams(window.location.search);
                         const userEmail = urlParams.get('email') || localStorage.getItem('userEmail') || 'unknown@email.com';
                         const userPackage = document.getElementById('orderTitle').textContent;
