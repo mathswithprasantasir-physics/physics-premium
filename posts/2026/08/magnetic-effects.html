@@ -44,22 +44,11 @@
         const container = document.getElementById('contentContainer');
 
         // =============================================
-        // ১. LocalStorage থেকে Email বের করুন
-        // =============================================
-        const storedEmail = localStorage.getItem('userEmail');
-
-        // =============================================
-        // ২. Backend API দিয়ে Token Verify করুন
+        // ১. Backend API দিয়ে Token Verify করুন
         // =============================================
         async function verifyToken() {
             if (!token) {
                 showDenied();
-                return;
-            }
-
-            // Test Token (শুধু টেস্ট করার জন্য)
-            if (token === 'test-token-2026') {
-                showContent();
                 return;
             }
 
@@ -68,8 +57,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        token: token,
-                        email: storedEmail // LocalStorage থেকে Email পাঠানো হচ্ছে
+                        token: token
                     })
                 });
 
@@ -87,7 +75,7 @@
         }
 
         // =============================================
-        // ৩. Content Show করার ফাংশন
+        // ২. Content Show করার ফাংশন
         // =============================================
         function showContent() {
             container.innerHTML = `
@@ -146,20 +134,20 @@
         }
 
         // =============================================
-        // ৪. Access Denied Show করার ফাংশন
+        // ৩. Access Denied Show করার ফাংশন
         // =============================================
         function showDenied() {
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p>This link is not valid for this device/browser.<br>You must purchase the content and login with the same email to view it.</p>
+                    <p>This link is not valid.<br>You must purchase the content to get your unique access link.</p>
                     <a href="/" class="btn">← Go back to Home</a>
                 </div>
             `;
         }
 
         // =============================================
-        // ৫. পেজ লোড হওয়ার সময় Verify করুন
+        // ৪. পেজ লোড হওয়ার সময় Verify করুন
         // =============================================
         document.addEventListener('DOMContentLoaded', verifyToken);
     </script>
