@@ -44,53 +44,52 @@
         const container = document.getElementById('contentContainer');
 
         // =============================================
-        // ১. Token থেকে Email বের করার ফাংশন
+        // ১. LocalStorage থেকে Email বের করুন
         // =============================================
-        function extractEmailFromToken(token) {
-            if (!token || !token.startsWith('prem_')) return null;
+        const storedEmail = localStorage.getItem('userEmail');
+
+        // =============================================
+        // ২. Backend API দিয়ে Token Verify করুন
+        // =============================================
+        async function verifyToken() {
+            if (!token) {
+                showDenied();
+                return;
+            }
+
+            // Test Token (শুধু টেস্ট করার জন্য)
+            if (token === 'test-token-2026') {
+                showContent();
+                return;
+            }
+
             try {
-                const parts = token.split('_');
-                if (parts.length >= 3) {
-                    return atob(parts[2]); // Decode base64 email
+                const response = await fetch('/api/verify-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        email: storedEmail // LocalStorage থেকে Email পাঠানো হচ্ছে
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.valid) {
+                    showContent();
+                } else {
+                    showDenied();
                 }
-            } catch (e) { 
-                return null; 
+            } catch (error) {
+                console.error('Verification error:', error);
+                showDenied();
             }
-            return null;
         }
 
         // =============================================
-        // ২. সঠিক Validation Logic (শেয়ার প্রুফ)
+        // ৩. Content Show করার ফাংশন
         // =============================================
-        function isTokenValid(token) {
-            if (!token) return false;
-            
-            // Test Token
-            if (token === 'test-token-2026') return true;
-            
-            // Token অবশ্যই 'prem_' দিয়ে শুরু হতে হবে
-            if (!token.startsWith('prem_')) return false;
-            
-            // Token থেকে Email বের করুন
-            const tokenEmail = extractEmailFromToken(token);
-            if (!tokenEmail) return false;
-
-            // ===== সবচেয়ে গুরুত্বপূর্ণ =====
-            // ব্রাউজারে LocalStorage-এ আগে থেকে সেভ করা Email-এর সাথে মিলিয়ে দেখুন
-            const storedEmail = localStorage.getItem('userEmail');
-
-            // Token-এর Email এবং LocalStorage-এর Email পুরোপুরি মিলতে হবে
-            if (storedEmail && storedEmail.toLowerCase() === tokenEmail.toLowerCase()) {
-                return true;
-            }
-
-            return false;
-        }
-
-        // =============================================
-        // ৩. পেজ লোড হওয়ার সময় Token চেক করুন
-        // =============================================
-        if (isTokenValid(token)) {
+        function showContent() {
             container.innerHTML = `
                 <h1>🧲 Magnetic Effects of Current</h1>
                 
@@ -144,15 +143,25 @@
 
                 <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science. All rights reserved.</p>
             `;
-        } else {
+        }
+
+        // =============================================
+        // ৪. Access Denied Show করার ফাংশন
+        // =============================================
+        function showDenied() {
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p>This link is not valid for this device/browser.<br>Please use the link sent to your registered email only.</p>
+                    <p>This link is not valid for this device/browser.<br>You must purchase the content and login with the same email to view it.</p>
                     <a href="/" class="btn">← Go back to Home</a>
                 </div>
             `;
         }
+
+        // =============================================
+        // ৫. পেজ লোড হওয়ার সময় Verify করুন
+        // =============================================
+        document.addEventListener('DOMContentLoaded', verifyToken);
     </script>
 </body>
 </html>
