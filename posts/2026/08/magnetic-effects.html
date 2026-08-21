@@ -43,14 +43,19 @@
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
+        console.log('📌 Page loaded. Token from URL:', token);
+
         // =============================================
         // ১. Backend API দিয়ে Token Verify করুন
         // =============================================
         async function verifyToken() {
             if (!token) {
+                console.log('❌ No token found in URL');
                 showDenied();
                 return;
             }
+
+            console.log('📤 Sending token to backend for verification...');
 
             try {
                 const response = await fetch('/api/verify-token', {
@@ -62,14 +67,18 @@
                 });
 
                 const data = await response.json();
+                
+                console.log('📥 Backend response:', data);
 
                 if (data.valid) {
+                    console.log('✅ Token verified successfully. Showing content.');
                     showContent();
                 } else {
+                    console.log('❌ Backend says token is invalid. Showing denied.');
                     showDenied();
                 }
             } catch (error) {
-                console.error('Verification error:', error);
+                console.error('❌ Fetch error:', error);
                 showDenied();
             }
         }
