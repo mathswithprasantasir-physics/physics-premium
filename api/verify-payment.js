@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 
 export default async function handler(req, res) {
-    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -19,23 +18,16 @@ export default async function handler(req, res) {
 
         console.log('📦 Full request body:', { orderId, paymentId, email, packageName, amount });
 
-        // ===== Email চেক =====
         if (!email) {
             console.error('❌ Email is missing from request');
-            return res.status(400).json({
-                success: false,
-                message: 'Email is required'
-            });
+            return res.status(400).json({ success: false, message: 'Email is required' });
         }
 
         const secret = process.env.RAZORPAY_KEY_SECRET;
         
         if (!secret) {
             console.error('❌ RAZORPAY_KEY_SECRET not configured');
-            return res.status(500).json({ 
-                success: false, 
-                message: 'Razorpay secret not configured' 
-            });
+            return res.status(500).json({ success: false, message: 'Razorpay secret not configured' });
         }
 
         const generatedSignature = crypto
@@ -49,10 +41,9 @@ export default async function handler(req, res) {
             const token = generateToken(email, packageName);
             console.log('🔑 Token generated:', token);
 
-            // ১. Google Sheets-এ সেভ
             await saveUserToGoogleSheets(email, packageName, token, paymentId, amount);
 
-            // ২. অটো ইমেইল পাঠান (EmailJS) — সরাসরি Public Key দিয়ে
+            // EmailJS পাঠানো (সঠিকভাবে)
             await sendEmailJS(email, token, packageName);
 
             res.status(200).json({
@@ -63,21 +54,14 @@ export default async function handler(req, res) {
             });
         } else {
             console.error('❌ Invalid signature');
-            res.status(400).json({
-                success: false,
-                message: 'Invalid signature'
-            });
+            res.status(400).json({ success: false, message: 'Invalid signature' });
         }
     } catch (error) {
         console.error('❌ Verification error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: error.message 
-        });
+        res.status(500).json({ success: false, message: error.message });
     }
 }
 
-// ===== টোকেন জেনারেট =====
 function generateToken(email, packageName) {
     const encodedEmail = btoa(email);
     const random = Math.random().toString(36).substring(2, 10);
@@ -85,7 +69,6 @@ function generateToken(email, packageName) {
     return 'prem_' + timestamp + '_' + encodedEmail + '_' + random;
 }
 
-// ===== Google Sheets-এ সেভ =====
 async function saveUserToGoogleSheets(email, packageName, token, paymentId, amount) {
     try {
         const SHEET_URL = process.env.GOOGLE_SHEETS_WEBHOOK;
@@ -123,13 +106,11 @@ async function saveUserToGoogleSheets(email, packageName, token, paymentId, amou
     }
 }
 
-// ===== EmailJS দিয়ে অটো ইমেইল (Private Key + Public Key) =====
 async function sendEmailJS(email, token, packageName) {
     try {
         const baseUrl = process.env.BASE_URL || 'https://physics-premium.vercel.app';
         const accessLink = `${baseUrl}/posts/2026/08/magnetic-effects.html?token=${token}`;
         
-        // ✅ Expiry Date সঠিক ফরম্যাটে
         const expiryDate = new Date();
         expiryDate.setFullYear(expiryDate.getFullYear() + 1);
         const formattedExpiry = expiryDate.toLocaleDateString('en-IN', {
@@ -142,17 +123,16 @@ async function sendEmailJS(email, token, packageName) {
         console.log('🔗 Access link:', accessLink);
         console.log('📅 Expiry date:', formattedExpiry);
 
-        // ===== EmailJS API কল — Private Key + Public Key =====
+        // ===== EmailJS API কল (Bearer Token বাদ, শুধু Public Key) =====
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.EMAILJS_PRIVATE_KEY}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 service_id: process.env.EMAILJS_SERVICE_ID,
                 template_id: process.env.EMAILJS_TEMPLATE_ID,
-                user_id: 'hViHPsxs_BAdnj5_O',  // ← Public Key
+                user_id: 'hViHPsxs_BAdnj5_O',  // <--- আপনার Public Key
                 template_params: {
                     to_email: email,
                     access_link: accessLink,
@@ -171,7 +151,6 @@ async function sendEmailJS(email, token, packageName) {
             console.log('✅ EmailJS Response:', result);
         } catch (e) {
             console.error('❌ EmailJS JSON Parse Error:', e);
-            console.error('❌ Raw Response:', text);
         }
 
         if (response.ok) {
