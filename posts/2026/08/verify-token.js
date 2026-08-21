@@ -24,7 +24,7 @@ export default async function handler(req, res) {
             // Token format: prem_<timestamp>_<base64_email>_<random>
             if (parts.length >= 3) {
                 try {
-                    // Node.js Buffer দিয়ে সঠিক Base64 Decode
+                    // Node.js Buffer দিয়ে সঠিকভাবে Decode করুন
                     const decodedEmail = Buffer.from(parts[2], 'base64').toString('utf-8');
                     
                     if (decodedEmail && decodedEmail.includes('@')) {
