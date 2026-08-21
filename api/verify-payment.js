@@ -142,22 +142,27 @@ async function sendEmailJS(email, token, packageName) {
         console.log('🔗 Access link:', accessLink);
         console.log('📅 Expiry date:', formattedExpiry);
 
-        // ===== EmailJS API কল — সরাসরি Public Key হার্ডকোড =====
-        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                service_id: 'service_27gemli',
-                template_id: 'template_ycce885',
-                user_id: 'hViHPsxs_BAdnj5_O',  // ← সরাসরি Public Key
-                template_params: {
-                    to_email: email,
-                    access_link: accessLink,
-                    expiry_date: formattedExpiry,
-                    package_name: packageName || 'Premium Notes'
-                }
-            })
-        });
+       // ===== EmailJS API কল — Private Key দিয়ে =====
+const privateKey = 'X8yB60SM3DBdqN0jhqjEW';  // আপনার Private Key
+
+const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${privateKey}`
+    },
+    body: JSON.stringify({
+        service_id: 'service_27gemli',
+        template_id: 'template_ycce885',
+        // user_id বাদ দিন
+        template_params: {
+            to_email: email,
+            access_link: accessLink,
+            expiry_date: formattedExpiry,
+            package_name: packageName || 'Premium Notes'
+        }
+    })
+});
 
         const text = await response.text();
         console.log('📦 Raw EmailJS Response:', text);
