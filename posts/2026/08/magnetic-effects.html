@@ -50,34 +50,41 @@
             if (!token || !token.startsWith('prem_')) return null;
             try {
                 const parts = token.split('_');
-                // Token Format: prem_timestamp_encodedEmail_random
                 if (parts.length >= 3) {
-                    return atob(parts[2]); // Decode the base64 email
+                    return atob(parts[2]); // Decode base64 email
                 }
             } catch (e) { 
-                console.error('Token decode error:', e);
                 return null; 
             }
             return null;
         }
 
         // =============================================
-        // ২. Token Valid কিনা চেক করা (শুধু Token-এর ভিত্তিতে)
+        // ২. Token Valid কিনা চেক করা
         // =============================================
         function isTokenValid(token) {
             if (!token) return false;
             
-            // Test Mode এর জন্য (যদি কখনো টেস্ট করতে হয়)
+            // Test Token
             if (token === 'test-token-2026') return true;
             
             // Token অবশ্যই 'prem_' দিয়ে শুরু হতে হবে
             if (!token.startsWith('prem_')) return false;
             
-            // Token-এর ভেতরে Email থাকলেই সেটি Valid
+            // Token-এর ভেতরে Email থাকতে হবে
             const tokenEmail = extractEmailFromToken(token);
-            if (tokenEmail) return true;
+            if (!tokenEmail) return false;
+
+            // ===== সবচেয়ে গুরুত্বপূর্ণ অংশ =====
+            // Token থেকে পাওয়া Email-টা LocalStorage-এ সেভ করে দিন,
+            // যাতে মোবাইল ব্রাউজারেও এই ইউজারকে চেনা যায়।
+            localStorage.setItem('userEmail', tokenEmail);
+
+            // এখন LocalStorage-এর Email আর Token-এর Email মিলছে কিনা দেখুন
+            const storedEmail = localStorage.getItem('userEmail');
             
-            return false;
+            // মিলে গেলে Access দিবে, না মিললে Access Denied
+            return storedEmail === tokenEmail;
         }
 
         // =============================================
@@ -138,11 +145,10 @@
                 <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science. All rights reserved.</p>
             `;
         } else {
-            // Access Denied UI
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p>You do not have permission to view this content.<br>Please purchase the content first to get your unique access link.</p>
+                    <p>This link is not valid for this device/browser.<br>Please use the link sent to your registered email only.</p>
                     <a href="/" class="btn">← Go back to Home</a>
                 </div>
             `;
