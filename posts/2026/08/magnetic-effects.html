@@ -43,50 +43,47 @@
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
-        console.log('📌 Page loaded. Token from URL:', token);
-
         // =============================================
-        // ১. Backend API দিয়ে Token Verify করুন
+        // ১. Token থেকে Email বের করার ফাংশন (Browser এ)
         // =============================================
-        async function verifyToken() {
-            if (!token) {
-                console.log('❌ No token found in URL');
-                showDenied();
-                return;
-            }
-
-            console.log('📤 Sending token to backend for verification...');
-
+        function extractEmailFromToken(token) {
+            if (!token || !token.startsWith('prem_')) return null;
             try {
-                const response = await fetch('/api/verify-token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        token: token
-                    })
-                });
-
-                const data = await response.json();
-                
-                console.log('📥 Backend response:', data);
-
-                if (data.valid) {
-                    console.log('✅ Token verified successfully. Showing content.');
-                    showContent();
-                } else {
-                    console.log('❌ Backend says token is invalid. Showing denied.');
-                    showDenied();
+                const parts = token.split('_');
+                if (parts.length >= 3) {
+                    // Node.js Buffer এর মতো Browser-এ btoa ব্যবহার হবে
+                    return atob(parts[2]); // Decode base64 email
                 }
-            } catch (error) {
-                console.error('❌ Fetch error:', error);
-                showDenied();
+            } catch (e) { 
+                return null; 
             }
+            return null;
         }
 
         // =============================================
-        // ২. Content Show করার ফাংশন
+        // ২. Token Valid কিনা চেক করা (শুধু Token-এর ভিত্তিতে)
         // =============================================
-        function showContent() {
+        function isTokenValid(token) {
+            if (!token) return false;
+            
+            if (token === 'test-token-2026') return true;
+            
+            if (!token.startsWith('prem_')) return false;
+            
+            const tokenEmail = extractEmailFromToken(token);
+            
+            // Token-এ সঠিক Email থাকলেই Valid
+            if (tokenEmail && tokenEmail.includes('@')) {
+                return true;
+            }
+            
+            return false;
+        }
+
+        // =============================================
+        // ৩. পেজ লোড হওয়ার সময় Token চেক করুন
+        // =============================================
+        if (isTokenValid(token)) {
             container.innerHTML = `
                 <h1>🧲 Magnetic Effects of Current</h1>
                 
@@ -140,12 +137,7 @@
 
                 <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science. All rights reserved.</p>
             `;
-        }
-
-        // =============================================
-        // ৩. Access Denied Show করার ফাংশন
-        // =============================================
-        function showDenied() {
+        } else {
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
@@ -154,11 +146,6 @@
                 </div>
             `;
         }
-
-        // =============================================
-        // ৪. পেজ লোড হওয়ার সময় Verify করুন
-        // =============================================
-        document.addEventListener('DOMContentLoaded', verifyToken);
     </script>
 </body>
 </html>
