@@ -143,17 +143,15 @@ async function sendEmailJS(email, token, packageName) {
         console.log('📅 Expiry date:', formattedExpiry);
 
        // ===== EmailJS API কল — Private Key দিয়ে =====
-const privateKey = 'X8yB60SM3DBdqN0jhqjEW';  // আপনার Private Key
-
 const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
     method: 'POST',
     headers: { 
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${privateKey}`
+        'Authorization': `Bearer ${process.env.EMAILJS_PRIVATE_KEY}`
     },
     body: JSON.stringify({
-        service_id: 'service_27gemli',
-        template_id: 'template_ycce885',
+        service_id: process.env.EMAILJS_SERVICE_ID,
+        template_id: process.env.EMAILJS_TEMPLATE_ID,
         // user_id বাদ দিন
         template_params: {
             to_email: email,
