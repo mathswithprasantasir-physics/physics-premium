@@ -5,10 +5,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { token } = req.body;
+        const { token, email } = req.body;
 
-        if (!token) {
-            return res.status(400).json({ valid: false, error: 'Missing token' });
+        if (!token || !email) {
+            return res.status(400).json({ valid: false, error: 'Missing token or email' });
         }
 
         let isValid = false;
@@ -27,7 +27,8 @@ export default async function handler(req, res) {
                     // Node.js Buffer দিয়ে সঠিকভাবে Decode করুন
                     const decodedEmail = Buffer.from(parts[2], 'base64').toString('utf-8');
                     
-                    if (decodedEmail && decodedEmail.includes('@')) {
+                    // Token-এর Email এবং Browser-এর Email মিলিয়ে দেখুন
+                    if (decodedEmail && decodedEmail.toLowerCase() === email.toLowerCase()) {
                         isValid = true; 
                     }
                 } catch (e) {
@@ -39,7 +40,7 @@ export default async function handler(req, res) {
         if (isValid) {
             return res.status(200).json({ valid: true });
         } else {
-            return res.status(200).json({ valid: false, error: 'Invalid token structure' });
+            return res.status(200).json({ valid: false, error: 'Token does not match email' });
         }
 
     } catch (error) {
