@@ -39,7 +39,7 @@ export default async function handler(req, res) {
             console.log('✅ Payment verified for:', email);
 
             // ✅ টোকেন জেনারেট (ইমেইল এনকোড সহ)
-            const token = generateToken(email, packageName);
+            const token = generateToken(email);
             console.log('🔑 Token generated:', token);
 
             // Google Sheets-এ সেভ
@@ -64,12 +64,15 @@ export default async function handler(req, res) {
     }
 }
 
-// ===== টোকেন জেনারেট (ইমেইল এনকোড সহ) =====
-function generateToken(email, packageName) {
+// ===== টোকেন জেনারেট (সরলীকৃত) =====
+function generateToken(email) {
+    // Email কে base64 এ encode করুন (URL-safe)
     const encodedEmail = Buffer.from(email).toString('base64');
+    // base64 থেকে +, /, = চিহ্নগুলো সরান (URL-safe)
+    const safeEmail = encodedEmail.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     const random = Math.random().toString(36).substring(2, 10);
     const timestamp = Date.now().toString(36);
-    return 'prem_' + timestamp + '_' + encodedEmail + '_' + random;
+    return `prem_${timestamp}_${safeEmail}_${random}`;
 }
 
 // ===== Google Sheets-এ সেভ =====

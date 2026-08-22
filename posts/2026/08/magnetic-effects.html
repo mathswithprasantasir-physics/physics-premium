@@ -27,6 +27,7 @@
         .access-denied .btn:hover { background: #6C63FF; transform: scale(1.05); }
         .access-denied .error-detail { background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px; text-align: left; }
         .access-denied .error-detail li { margin: 8px 0; color: #555; }
+        .debug-info { background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; color: #666; margin-top: 10px; text-align: left; word-break: break-all; }
 
         @media (max-width: 600px) {
             .container { padding: 20px; margin: 10px; }
@@ -58,6 +59,9 @@
             }
         }
 
+        console.log('📧 User Email:', userEmail);
+        console.log('🔑 Token:', token);
+
         // =============================================
         // ২. Token Verify করুন
         // =============================================
@@ -83,6 +87,8 @@
                 // লোডিং দেখান
                 document.getElementById('loadingMessage').innerHTML = '⏳ Verifying your access...';
 
+                console.log('📤 Sending verification request...');
+                
                 const response = await fetch('/api/verify-token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -93,14 +99,15 @@
                 });
 
                 const data = await response.json();
+                console.log('📥 Verification response:', data);
 
                 if (data.valid) {
                     showContent();
                 } else {
-                    showDenied(data.error || 'Invalid token or email mismatch.');
+                    showDenied(data.error || 'Invalid token or email mismatch.', data.debug);
                 }
             } catch (error) {
-                console.error('Verification error:', error);
+                console.error('❌ Verification error:', error);
                 showDenied('Unable to verify access. Please check your internet connection.');
             }
         }
@@ -174,7 +181,17 @@
         // =============================================
         // ৪. Access Denied Show করুন
         // =============================================
-        function showDenied(errorMessage = '') {
+        function showDenied(errorMessage = '', debug = null) {
+            let debugHtml = '';
+            if (debug) {
+                debugHtml = `
+                    <div class="debug-info">
+                        <strong>🔍 Debug Info:</strong><br>
+                        <pre>${JSON.stringify(debug, null, 2)}</pre>
+                    </div>
+                `;
+            }
+
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
@@ -187,8 +204,11 @@
                             <li>• This link is tied to the email used for payment.</li>
                             <li>• Please use the same email address you used during purchase.</li>
                             ${userEmail ? `<li>• Your current email: <strong>${userEmail}</strong></li>` : ''}
+                            ${token ? `<li>• Token: <code style="font-size:11px;word-break:break-all;">${token}</code></li>` : ''}
                         </ul>
                     </div>
+                    
+                    ${debugHtml}
                     
                     <p style="font-size:14px;color:#888;margin-top:20px;">
                         <strong>Need help?</strong> Contact us at <a href="mailto:support@learningscience.in">support@learningscience.in</a>
