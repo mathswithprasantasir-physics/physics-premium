@@ -39,8 +39,10 @@
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
-        // localStorage থেকে বা prompt থেকে ইমেইল নিন
+        // localStorage থেকে Email নিন
         let userEmail = localStorage.getItem('userEmail');
+
+        // Email না থাকলে Prompt দেখান
         if (!userEmail) {
             userEmail = prompt('Please enter your registered email address:');
             if (userEmail && userEmail.trim() !== '') {
@@ -53,62 +55,33 @@
         console.log('🔑 Token:', token);
 
         // ============================================
-        // টোকেন ভেরিফাই করার নতুন সিম্পল পদ্ধতি
+        // টোকেন ভেরিফাই করুন
         // ============================================
         async function verifyToken() {
             if (!token) {
-                showDenied('No access token found in the URL.');
+                showDenied('No access token found.');
                 return;
             }
 
             if (!userEmail) {
-                showDenied('Email is required to access this content.');
+                showDenied('Email is required. Please refresh and try again.');
                 return;
             }
 
-            // প্রথমে লোকালি চেক করুন (দ্রুত করার জন্য)
-            if (token === 'test-token-2026') {
-                showContent();
-                return;
-            }
-
-            // Token থেকে ইমেইল বের করুন (লোকালি)
-            if (token.startsWith('prem_')) {
-                try {
-                    const parts = token.split('_');
-                    if (parts.length >= 3) {
-                        const base64Email = parts[2];
-                        const decodedEmail = atob(base64Email); // ব্রাউজারের atob ব্যবহার করুন
-                        console.log('🔍 Decoded from token:', decodedEmail);
-                        
-                        // যদি ইমেইল মিলে যায় তাহলে সরাসরি কন্টেন্ট দেখান
-                        if (decodedEmail.toLowerCase() === userEmail.toLowerCase()) {
-                            console.log('✅ Local verification passed!');
-                            showContent();
-                            return;
-                        } else {
-                            console.log('❌ Local email mismatch');
-                            showDenied(`This link is for ${decodedEmail}, but you are using ${userEmail}`);
-                            return;
-                        }
-                    }
-                } catch (e) {
-                    console.log('Local decode failed, trying API...');
-                }
-            }
-
-            // API দিয়ে ভেরিফাই করুন (ব্যাকআপ)
             try {
-                document.getElementById('loadingMessage').innerHTML = '⏳ Verifying with server...';
+                document.getElementById('loadingMessage').innerHTML = '⏳ Verifying access...';
 
                 const response = await fetch('/api/verify-token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token, email: userEmail })
+                    body: JSON.stringify({ 
+                        token: token, 
+                        email: userEmail 
+                    })
                 });
 
                 const data = await response.json();
-                console.log('📥 API Response:', data);
+                console.log('📥 Response:', data);
 
                 if (data.valid) {
                     showContent();
@@ -117,16 +90,19 @@
                 }
 
             } catch (error) {
-                console.error('❌ API Error:', error);
+                console.error('❌ Error:', error);
                 showDenied('Unable to verify. Please check your connection.');
             }
         }
 
-        // ===== Content Show =====
+        // ============================================
+        // Content Show
+        // ============================================
         function showContent() {
             container.innerHTML = `
                 <div class="access-granted">
                     ✅ <strong>Access Granted</strong> — Welcome ${userEmail}
+                    <span style="font-size:12px;color:#666;margin-left:10px;">(Verified: ${new Date().toLocaleString()})</span>
                 </div>
 
                 <h1>🧲 Magnetic Effects of Current</h1>
@@ -172,19 +148,27 @@
                     <tr><td>Voltmeter</td><td>High resistance (R) in series</td><td>R = V/I<sub>g</sub> - G</td></tr>
                 </table>
 
-                <div style="background:#e3f2fd;padding:15px;border-radius:8px;margin-top:30px;text-align:center;">
-                    <p style="color:#0d47a1;">🔒 Exclusive for <strong>${userEmail}</strong></p>
+                <div style="background:#e3f2fd;padding:15px;border-radius:8px;margin-top:30px;text-align:center;border:1px solid #90caf9;">
+                    <p style="margin:0;color:#0d47a1;">
+                        🔒 Exclusive for <strong>${userEmail}</strong>
+                        <span style="font-size:12px;display:block;margin-top:5px;color:#666;">
+                            This content is protected. Do not share this link.
+                        </span>
+                    </p>
                 </div>
+
                 <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science</p>
             `;
         }
 
-        // ===== Show Denied =====
+        // ============================================
+        // Access Denied
+        // ============================================
         function showDenied(errorMessage) {
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p>${errorMessage || 'Unable to verify access.'}</p>
+                    <p>${errorMessage}</p>
                     
                     <div class="error-detail">
                         <p style="font-weight:600;color:#e65100;">📌 Why this happened?</p>

@@ -59,14 +59,17 @@ async function verifyTokenFromDatabase(token, email) {
         // Vercel-এ JSON ফাইলের পাথ
         const dataPath = path.join(process.cwd(), 'data', 'tokens.json');
         
+        console.log('📂 Looking for database at:', dataPath);
+        
         // ফাইল পড়ুন
         let tokens = [];
         try {
             const fileContent = fs.readFileSync(dataPath, 'utf8');
             tokens = JSON.parse(fileContent);
+            console.log('📦 Database has', tokens.length, 'tokens');
         } catch (error) {
-            // ফাইল না থাকলে খালি অ্যারে
-            tokens = [];
+            console.log('⚠️ tokens.json not found or empty');
+            return false;
         }
 
         // টোকেন খুঁজুন
@@ -76,6 +79,9 @@ async function verifyTokenFromDatabase(token, email) {
             console.log('❌ Token not found in database');
             return false;
         }
+
+        console.log('📧 Token email:', tokenData.email);
+        console.log('📧 Request email:', email);
 
         // ইমেইল মিলিয়ে দেখুন
         if (tokenData.email.toLowerCase() !== email.toLowerCase()) {

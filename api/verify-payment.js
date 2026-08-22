@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     try {
         const { orderId, paymentId, signature, email, packageName, amount } = req.body;
 
-        console.log('📦 Payment verification:', { email, packageName });
+        console.log('📦 Payment verification:', { email, packageName, amount });
 
         if (!email) {
             return res.status(400).json({ success: false, message: 'Email is required' });
@@ -44,10 +44,15 @@ export default async function handler(req, res) {
             console.log('🔑 Token generated:', token);
 
             // ✅ JSON ডেটাবেসে সেভ
-            await saveTokenToDatabase(email, token, packageName, paymentId, amount);
-
-            // ✅ Google Sheets-এ সেভ (ঐচ্ছিক)
-            await saveUserToGoogleSheets(email, packageName, token, paymentId, amount);
+            const saved = await saveTokenToDatabase(email, token, packageName, paymentId, amount);
+            
+            if (!saved) {
+                console.error('❌ Failed to save token to database');
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Failed to save token' 
+                });
+            }
 
             // ✅ ইমেইল পাঠান
             await sendEmailWithToken(email, token, packageName);
@@ -90,16 +95,20 @@ async function saveTokenToDatabase(email, token, packageName, paymentId, amount)
         const dataDir = path.join(process.cwd(), 'data');
         if (!fs.existsSync(dataDir)) {
             fs.mkdirSync(dataDir, { recursive: true });
+            console.log('📁 Created data directory');
         }
 
         const dataPath = path.join(dataDir, 'tokens.json');
+        console.log('📂 Saving to:', dataPath);
         
         // পুরানো ডেটা পড়ুন
         let tokens = [];
         try {
             const fileContent = fs.readFileSync(dataPath, 'utf8');
             tokens = JSON.parse(fileContent);
+            console.log('📦 Existing tokens:', tokens.length);
         } catch (error) {
+            console.log('⚠️ No existing tokens, creating new file');
             tokens = [];
         }
 
@@ -118,37 +127,13 @@ async function saveTokenToDatabase(email, token, packageName, paymentId, amount)
 
         // ফাইলে সেভ করুন
         fs.writeFileSync(dataPath, JSON.stringify(tokens, null, 2));
-        console.log('✅ Token saved to JSON database');
+        console.log('✅ Token saved to JSON database. Total:', tokens.length);
+
+        return true;
 
     } catch (error) {
         console.error('❌ Database save error:', error.message);
-    }
-}
-
-// ===== Google Sheets-এ সেভ (ব্যাকআপ) =====
-async function saveUserToGoogleSheets(email, packageName, token, paymentId, amount) {
-    try {
-        const SHEET_URL = process.env.GOOGLE_SHEETS_WEBHOOK;
-        if (!SHEET_URL) return;
-
-        const userData = {
-            email: email,
-            package: packageName || 'Unknown',
-            token: token,
-            paymentId: paymentId || 'N/A',
-            amount: amount || 0,
-            createdAt: new Date().toISOString(),
-            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-        };
-
-        await fetch(SHEET_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData)
-        });
-        console.log('✅ Saved to Google Sheets');
-    } catch (error) {
-        console.error('❌ Sheets error:', error.message);
+        return false;
     }
 }
 
@@ -163,6 +148,9 @@ async function sendEmailWithToken(email, token, packageName) {
         const formattedExpiry = expiryDate.toLocaleDateString('en-IN', {
             day: '2-digit', month: 'short', year: 'numeric'
         });
+
+        console.log('📧 Sending email to:', email);
+        console.log('🔗 Access link:', accessLink);
 
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',

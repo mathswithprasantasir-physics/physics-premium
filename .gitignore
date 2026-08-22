@@ -1,6 +1,23 @@
-# .gitignore
-.env
+# Dependencies
 node_modules/
-.vercel/
-.DS_Store
+package-lock.json
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
 *.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Vercel
+.vercel/
