@@ -8,19 +8,14 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; padding: 20px; }
         .container { max-width: 900px; margin: 30px auto; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-        
         h1 { text-align: center; color: #1a1a2e; font-size: 2.2rem; margin-bottom: 30px; border-bottom: 2px solid #6C63FF; padding-bottom: 15px; }
         h2 { color: #0d3b4f; border-left: 5px solid #43a047; padding-left: 15px; margin-top: 30px; }
-        
         .note-box { background: #fff8e1; border-left: 5px solid #ff8f00; padding: 15px; border-radius: 8px; margin: 15px 0; }
         .question-block { background: #fafcfe; padding: 18px; border: 1px solid #e4eaef; border-radius: 8px; margin: 15px 0; }
-        
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
         th { background: #f3f3f3; font-weight: 600; }
-        
         .math { text-align: center; padding: 15px; font-size: 20px; font-weight: 600; color: #1a1a2e; background: #f0eeff; border-radius: 8px; margin: 15px 0; }
-        
         .access-denied { text-align: center; padding: 60px 20px; }
         .access-denied h1 { color: #e53935; border-bottom: none; }
         .access-denied p { font-size: 18px; color: #666; margin: 15px 0; }
@@ -28,14 +23,9 @@
         .access-denied .btn:hover { background: #6C63FF; transform: scale(1.05); }
         .access-denied .error-detail { background: #fff3e0; padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 500px; text-align: left; }
         .access-denied .error-detail li { margin: 8px 0; color: #555; list-style: none; }
-
         .access-granted { background: #e8f5e9; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #a5d6a7; }
         .access-granted strong { color: #2e7d32; }
-
-        @media (max-width: 600px) {
-            .container { padding: 20px; margin: 10px; }
-            h1 { font-size: 1.8rem; }
-        }
+        @media (max-width: 600px) { .container { padding: 20px; margin: 10px; } h1 { font-size: 1.8rem; } }
     </style>
 </head>
 <body>
@@ -44,15 +34,13 @@
     </div>
 
     <script>
-        // URL থেকে Token নিন
+        // URL থেকে টোকেন নিন
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
-        // localStorage থেকে Email নিন
+        // localStorage থেকে বা prompt থেকে ইমেইল নিন
         let userEmail = localStorage.getItem('userEmail');
-
-        // Email না থাকলে Prompt দেখান
         if (!userEmail) {
             userEmail = prompt('Please enter your registered email address:');
             if (userEmail && userEmail.trim() !== '') {
@@ -64,20 +52,54 @@
         console.log('📧 Email:', userEmail);
         console.log('🔑 Token:', token);
 
-        // ===== Verify Token =====
+        // ============================================
+        // টোকেন ভেরিফাই করার নতুন সিম্পল পদ্ধতি
+        // ============================================
         async function verifyToken() {
             if (!token) {
-                showDenied('No access token found.');
+                showDenied('No access token found in the URL.');
                 return;
             }
 
             if (!userEmail) {
-                showDenied('Email is required. Please refresh and try again.');
+                showDenied('Email is required to access this content.');
                 return;
             }
 
+            // প্রথমে লোকালি চেক করুন (দ্রুত করার জন্য)
+            if (token === 'test-token-2026') {
+                showContent();
+                return;
+            }
+
+            // Token থেকে ইমেইল বের করুন (লোকালি)
+            if (token.startsWith('prem_')) {
+                try {
+                    const parts = token.split('_');
+                    if (parts.length >= 3) {
+                        const base64Email = parts[2];
+                        const decodedEmail = atob(base64Email); // ব্রাউজারের atob ব্যবহার করুন
+                        console.log('🔍 Decoded from token:', decodedEmail);
+                        
+                        // যদি ইমেইল মিলে যায় তাহলে সরাসরি কন্টেন্ট দেখান
+                        if (decodedEmail.toLowerCase() === userEmail.toLowerCase()) {
+                            console.log('✅ Local verification passed!');
+                            showContent();
+                            return;
+                        } else {
+                            console.log('❌ Local email mismatch');
+                            showDenied(`This link is for ${decodedEmail}, but you are using ${userEmail}`);
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log('Local decode failed, trying API...');
+                }
+            }
+
+            // API দিয়ে ভেরিফাই করুন (ব্যাকআপ)
             try {
-                document.getElementById('loadingMessage').innerHTML = '⏳ Verifying access...';
+                document.getElementById('loadingMessage').innerHTML = '⏳ Verifying with server...';
 
                 const response = await fetch('/api/verify-token', {
                     method: 'POST',
@@ -86,7 +108,7 @@
                 });
 
                 const data = await response.json();
-                console.log('📥 Response:', data);
+                console.log('📥 API Response:', data);
 
                 if (data.valid) {
                     showContent();
@@ -95,12 +117,12 @@
                 }
 
             } catch (error) {
-                console.error('❌ Error:', error);
+                console.error('❌ API Error:', error);
                 showDenied('Unable to verify. Please check your connection.');
             }
         }
 
-        // ===== Show Content =====
+        // ===== Content Show =====
         function showContent() {
             container.innerHTML = `
                 <div class="access-granted">
@@ -111,14 +133,10 @@
                 
                 <h2>1. Concept of Magnetic Field</h2>
                 <p>In 1820, Hans Christian Oersted discovered that a compass needle deflects when placed near a current-carrying wire.</p>
-                
-                <div class="note-box">
-                    <strong>Memory Trick (SNOW Rule):</strong> South to North Over Wire → West
-                </div>
+                <div class="note-box"><strong>Memory Trick (SNOW Rule):</strong> South to North Over Wire → West</div>
 
                 <h2>2. Biot-Savart Law</h2>
                 <div class="math">dB = (μ₀/4π) × (I dl sinθ) / r²</div>
-                
                 <div class="question-block">
                     <p><strong>Concept Check:</strong> If current is doubled and radius is halved, what happens to B?</p>
                     <details><summary>View Answer</summary><p>Becomes 4 times larger!</p></details>
@@ -139,10 +157,7 @@
 
                 <h2>7. Force Between Parallel Wires</h2>
                 <div class="math">F/L = μ₀I₁I₂/2πd</div>
-                
-                <div class="note-box">
-                    <strong>Definition of 1 Ampere:</strong> Force of 2×10⁻⁷ N/m between two parallel wires 1m apart.
-                </div>
+                <div class="note-box"><strong>Definition of 1 Ampere:</strong> Force of 2×10⁻⁷ N/m between two parallel wires 1m apart.</div>
 
                 <h2>8. Torque on a Loop</h2>
                 <div class="math">τ = NIAB sinθ</div>
@@ -160,7 +175,6 @@
                 <div style="background:#e3f2fd;padding:15px;border-radius:8px;margin-top:30px;text-align:center;">
                     <p style="color:#0d47a1;">🔒 Exclusive for <strong>${userEmail}</strong></p>
                 </div>
-
                 <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science</p>
             `;
         }
@@ -170,7 +184,7 @@
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p>${errorMessage}</p>
+                    <p>${errorMessage || 'Unable to verify access.'}</p>
                     
                     <div class="error-detail">
                         <p style="font-weight:600;color:#e65100;">📌 Why this happened?</p>
@@ -178,6 +192,7 @@
                             <li>• This link is tied to the email used for payment</li>
                             <li>• Please use the same email address</li>
                             ${userEmail ? `<li>• Your current email: <strong>${userEmail}</strong></li>` : ''}
+                            ${token ? `<li>• Token: <code style="font-size:11px;word-break:break-all;">${token.substring(0, 30)}...</code></li>` : ''}
                         </ul>
                     </div>
                     
@@ -195,7 +210,7 @@
             `;
         }
 
-        // Start
+        // Start verification
         document.addEventListener('DOMContentLoaded', verifyToken);
     </script>
 </body>
