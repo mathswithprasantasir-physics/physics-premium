@@ -33,14 +33,14 @@ model AccessToken {
   userId      Int      @map("user_id")
   token       String   @unique
   packageName String?  @map("package_name")
-  amount      Decimal? @db.Decimal(10, 2)  // ✅ Float → Decimal
+  amount      Decimal? @db.Decimal(10, 2)
   paymentId   String?  @map("payment_id")
   createdAt   DateTime @default(now()) @map("created_at")
-  expiresAt   DateTime @default(now()) @map("expires_at")  // ✅ 365 days সরানো
+  expiresAt   DateTime @default(now()) @map("expires_at")
   isActive    Boolean  @default(true) @map("is_active")
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessLogs  AccessLog[]  // ✅ relation ঠিক আছে
+  accessLogs  AccessLog[]  // এই relation-এর জন্য AccessLog-এ বিপরীত relation দরকার
 
   @@map("access_tokens")
 }
@@ -51,7 +51,7 @@ model Payment {
   userId      Int      @map("user_id")
   orderId     String?  @map("order_id")
   paymentId   String?  @map("payment_id")
-  amount      Decimal  @db.Decimal(10, 2)  // ✅ Float → Decimal
+  amount      Decimal  @db.Decimal(10, 2)
   status      String   @default("pending")
   createdAt   DateTime @default(now()) @map("created_at")
   completedAt DateTime? @map("completed_at")
@@ -70,7 +70,9 @@ model AccessLog {
   ipAddress  String?  @map("ip_address")
   userAgent  String?  @map("user_agent")
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // ✅ বিপরীত relation যোগ করুন
+  accessToken AccessToken? @relation(fields: [token], references: [token])
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("access_logs")
 }
