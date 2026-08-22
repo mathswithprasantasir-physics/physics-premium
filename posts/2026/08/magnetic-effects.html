@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magnetic Effects of Current</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; padding: 20px; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; padding: 20px; }
         .container { max-width: 900px; margin: 30px auto; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
         
         h1 { text-align: center; color: #1a1a2e; font-size: 2.2rem; margin-bottom: 30px; border-bottom: 2px solid #6C63FF; padding-bottom: 15px; }
@@ -20,14 +21,16 @@
         
         .math { text-align: center; padding: 15px; font-size: 20px; font-weight: 600; color: #1a1a2e; background: #f0eeff; border-radius: 8px; margin: 15px 0; }
         
-        .access-denied { text-align: center; padding: 80px 20px; }
+        .access-denied { text-align: center; padding: 60px 20px; }
         .access-denied h1 { color: #e53935; border-bottom: none; }
-        .access-denied p { font-size: 18px; color: #666; margin-bottom: 15px; }
+        .access-denied p { font-size: 18px; color: #666; margin: 15px 0; }
         .access-denied .btn { background: #1a1a2e; color: #fff; padding: 14px 50px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 16px; display: inline-block; transition: 0.3s; }
         .access-denied .btn:hover { background: #6C63FF; transform: scale(1.05); }
-        .access-denied .error-detail { background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px; text-align: left; }
-        .access-denied .error-detail li { margin: 8px 0; color: #555; }
-        .debug-info { background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; color: #666; margin-top: 10px; text-align: left; word-break: break-all; }
+        .access-denied .error-detail { background: #fff3e0; padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 500px; text-align: left; }
+        .access-denied .error-detail li { margin: 8px 0; color: #555; list-style: none; }
+
+        .access-granted { background: #e8f5e9; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #a5d6a7; }
+        .access-granted strong { color: #2e7d32; }
 
         @media (max-width: 600px) {
             .container { padding: 20px; margin: 10px; }
@@ -41,85 +44,69 @@
     </div>
 
     <script>
+        // URL থেকে Token নিন
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const container = document.getElementById('contentContainer');
 
-        // =============================================
-        // ১. ইউজারের ইমেইল চেক করুন
-        // =============================================
-        let userEmail = urlParams.get('email') || localStorage.getItem('userEmail');
+        // localStorage থেকে Email নিন
+        let userEmail = localStorage.getItem('userEmail');
 
-        // যদি ইমেইল না থাকে, তাহলে ইউজারকে ইনপুট দিতে বলুন
+        // Email না থাকলে Prompt দেখান
         if (!userEmail) {
-            userEmail = prompt('Please enter your registered email address to access this content:');
+            userEmail = prompt('Please enter your registered email address:');
             if (userEmail && userEmail.trim() !== '') {
-                localStorage.setItem('userEmail', userEmail.trim());
                 userEmail = userEmail.trim();
+                localStorage.setItem('userEmail', userEmail);
             }
         }
 
-        console.log('📧 User Email:', userEmail);
+        console.log('📧 Email:', userEmail);
         console.log('🔑 Token:', token);
 
-        // =============================================
-        // ২. Token Verify করুন
-        // =============================================
+        // ===== Verify Token =====
         async function verifyToken() {
             if (!token) {
-                showDenied('No access token found in the URL.');
+                showDenied('No access token found.');
                 return;
             }
 
-            // Test Token (শুধু ডেভেলপমেন্টের জন্য)
-            if (token === 'test-token-2026') {
-                showContent();
-                return;
-            }
-
-            // যদি ইমেইল না থাকে
             if (!userEmail) {
-                showDenied('Email is required to access this content. Please refresh and enter your email.');
+                showDenied('Email is required. Please refresh and try again.');
                 return;
             }
 
             try {
-                // লোডিং দেখান
-                document.getElementById('loadingMessage').innerHTML = '⏳ Verifying your access...';
+                document.getElementById('loadingMessage').innerHTML = '⏳ Verifying access...';
 
-                console.log('📤 Sending verification request...');
-                
                 const response = await fetch('/api/verify-token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        token: token,
-                        email: userEmail
-                    })
+                    body: JSON.stringify({ token, email: userEmail })
                 });
 
                 const data = await response.json();
-                console.log('📥 Verification response:', data);
+                console.log('📥 Response:', data);
 
                 if (data.valid) {
                     showContent();
                 } else {
-                    showDenied(data.error || 'Invalid token or email mismatch.', data.debug);
+                    showDenied(data.error || 'Invalid token or email mismatch.');
                 }
+
             } catch (error) {
-                console.error('❌ Verification error:', error);
-                showDenied('Unable to verify access. Please check your internet connection.');
+                console.error('❌ Error:', error);
+                showDenied('Unable to verify. Please check your connection.');
             }
         }
 
-        // =============================================
-        // ৩. Content Show করুন
-        // =============================================
+        // ===== Show Content =====
         function showContent() {
             container.innerHTML = `
-                <div style="background:#e8f5e9;padding:10px 16px;border-radius:8px;margin-bottom:20px;text-align:center;border:1px solid #a5d6a7;">
-                    ✅ <strong>Access Granted</strong> — Welcome <span style="color:#2e7d32;">${userEmail || 'User'}</span>
+                <div class="access-granted">
+                    ✅ <strong>Access Granted</strong> — Welcome ${userEmail}
                 </div>
+
                 <h1>🧲 Magnetic Effects of Current</h1>
                 
                 <h2>1. Concept of Magnetic Field</h2>
@@ -170,60 +157,45 @@
                     <tr><td>Voltmeter</td><td>High resistance (R) in series</td><td>R = V/I<sub>g</sub> - G</td></tr>
                 </table>
 
-                <div style="background:#e3f2fd;padding:15px;border-radius:8px;margin-top:30px;text-align:center;border:1px solid #90caf9;">
-                    <p style="margin:0;color:#0d47a1;">🔒 This content is exclusively for <strong>${userEmail || 'registered users'}</strong></p>
+                <div style="background:#e3f2fd;padding:15px;border-radius:8px;margin-top:30px;text-align:center;">
+                    <p style="color:#0d47a1;">🔒 Exclusive for <strong>${userEmail}</strong></p>
                 </div>
 
-                <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science. All rights reserved.</p>
+                <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science</p>
             `;
         }
 
-        // =============================================
-        // ৪. Access Denied Show করুন
-        // =============================================
-        function showDenied(errorMessage = '', debug = null) {
-            let debugHtml = '';
-            if (debug) {
-                debugHtml = `
-                    <div class="debug-info">
-                        <strong>🔍 Debug Info:</strong><br>
-                        <pre>${JSON.stringify(debug, null, 2)}</pre>
-                    </div>
-                `;
-            }
-
+        // ===== Show Denied =====
+        function showDenied(errorMessage) {
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p>${errorMessage || 'This link is not valid for this device/browser.'}</p>
+                    <p>${errorMessage}</p>
                     
                     <div class="error-detail">
-                        <p style="font-weight:600;margin-top:0;color:#e65100;">📌 Why this happened?</p>
-                        <ul style="list-style:none;padding:0;">
-                            <li>• You may be trying to access from a different email address.</li>
-                            <li>• This link is tied to the email used for payment.</li>
-                            <li>• Please use the same email address you used during purchase.</li>
+                        <p style="font-weight:600;color:#e65100;">📌 Why this happened?</p>
+                        <ul>
+                            <li>• This link is tied to the email used for payment</li>
+                            <li>• Please use the same email address</li>
                             ${userEmail ? `<li>• Your current email: <strong>${userEmail}</strong></li>` : ''}
-                            ${token ? `<li>• Token: <code style="font-size:11px;word-break:break-all;">${token}</code></li>` : ''}
                         </ul>
                     </div>
                     
-                    ${debugHtml}
-                    
                     <p style="font-size:14px;color:#888;margin-top:20px;">
-                        <strong>Need help?</strong> Contact us at <a href="mailto:support@learningscience.in">support@learningscience.in</a>
+                        Need help? <a href="mailto:support@learningscience.in">support@learningscience.in</a>
                     </p>
                     
-                    <a href="/" class="btn" style="margin-top:10px;">← Go back to Home</a>
+                    <a href="/" class="btn">← Go back to Home</a>
                     <br>
-                    <a href="#" onclick="location.reload()" style="display:inline-block;margin-top:15px;color:#6C63FF;text-decoration:underline;cursor:pointer;">⟳ Try again with different email</a>
+                    <a href="#" onclick="localStorage.removeItem('userEmail');location.reload();" 
+                       style="display:inline-block;margin-top:15px;color:#6C63FF;text-decoration:underline;cursor:pointer;">
+                        ⟳ Try with different email
+                    </a>
                 </div>
             `;
         }
 
-        // =============================================
-        // ৫. পেজ লোড হওয়ার সময় Verify করুন
-        // =============================================
+        // Start
         document.addEventListener('DOMContentLoaded', verifyToken);
     </script>
 </body>

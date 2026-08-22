@@ -16,10 +16,10 @@ export default async function handler(req, res) {
     try {
         const { orderId, paymentId, signature, email, packageName, amount } = req.body;
 
-        console.log('📦 Full request body:', { orderId, paymentId, email, packageName, amount });
+        console.log('📦 Payment verification request:', { orderId, paymentId, email, packageName, amount });
 
         if (!email) {
-            console.error('❌ Email is missing from request');
+            console.error('❌ Email is missing');
             return res.status(400).json({ success: false, message: 'Email is required' });
         }
 
@@ -30,6 +30,7 @@ export default async function handler(req, res) {
             return res.status(500).json({ success: false, message: 'Razorpay secret not configured' });
         }
 
+        // Signature verify
         const generatedSignature = crypto
             .createHmac('sha256', secret)
             .update(orderId + '|' + paymentId)
@@ -38,15 +39,15 @@ export default async function handler(req, res) {
         if (generatedSignature === signature) {
             console.log('✅ Payment verified for:', email);
 
-            // ✅ টোকেন জেনারেট (ইমেইল এনকোড সহ)
-            const token = generateToken(email);
+            // ✅ সঠিক টোকেন জেনারেট
+            const token = generateSecureToken(email);
             console.log('🔑 Token generated:', token);
 
             // Google Sheets-এ সেভ
             await saveUserToGoogleSheets(email, packageName, token, paymentId, amount);
 
             // ইমেইল পাঠান
-            await sendEmailJS(email, token, packageName);
+            await sendEmailWithToken(email, token, packageName);
 
             res.status(200).json({
                 success: true,
@@ -64,14 +65,22 @@ export default async function handler(req, res) {
     }
 }
 
-// ===== টোকেন জেনারেট (সরলীকৃত) =====
-function generateToken(email) {
-    // Email কে base64 এ encode করুন (URL-safe)
+// ===== সঠিক টোকেন জেনারেট =====
+function generateSecureToken(email) {
+    // Email কে base64url এ encode করুন (URL-safe)
     const encodedEmail = Buffer.from(email).toString('base64');
-    // base64 থেকে +, /, = চিহ্নগুলো সরান (URL-safe)
-    const safeEmail = encodedEmail.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    const random = Math.random().toString(36).substring(2, 10);
+    
+    // base64 থেকে URL-safe characters এ কনভার্ট
+    const safeEmail = encodedEmail
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+    
+    // র্যান্ডম স্ট্রিং
+    const random = Math.random().toString(36).substring(2, 15);
     const timestamp = Date.now().toString(36);
+    
+    // টোকেন তৈরি: prem_<timestamp>_<email>_<random>
     return `prem_${timestamp}_${safeEmail}_${random}`;
 }
 
@@ -94,7 +103,7 @@ async function saveUserToGoogleSheets(email, packageName, token, paymentId, amou
             expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
         };
 
-        console.log('📤 Sending to Google Sheets:', userData);
+        console.log('📤 Saving to Google Sheets:', userData);
 
         const response = await fetch(SHEET_URL, {
             method: 'POST',
@@ -102,19 +111,18 @@ async function saveUserToGoogleSheets(email, packageName, token, paymentId, amou
             body: JSON.stringify(userData)
         });
 
-        const result = await response.json();
-        if (result.success) {
-            console.log('✅ User saved to Google Sheets:', email);
+        if (response.ok) {
+            console.log('✅ Saved to Google Sheets');
         } else {
-            console.error('❌ Google Sheets error:', result);
+            console.error('❌ Google Sheets error:', await response.text());
         }
     } catch (error) {
-        console.error('❌ Database save error:', error.message);
+        console.error('❌ Save error:', error.message);
     }
 }
 
-// ===== EmailJS দিয়ে অটো ইমেইল =====
-async function sendEmailJS(email, token, packageName) {
+// ===== Email পাঠান =====
+async function sendEmailWithToken(email, token, packageName) {
     try {
         const baseUrl = process.env.BASE_URL || 'https://physics-premium.vercel.app';
         const accessLink = `${baseUrl}/posts/2026/08/magnetic-effects.html?token=${token}`;
@@ -127,7 +135,6 @@ async function sendEmailJS(email, token, packageName) {
 
         console.log('📧 Sending email to:', email);
         console.log('🔗 Access link:', accessLink);
-        console.log('📅 Expiry date:', formattedExpiry);
 
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
@@ -147,16 +154,13 @@ async function sendEmailJS(email, token, packageName) {
             })
         });
 
-        const text = await response.text();
-        console.log('📦 Raw EmailJS Response:', text);
-
         if (response.ok) {
-            console.log('✅ Email sent successfully to:', email);
+            console.log('✅ Email sent successfully');
         } else {
-            console.error('❌ EmailJS HTTP Error:', response.status, text);
+            console.error('❌ Email send failed:', await response.text());
         }
 
     } catch (error) {
-        console.error('❌ EmailJS error:', error.message);
+        console.error('❌ Email error:', error.message);
     }
 }
