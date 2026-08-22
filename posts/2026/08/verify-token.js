@@ -1,4 +1,7 @@
 // api/verify-token.js
+import fs from 'fs';
+import path from 'path';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -15,73 +18,29 @@ export default async function handler(req, res) {
     try {
         const { token, email } = req.body;
 
-        console.log('🔍 Verifying token for:', email);
+        console.log('🔍 Verifying token for email:', email);
         console.log('🔑 Token:', token);
 
         if (!token || !email) {
-            return res.status(400).json({ 
+            return res.status(200).json({ 
                 valid: false, 
                 error: 'Missing token or email' 
             });
         }
 
-        // Test Token
-        if (token === 'test-token-2026') {
+        // ✅ JSON ডেটাবেস থেকে টোকেন চেক করুন
+        const isValid = await verifyTokenFromDatabase(token, email);
+
+        if (isValid) {
             return res.status(200).json({ 
                 valid: true,
-                email: email
+                email: email,
+                message: 'Access granted'
             });
-        }
-
-        // Token format check
-        if (!token.startsWith('prem_')) {
+        } else {
             return res.status(200).json({ 
                 valid: false, 
-                error: 'Invalid token format' 
-            });
-        }
-
-        // Token পার্স করুন
-        const parts = token.split('_');
-        console.log('📦 Token parts:', parts);
-
-        // prem_<timestamp>_<base64email>_<random>
-        if (parts.length < 3) {
-            return res.status(200).json({ 
-                valid: false, 
-                error: 'Invalid token structure' 
-            });
-        }
-
-        try {
-            // Base64 অংশ নিন (parts[2])
-            const base64Email = parts[2];
-            console.log('🔐 Base64 from token:', base64Email);
-
-            // ডিকোড করুন
-            const decodedEmail = Buffer.from(base64Email, 'base64').toString('utf-8');
-            console.log('📧 Decoded email:', decodedEmail);
-
-            // Email মিলিয়ে দেখুন
-            if (decodedEmail && decodedEmail.toLowerCase() === email.toLowerCase()) {
-                console.log('✅ Token verified successfully!');
-                return res.status(200).json({ 
-                    valid: true,
-                    email: decodedEmail
-                });
-            } else {
-                console.log(`❌ Email mismatch: ${decodedEmail} vs ${email}`);
-                return res.status(200).json({ 
-                    valid: false, 
-                    error: `This link is for ${decodedEmail}, but you are using ${email}`
-                });
-            }
-
-        } catch (decodeError) {
-            console.error('❌ Decode error:', decodeError);
-            return res.status(200).json({ 
-                valid: false, 
-                error: 'Invalid token encoding' 
+                error: 'Invalid token or email mismatch' 
             });
         }
 
@@ -91,5 +50,50 @@ export default async function handler(req, res) {
             valid: false, 
             error: 'Server error' 
         });
+    }
+}
+
+// ===== JSON ডেটাবেস থেকে ভেরিফাই করুন =====
+async function verifyTokenFromDatabase(token, email) {
+    try {
+        // Vercel-এ JSON ফাইলের পাথ
+        const dataPath = path.join(process.cwd(), 'data', 'tokens.json');
+        
+        // ফাইল পড়ুন
+        let tokens = [];
+        try {
+            const fileContent = fs.readFileSync(dataPath, 'utf8');
+            tokens = JSON.parse(fileContent);
+        } catch (error) {
+            // ফাইল না থাকলে খালি অ্যারে
+            tokens = [];
+        }
+
+        // টোকেন খুঁজুন
+        const tokenData = tokens.find(t => t.token === token);
+        
+        if (!tokenData) {
+            console.log('❌ Token not found in database');
+            return false;
+        }
+
+        // ইমেইল মিলিয়ে দেখুন
+        if (tokenData.email.toLowerCase() !== email.toLowerCase()) {
+            console.log(`❌ Email mismatch: ${tokenData.email} vs ${email}`);
+            return false;
+        }
+
+        // এক্সপাইরি চেক করুন
+        if (tokenData.expiresAt && new Date(tokenData.expiresAt) < new Date()) {
+            console.log('❌ Token expired');
+            return false;
+        }
+
+        console.log('✅ Token verified from database');
+        return true;
+
+    } catch (error) {
+        console.error('❌ Database error:', error);
+        return false;
     }
 }

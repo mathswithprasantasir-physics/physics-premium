@@ -1,5 +1,16 @@
 {
   "version": 2,
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 10
+    }
+  },
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
   "routes": [
     {
       "src": "/",
@@ -28,6 +39,10 @@
     {
       "src": "/posts/(.*)",
       "dest": "/posts/$1"
+    },
+    {
+      "src": "/data/(.*)",
+      "dest": "/data/$1"
     }
   ]
 }
