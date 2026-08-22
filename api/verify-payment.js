@@ -1,7 +1,8 @@
 // api/verify-payment.js
 import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -26,48 +27,80 @@ export default async function handler(req, res) {
         }
 
         const secret = process.env.RAZORPAY_KEY_SECRET;
-        
         if (!secret) {
             return res.status(500).json({ success: false, message: 'Razorpay secret not configured' });
         }
 
+        // ✅ Signature Verify
         const generatedSignature = crypto
             .createHmac('sha256', secret)
             .update(orderId + '|' + paymentId)
             .digest('hex');
 
-        if (generatedSignature === signature) {
-            console.log('✅ Payment verified for:', email);
-
-            // ✅ টোকেন জেনারেট
-            const token = generateSecureToken(email);
-            console.log('🔑 Token generated:', token);
-
-            // ✅ JSON ডেটাবেসে সেভ
-            const saved = await saveTokenToDatabase(email, token, packageName, paymentId, amount);
-            
-            if (!saved) {
-                console.error('❌ Failed to save token to database');
-                return res.status(500).json({ 
-                    success: false, 
-                    message: 'Failed to save token' 
-                });
-            }
-
-            // ✅ ইমেইল পাঠান
-            await sendEmailWithToken(email, token, packageName);
-
-            res.status(200).json({
-                success: true,
-                paymentId: paymentId,
-                token: token,
-                email: email,
-                message: 'Payment verified! Email sent.'
-            });
-        } else {
+        if (generatedSignature !== signature) {
             console.error('❌ Invalid signature');
-            res.status(400).json({ success: false, message: 'Invalid signature' });
+            return res.status(400).json({ success: false, message: 'Invalid signature' });
         }
+
+        console.log('✅ Payment verified for:', email);
+
+        // ✅ ইউজার খুঁজুন (নতুন নাকি পুরনো)
+        let user = await prisma.user.findUnique({
+            where: { email }
+        });
+
+        // ✅ ইউজার না থাকলে তৈরি করুন
+        if (!user) {
+            user = await prisma.user.create({
+                data: {
+                    email: email,
+                    passwordHash: 'placeholder', // পরে আপডেট করতে হবে
+                    fullName: email.split('@')[0],
+                    isAdmin: false
+                }
+            });
+            console.log('📝 New user created:', user.id);
+        }
+
+        // ✅ টোকেন জেনারেট
+        const token = generateSecureToken(email);
+        console.log('🔑 Token generated:', token);
+
+        // ✅ Prisma দিয়ে টোকেন সেভ
+        await prisma.accessToken.create({
+            data: {
+                userId: user.id,
+                token: token,
+                packageName: packageName || 'Unknown',
+                amount: amount || 0,
+                paymentId: paymentId || 'N/A',
+                expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+            }
+        });
+
+        // ✅ পেমেন্ট সেভ
+        await prisma.payment.create({
+            data: {
+                userId: user.id,
+                orderId: orderId,
+                paymentId: paymentId,
+                amount: amount || 0,
+                status: 'completed',
+                completedAt: new Date()
+            }
+        });
+
+        // ✅ ইমেইল পাঠান
+        await sendEmailWithToken(email, token, packageName);
+
+        res.status(200).json({
+            success: true,
+            paymentId: paymentId,
+            token: token,
+            email: email,
+            message: 'Payment verified! Email sent.'
+        });
+
     } catch (error) {
         console.error('❌ Verification error:', error);
         res.status(500).json({ success: false, message: error.message });
@@ -86,55 +119,6 @@ function generateSecureToken(email) {
     const timestamp = Date.now().toString(36);
     
     return `prem_${timestamp}_${safeEmail}_${random}`;
-}
-
-// ===== JSON ডেটাবেসে টোকেন সেভ করুন =====
-async function saveTokenToDatabase(email, token, packageName, paymentId, amount) {
-    try {
-        // data ফোল্ডার তৈরি করুন (যদি না থাকে)
-        const dataDir = path.join(process.cwd(), 'data');
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
-            console.log('📁 Created data directory');
-        }
-
-        const dataPath = path.join(dataDir, 'tokens.json');
-        console.log('📂 Saving to:', dataPath);
-        
-        // পুরানো ডেটা পড়ুন
-        let tokens = [];
-        try {
-            const fileContent = fs.readFileSync(dataPath, 'utf8');
-            tokens = JSON.parse(fileContent);
-            console.log('📦 Existing tokens:', tokens.length);
-        } catch (error) {
-            console.log('⚠️ No existing tokens, creating new file');
-            tokens = [];
-        }
-
-        // নতুন টোকেন যোগ করুন
-        const newToken = {
-            email: email,
-            token: token,
-            packageName: packageName || 'Unknown',
-            paymentId: paymentId || 'N/A',
-            amount: amount || 0,
-            createdAt: new Date().toISOString(),
-            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-        };
-
-        tokens.push(newToken);
-
-        // ফাইলে সেভ করুন
-        fs.writeFileSync(dataPath, JSON.stringify(tokens, null, 2));
-        console.log('✅ Token saved to JSON database. Total:', tokens.length);
-
-        return true;
-
-    } catch (error) {
-        console.error('❌ Database save error:', error.message);
-        return false;
-    }
 }
 
 // ===== Email পাঠান =====
@@ -156,7 +140,7 @@ async function sendEmailWithToken(email, token, packageName) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                service_id: 'service_27gemli', 
+                service_id: 'service_27gemli',
                 template_id: 'template_ycce885',
                 user_id: 'hViHPsxs_BAdnj5_O',
                 template_params: {

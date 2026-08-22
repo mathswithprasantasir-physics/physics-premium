@@ -33,25 +33,38 @@
     </div>
 
     <script src="/js/main.js"></script>
-    <script>
-        const ADMIN_PASSWORD = 'admin123';
+    <!-- admin-login.html - JavaScript আপডেট -->
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('adminEmail').value;
+        const password = document.getElementById('adminPassword').value;
+        const errorMsg = document.getElementById('errorMsg');
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const password = document.getElementById('adminPassword').value;
-            const errorMsg = document.getElementById('errorMsg');
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-            if (password === ADMIN_PASSWORD) {
+            const data = await response.json();
+
+            if (data.success && data.user.isAdmin) {
                 localStorage.setItem('adminLoggedIn', 'true');
+                localStorage.setItem('adminToken', data.token);
                 localStorage.setItem('adminLoginTime', new Date().toISOString());
                 Toast.show('✅ Login successful!', 'success');
                 window.location.href = '/admin.html';
             } else {
                 errorMsg.style.display = 'block';
-                document.getElementById('adminPassword').value = '';
-                document.getElementById('adminPassword').focus();
+                errorMsg.textContent = '❌ Invalid admin credentials';
             }
-        });
-    </script>
+        } catch (error) {
+            errorMsg.style.display = 'block';
+            errorMsg.textContent = '❌ Server error. Please try again.';
+        }
+    });
+</script>
 </body>
 </html>

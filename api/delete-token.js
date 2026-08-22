@@ -1,11 +1,12 @@
 // api/delete-token.js
-import fs from 'fs';
-import path from 'path';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-key');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -27,25 +28,15 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Token required' });
         }
 
-        const dataPath = path.join(process.cwd(), 'data', 'tokens.json');
-        
-        let tokens = [];
-        try {
-            const fileContent = fs.readFileSync(dataPath, 'utf8');
-            tokens = JSON.parse(fileContent);
-        } catch (error) {
-            tokens = [];
-        }
+        // ✅ Prisma দিয়ে টোকেন ডিলিট
+        const deleted = await prisma.accessToken.delete({
+            where: { token: token }
+        });
 
-        // টোকেন রিমুভ করুন
-        const filteredTokens = tokens.filter(t => t.token !== token);
-        
-        if (filteredTokens.length === tokens.length) {
+        if (!deleted) {
             return res.status(404).json({ error: 'Token not found' });
         }
 
-        fs.writeFileSync(dataPath, JSON.stringify(filteredTokens, null, 2));
-        
         res.status(200).json({
             success: true,
             message: 'Token deleted successfully'

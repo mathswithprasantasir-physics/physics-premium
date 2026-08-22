@@ -1,6 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<script>
+    // পেজ লোডের সময় লগইন চেক
+    document.addEventListener('DOMContentLoaded', async function() {
+        const token = localStorage.getItem('authToken');
+        
+        if (!token) {
+            // লগইন না থাকলে লগইন পেজে রিডাইরেক্ট
+            const currentUrl = window.location.href;
+            window.location.href = `/login.html?redirect=${encodeURIComponent(currentUrl)}`;
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/verify-session', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (!data.valid) {
+                localStorage.removeItem('authToken');
+                const currentUrl = window.location.href;
+                window.location.href = `/login.html?redirect=${encodeURIComponent(currentUrl)}`;
+            }
+        } catch (error) {
+            console.error('Session check error:', error);
+        }
+    });
+</script>
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Premium Learning Notes</title>
