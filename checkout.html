@@ -207,105 +207,114 @@
         // Razorpay পেমেন্ট
         // ============================================
         async function makePayment() {
-            const email = document.getElementById('userEmailDisplay').textContent;
-            const priceText = document.getElementById('orderPrice').textContent;
-            const amount = parseInt(priceText.replace('₹', '').trim());
-            const orderTitle = document.getElementById('orderTitle').textContent;
+    const email = document.getElementById('userEmailDisplay').textContent;
+    const priceText = document.getElementById('orderPrice').textContent;
+    const amount = parseInt(priceText.replace('₹', '').trim());
+    const orderTitle = document.getElementById('orderTitle').textContent;
 
-            if (!email || email === 'Not provided') {
-                alert('❌ Please provide your email address to proceed with payment.');
-                return;
-            }
+    if (!email || email === 'Not provided') {
+        alert('❌ Please provide your email address to proceed with payment.');
+        return;
+    }
 
-            const btn = document.getElementById('razorpayBtn');
-            btn.textContent = '⏳ Processing...';
-            btn.disabled = true;
+    const btn = document.getElementById('razorpayBtn');
+    btn.textContent = '⏳ Processing...';
+    btn.disabled = true;
 
-            try {
-                const response = await fetch('/api/create-order', {
+    try {
+        const response = await fetch('/api/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: amount,
+                email: email,
+                packageName: orderTitle
+            })
+        });
+
+        const data = await response.json();
+        console.log('📥 Order response:', data);
+
+        // ❌ এরর চেক
+        if (!response.ok || data.error) {
+            const errorMsg = data.razorpayError || data.message || data.error || 'Unknown error';
+            alert(`❌ Order creation failed:\n\n${errorMsg}\n\nPlease try again or contact support.`);
+            btn.textContent = '💳 Pay with Razorpay';
+            btn.disabled = false;
+            return;
+        }
+
+        if (!data.id) {
+            alert('❌ Invalid order response. Please try again.');
+            btn.textContent = '💳 Pay with Razorpay';
+            btn.disabled = false;
+            return;
+        }
+
+        // ✅ Razorpay চেকআউট
+        const options = {
+            key: 'rzp_test_TSNkvfOF1qshGC',
+            amount: data.amount,
+            currency: data.currency || 'INR',
+            name: 'Learning Science Premium',
+            description: orderTitle || 'Access to premium content',
+            order_id: data.id,
+            prefill: {
+                email: email,
+                contact: '7980608289'
+            },
+            theme: { color: '#6C63FF' },
+            handler: function(response) {
+                console.log('🔹 Razorpay Response:', response);
+                
+                const userEmail = localStorage.getItem('userEmail') || email;
+                const userPackage = document.getElementById('orderTitle').textContent;
+                const userAmount = parseInt(document.getElementById('orderPrice').textContent.replace('₹', '').trim());
+                
+                fetch('/api/verify-payment', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: amount,
-                        email: email,
-                        packageName: orderTitle
+                        orderId: response.razorpay_order_id,
+                        paymentId: response.razorpay_payment_id,
+                        signature: response.razorpay_signature,
+                        email: userEmail,
+                        packageName: userPackage,
+                        amount: userAmount
                     })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('✅ Payment successful! We will send your access link.');
+                        window.location.href = '/payment-success.html';
+                    } else {
+                        alert('❌ Payment verification failed. Please contact support.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Verification error:', err);
+                    alert('❌ Something went wrong. Please try again.');
                 });
-
-                const order = await response.json();
-
-                if (!order.id) {
-                    alert('Order creation failed. Please try again.');
+            },
+            modal: {
+                ondismiss: function() {
                     btn.textContent = '💳 Pay with Razorpay';
                     btn.disabled = false;
-                    return;
                 }
-
-                const options = {
-                    key: 'rzp_test_TSNkvfOF1qshGC',
-                    amount: order.amount,
-                    currency: order.currency || 'INR',
-                    name: 'Learning Science Premium',
-                    description: orderTitle || 'Access to premium content',
-                    order_id: order.id,
-                    prefill: {
-                        email: email,
-                        contact: '7980608289'
-                    },
-                    theme: { color: '#6C63FF' },
-                    handler: function(response) {
-                        console.log('🔹 Razorpay Response:', response);
-                        
-                        const userEmail = localStorage.getItem('userEmail') || email;
-                        const userPackage = document.getElementById('orderTitle').textContent;
-                        const userAmount = parseInt(document.getElementById('orderPrice').textContent.replace('₹', '').trim());
-                        
-                        console.log('📧 Sending email to verify:', userEmail);
-                        
-                        fetch('/api/verify-payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                orderId: response.razorpay_order_id,
-                                paymentId: response.razorpay_payment_id,
-                                signature: response.razorpay_signature,
-                                email: userEmail,
-                                packageName: userPackage,
-                                amount: userAmount
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('✅ Payment successful! We will send your access link.');
-                                window.location.href = '/payment-success.html';
-                            } else {
-                                alert('❌ Payment verification failed. Please contact support.');
-                            }
-                        })
-                        .catch(err => {
-                            console.error('Verification error:', err);
-                            alert('❌ Something went wrong. Please try again.');
-                        });
-                    },
-                    modal: {
-                        ondismiss: function() {
-                            btn.textContent = '💳 Pay with Razorpay';
-                            btn.disabled = false;
-                        }
-                    }
-                };
-
-                const rzp = new Razorpay(options);
-                rzp.open();
-
-            } catch (error) {
-                console.error('Payment error:', error);
-                alert('❌ Something went wrong. Please try again.');
-                btn.textContent = '💳 Pay with Razorpay';
-                btn.disabled = false;
             }
-        }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+
+    } catch (error) {
+        console.error('Payment error:', error);
+        alert(`❌ Error: ${error.message || 'Something went wrong'}\n\nPlease try again.`);
+        btn.textContent = '💳 Pay with Razorpay';
+        btn.disabled = false;
+    }
+}
     </script>
 </body>
 </html>
