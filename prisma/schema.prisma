@@ -36,7 +36,7 @@ model AccessToken {
   amount      Float?   @db.Decimal(10, 2)
   paymentId   String?  @map("payment_id")
   createdAt   DateTime @default(now()) @map("created_at")
-  expiresAt   DateTime @default(now() + 365 days) @map("expires_at")
+  expiresAt   DateTime @default(now()) @map("expires_at")
   isActive    Boolean  @default(true) @map("is_active")
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)

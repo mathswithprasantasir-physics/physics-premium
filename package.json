@@ -10,12 +10,12 @@
     "db:generate": "npx prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.8.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
     "razorpay": "^2.8.6"
   },
   "devDependencies": {
+    "@prisma/client": "^5.8.0",
     "@vercel/node": "^2.15.10",
     "prisma": "^5.8.0"
   }
