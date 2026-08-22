@@ -126,6 +126,11 @@
         const amount = parseInt(urlParams.get('amount')) || 0;
         const email = urlParams.get('email') || localStorage.getItem('userEmail') || 'Not provided';
 
+        // ✅ ইমেইল localStorage-এ সেভ করুন
+        if (email && email !== 'Not provided') {
+            localStorage.setItem('userEmail', email);
+        }
+
         const PACKAGES = {
             'physics': { title: '⚛️ Physics Pack', desc: 'All Physics chapters — Magnetic Effects, Thermodynamics, Optics & more', price: 49, emoji: '⚛️', items: ['🧲 Magnetic Effects', '🔥 Thermodynamics', '🔦 Ray Optics', '⚡ Electrostatics', '🌊 Waves'] },
             'maths': { title: '📐 Maths Pack', desc: 'All Maths chapters — Calculus, Algebra, Trigonometry & more', price: 39, emoji: '📐', items: ['📐 Calculus', '📊 Algebra', '📏 Trigonometry', '📈 Statistics', '📍 Coordinate Geometry'] },
@@ -195,12 +200,11 @@
             btn.disabled = true;
 
             try {
-                // অর্ডার তৈরি
                 const response = await fetch('/api/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: amount, // রুপি থেকে পয়সা (Server-এ হবে)
+                        amount: amount,
                         email: email,
                         packageName: orderTitle
                     })
@@ -215,10 +219,9 @@
                     return;
                 }
 
-                // Razorpay চেকআউট (Test Mode Key)
                 const options = {
-                    key: 'rzp_test_TSNkvfOF1qshGC', // <--- TEST KEY এখানে বসান
-                    amount: order.amount, // Server থেকে পাওয়া amount (which is in paise)
+                    key: 'rzp_test_TSNkvfOF1qshGC',
+                    amount: order.amount,
                     currency: order.currency || 'INR',
                     name: 'Learning Science Premium',
                     description: orderTitle || 'Access to premium content',

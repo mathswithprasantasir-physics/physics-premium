@@ -22,11 +22,12 @@
         
         .access-denied { text-align: center; padding: 80px 20px; }
         .access-denied h1 { color: #e53935; border-bottom: none; }
-        .access-denied p { font-size: 18px; color: #666; margin-bottom: 30px; }
+        .access-denied p { font-size: 18px; color: #666; margin-bottom: 15px; }
         .access-denied .btn { background: #1a1a2e; color: #fff; padding: 14px 50px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 16px; display: inline-block; transition: 0.3s; }
         .access-denied .btn:hover { background: #6C63FF; transform: scale(1.05); }
+        .access-denied .error-detail { background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px; text-align: left; }
+        .access-denied .error-detail li { margin: 8px 0; color: #555; }
 
-        /* Mobile Responsive */
         @media (max-width: 600px) {
             .container { padding: 20px; margin: 10px; }
             h1 { font-size: 1.8rem; }
@@ -44,32 +45,50 @@
         const container = document.getElementById('contentContainer');
 
         // =============================================
-        // ১. LocalStorage থেকে Email বের করুন
+        // ১. ইউজারের ইমেইল চেক করুন
         // =============================================
-        const storedEmail = localStorage.getItem('userEmail');
+        let userEmail = urlParams.get('email') || localStorage.getItem('userEmail');
+
+        // যদি ইমেইল না থাকে, তাহলে ইউজারকে ইনপুট দিতে বলুন
+        if (!userEmail) {
+            userEmail = prompt('Please enter your registered email address to access this content:');
+            if (userEmail && userEmail.trim() !== '') {
+                localStorage.setItem('userEmail', userEmail.trim());
+                userEmail = userEmail.trim();
+            }
+        }
 
         // =============================================
-        // ২. Backend API দিয়ে Token + Email Verify করুন
+        // ২. Token Verify করুন
         // =============================================
         async function verifyToken() {
             if (!token) {
-                showDenied();
+                showDenied('No access token found in the URL.');
                 return;
             }
 
-            // Test Token (শুধু টেস্ট করার জন্য)
+            // Test Token (শুধু ডেভেলপমেন্টের জন্য)
             if (token === 'test-token-2026') {
                 showContent();
                 return;
             }
 
+            // যদি ইমেইল না থাকে
+            if (!userEmail) {
+                showDenied('Email is required to access this content. Please refresh and enter your email.');
+                return;
+            }
+
             try {
+                // লোডিং দেখান
+                document.getElementById('loadingMessage').innerHTML = '⏳ Verifying your access...';
+
                 const response = await fetch('/api/verify-token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         token: token,
-                        email: storedEmail
+                        email: userEmail
                     })
                 });
 
@@ -78,19 +97,22 @@
                 if (data.valid) {
                     showContent();
                 } else {
-                    showDenied();
+                    showDenied(data.error || 'Invalid token or email mismatch.');
                 }
             } catch (error) {
                 console.error('Verification error:', error);
-                showDenied();
+                showDenied('Unable to verify access. Please check your internet connection.');
             }
         }
 
         // =============================================
-        // ৩. Content Show করার ফাংশন
+        // ৩. Content Show করুন
         // =============================================
         function showContent() {
             container.innerHTML = `
+                <div style="background:#e8f5e9;padding:10px 16px;border-radius:8px;margin-bottom:20px;text-align:center;border:1px solid #a5d6a7;">
+                    ✅ <strong>Access Granted</strong> — Welcome <span style="color:#2e7d32;">${userEmail || 'User'}</span>
+                </div>
                 <h1>🧲 Magnetic Effects of Current</h1>
                 
                 <h2>1. Concept of Magnetic Field</h2>
@@ -141,19 +163,40 @@
                     <tr><td>Voltmeter</td><td>High resistance (R) in series</td><td>R = V/I<sub>g</sub> - G</td></tr>
                 </table>
 
+                <div style="background:#e3f2fd;padding:15px;border-radius:8px;margin-top:30px;text-align:center;border:1px solid #90caf9;">
+                    <p style="margin:0;color:#0d47a1;">🔒 This content is exclusively for <strong>${userEmail || 'registered users'}</strong></p>
+                </div>
+
                 <p style="text-align:center;margin-top:40px;color:#888;font-size:14px;">© 2026 Learning Science. All rights reserved.</p>
             `;
         }
 
         // =============================================
-        // ৪. Access Denied Show করার ফাংশন
+        // ৪. Access Denied Show করুন
         // =============================================
-        function showDenied() {
+        function showDenied(errorMessage = '') {
             container.innerHTML = `
                 <div class="access-denied">
                     <h1>⛔ Access Denied</h1>
-                    <p>This link is not valid for this device/browser.<br>You must purchase the content and login with the same email to view it.</p>
-                    <a href="/" class="btn">← Go back to Home</a>
+                    <p>${errorMessage || 'This link is not valid for this device/browser.'}</p>
+                    
+                    <div class="error-detail">
+                        <p style="font-weight:600;margin-top:0;color:#e65100;">📌 Why this happened?</p>
+                        <ul style="list-style:none;padding:0;">
+                            <li>• You may be trying to access from a different email address.</li>
+                            <li>• This link is tied to the email used for payment.</li>
+                            <li>• Please use the same email address you used during purchase.</li>
+                            ${userEmail ? `<li>• Your current email: <strong>${userEmail}</strong></li>` : ''}
+                        </ul>
+                    </div>
+                    
+                    <p style="font-size:14px;color:#888;margin-top:20px;">
+                        <strong>Need help?</strong> Contact us at <a href="mailto:support@learningscience.in">support@learningscience.in</a>
+                    </p>
+                    
+                    <a href="/" class="btn" style="margin-top:10px;">← Go back to Home</a>
+                    <br>
+                    <a href="#" onclick="location.reload()" style="display:inline-block;margin-top:15px;color:#6C63FF;text-decoration:underline;cursor:pointer;">⟳ Try again with different email</a>
                 </div>
             `;
         }

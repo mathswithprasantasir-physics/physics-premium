@@ -1,15 +1,7 @@
+// api/create-order.js
 import Razorpay from 'razorpay';
 
 export default async function handler(req, res) {
-    // CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -17,52 +9,34 @@ export default async function handler(req, res) {
     try {
         const { amount, email, packageName } = req.body;
 
-        console.log('📦 Creating order...', { amount, email, packageName });
-
-        // ===== Environment Variables =====
-        const keyId = process.env.RAZORPAY_KEY_ID;
-        const keySecret = process.env.RAZORPAY_KEY_SECRET;
-
-        console.log('🔑 Key ID:', keyId ? '✅ Present' : '❌ Missing');
-        console.log('🔑 Key Secret:', keySecret ? '✅ Present' : '❌ Missing');
-
-        if (!keyId || !keySecret) {
-            return res.status(500).json({ 
-                error: 'Razorpay keys not configured',
-                keyId: !!keyId,
-                keySecret: !!keySecret
-            });
-        }
-
-        // ===== Razorpay ইনিশিয়ালাইজ =====
+        // Razorpay ইনস্ট্যান্স তৈরি
         const razorpay = new Razorpay({
-            key_id: keyId,
-            key_secret: keySecret,
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
         });
 
-        // ===== অর্ডার তৈরি =====
-        const order = await razorpay.orders.create({
-            amount: amount * 100,
+        // অর্ডার তৈরি
+        const options = {
+            amount: amount * 100, // রুপি থেকে পয়সা
             currency: 'INR',
             receipt: `receipt_${Date.now()}`,
+            payment_capture: 1,
             notes: {
                 email: email,
-                package: packageName || 'Unknown'
+                package: packageName || 'Premium Notes'
             }
-        });
+        };
 
-        console.log('✅ Order created:', order.id);
+        const order = await razorpay.orders.create(options);
 
         res.status(200).json({
             id: order.id,
             amount: order.amount,
             currency: order.currency
         });
+
     } catch (error) {
-        console.error('❌ Order error:', error);
-        res.status(500).json({ 
-            error: error.message,
-            stack: error.stack
-        });
+        console.error('Order creation error:', error);
+        res.status(500).json({ error: error.message });
     }
 }

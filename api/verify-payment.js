@@ -38,11 +38,14 @@ export default async function handler(req, res) {
         if (generatedSignature === signature) {
             console.log('✅ Payment verified for:', email);
 
+            // ✅ টোকেন জেনারেট (ইমেইল এনকোড সহ)
             const token = generateToken(email, packageName);
             console.log('🔑 Token generated:', token);
 
+            // Google Sheets-এ সেভ
             await saveUserToGoogleSheets(email, packageName, token, paymentId, amount);
 
+            // ইমেইল পাঠান
             await sendEmailJS(email, token, packageName);
 
             res.status(200).json({
@@ -61,7 +64,7 @@ export default async function handler(req, res) {
     }
 }
 
-// ===== টোকেন জেনারেট (Node.js Buffer ব্যবহার করে) =====
+// ===== টোকেন জেনারেট (ইমেইল এনকোড সহ) =====
 function generateToken(email, packageName) {
     const encodedEmail = Buffer.from(email).toString('base64');
     const random = Math.random().toString(36).substring(2, 10);
