@@ -33,14 +33,14 @@ model AccessToken {
   userId      Int      @map("user_id")
   token       String   @unique
   packageName String?  @map("package_name")
-  amount      Float?   @db.Decimal(10, 2)
+  amount      Decimal? @db.Decimal(10, 2)  // ✅ Float → Decimal
   paymentId   String?  @map("payment_id")
   createdAt   DateTime @default(now()) @map("created_at")
-  expiresAt   DateTime @default(now()) @map("expires_at")
+  expiresAt   DateTime @default(now()) @map("expires_at")  // ✅ 365 days সরানো
   isActive    Boolean  @default(true) @map("is_active")
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessLogs  AccessLog[]
+  accessLogs  AccessLog[]  // ✅ relation ঠিক আছে
 
   @@map("access_tokens")
 }
@@ -51,7 +51,7 @@ model Payment {
   userId      Int      @map("user_id")
   orderId     String?  @map("order_id")
   paymentId   String?  @map("payment_id")
-  amount      Float    @db.Decimal(10, 2)
+  amount      Decimal  @db.Decimal(10, 2)  // ✅ Float → Decimal
   status      String   @default("pending")
   createdAt   DateTime @default(now()) @map("created_at")
   completedAt DateTime? @map("completed_at")
