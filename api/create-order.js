@@ -17,20 +17,19 @@ export default async function handler(req, res) {
     try {
         const { amount, email, packageName } = req.body;
 
-        console.log('📦 Creating order:', { amount, email, packageName });
+        console.log('📦 Creating order for:', { amount, email, packageName });
 
         // ✅ Environment Variables চেক
         const keyId = process.env.RAZORPAY_KEY_ID;
         const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-        console.log('🔑 RAZORPAY_KEY_ID:', keyId ? '✅ Present' : '❌ Missing');
-        console.log('🔑 RAZORPAY_KEY_SECRET:', keySecret ? '✅ Present' : '❌ Missing');
+        console.log('🔑 RAZORPAY_KEY_ID:', keyId ? '✅ Set' : '❌ Missing');
+        console.log('🔑 RAZORPAY_KEY_SECRET:', keySecret ? '✅ Set' : '❌ Missing');
 
-        // ❌ যদি Key না থাকে
         if (!keyId || !keySecret) {
             return res.status(500).json({ 
-                error: 'Razorpay keys not configured',
-                details: 'Please set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Vercel Environment Variables'
+                error: 'Razorpay configuration error',
+                details: 'API keys not configured'
             });
         }
 
@@ -40,21 +39,31 @@ export default async function handler(req, res) {
             key_secret: keySecret,
         });
 
-        // অর্ডার তৈরি
+        // ✅ UTF-8 স্যানিটাইজেশন
+        const sanitizedEmail = email ? email.trim().substring(0, 50) : 'unknown';
+        const sanitizedPackage = packageName ? packageName.trim().substring(0, 30) : 'Premium Notes';
+        
+        // ✅ শুধু অক্ষর এবং সংখ্যা রাখুন (স্পেশাল ক্যারেক্টার বাদ দিন)
+        const cleanEmail = sanitizedEmail.replace(/[^a-zA-Z0-9@._-]/g, '');
+        const cleanPackage = sanitizedPackage.replace(/[^a-zA-Z0-9\s-]/g, '');
+
+        // অর্ডার অপশন
         const options = {
-            amount: amount * 100,
+            amount: amount * 100, // রুপি থেকে পয়সা
             currency: 'INR',
             receipt: `receipt_${Date.now()}`,
             payment_capture: 1,
             notes: {
-                email: email || 'unknown',
-                package: packageName || 'Premium Notes'
+                email: cleanEmail || 'unknown',
+                package: cleanPackage || 'Premium Notes'
             }
         };
 
+        console.log('📤 Razorpay order options:', options);
+
         const order = await razorpay.orders.create(options);
         
-        console.log('✅ Order created:', order.id);
+        console.log('✅ Order created successfully:', order.id);
 
         res.status(200).json({
             id: order.id,
@@ -63,10 +72,9 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ Order error:', error);
+        console.error('❌ Order creation error:', error);
         console.error('📝 Error details:', error.response?.data || error.message);
         
-        // ✅ ক্লায়েন্টকে বিস্তারিত এরর দেখান
         res.status(500).json({ 
             error: 'Order creation failed',
             message: error.message,

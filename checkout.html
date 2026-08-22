@@ -222,13 +222,16 @@
     btn.disabled = true;
 
     try {
+        // ✅ প্যাকেজ নাম স্যানিটাইজ করুন (ইমোজি বাদ দিন)
+        const cleanPackageName = orderTitle.replace(/[^a-zA-Z0-9\s-]/g, '').trim() || 'Premium Notes';
+
         const response = await fetch('/api/create-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 amount: amount,
                 email: email,
-                packageName: orderTitle
+                packageName: cleanPackageName
             })
         });
 
@@ -257,7 +260,7 @@
             amount: data.amount,
             currency: data.currency || 'INR',
             name: 'Learning Science Premium',
-            description: orderTitle || 'Access to premium content',
+            description: cleanPackageName || 'Access to premium content',
             order_id: data.id,
             prefill: {
                 email: email,
@@ -315,6 +318,7 @@
         btn.disabled = false;
     }
 }
+
     </script>
 </body>
 </html>
