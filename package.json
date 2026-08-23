@@ -5,6 +5,7 @@
   "scripts": {
     "build": "npx prisma generate",
     "vercel-build": "npx prisma generate",
+	"postinstall": "npx prisma generate"
     "deploy": "vercel deploy --prod"
   },
   "dependencies": {
