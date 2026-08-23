@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "npx prisma generate",
-    "deploy": "vercel deploy --prod",
-    "dev": "vercel dev"
+    "vercel-build": "npx prisma generate",
+    "deploy": "vercel deploy --prod"
   },
   "dependencies": {
     "@prisma/client": "^5.8.0",
