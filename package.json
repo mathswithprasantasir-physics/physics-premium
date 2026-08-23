@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-	"build": "npx prisma generate",
+	"build": "npx prisma generate && echo 'Build completed'"
     "deploy": "vercel deploy --prod"
   },
   "dependencies": {
