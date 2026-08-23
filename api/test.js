@@ -4,6 +4,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
   try {
     // ডেটাবেস কানেকশন টেস্ট
     await prisma.$connect();
@@ -11,15 +13,16 @@ export default async function handler(req, res) {
     
     res.status(200).json({
       success: true,
-      message: 'Database connected!',
+      message: '✅ Database connected successfully!',
       userCount: userCount,
-      env: {
+      environment: {
         hasDatabaseUrl: !!process.env.DATABASE_URL,
-        nodeEnv: process.env.NODE_ENV
+        nodeEnv: process.env.NODE_ENV || 'unknown',
+        jwtSecret: !!process.env.JWT_SECRET
       }
     });
   } catch (error) {
-    console.error('Test error:', error);
+    console.error('❌ Test error:', error);
     res.status(500).json({
       success: false,
       error: error.message,
