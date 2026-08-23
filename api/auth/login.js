@@ -6,15 +6,17 @@ import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
-  // ✅ CORS headers
+  // ✅ CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // ✅ OPTIONS প্রিহ্যান্ডল
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
+  // ✅ শুধু POST অনুমোদিত
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
