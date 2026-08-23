@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== ইউজার =====
+model User {
+  id            Int           @id @default(autoincrement())
+  email         String        @unique
+  passwordHash  String        @map("password_hash")
+  fullName      String?       @map("full_name")
+  phone         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  lastLogin     DateTime?     @map("last_login")
+  isAdmin       Boolean       @default(false) @map("is_admin")
+  isActive      Boolean       @default(true) @map("is_active")
+
+  purchases     Purchase[]
+  downloads     Download[]
+  accessTokens  AccessToken[]
+
+  @@map("users")
+}
+
+// ===== পারচেজ =====
+model Purchase {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  postId      String   @map("post_id")
+  postTitle   String   @map("post_title")
+  postClass   String   @map("post_class")
+  postSubject String   @map("post_subject")
+  amount      Float
+  paymentId   String   @map("payment_id")
+  purchasedAt DateTime @default(now()) @map("purchased_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("purchases")
+}
+
+// ===== ডাউনলোড =====
+model Download {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  postId      String   @map("post_id")
+  postTitle   String   @map("post_title")
+  downloadedAt DateTime @default(now()) @map("downloaded_at")
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("downloads")
+}
+
+// ===== অ্যাক্সেস টোকেন =====
+model AccessToken {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  token       String   @unique
+  postId      String   @map("post_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  expiresAt   DateTime @default(now() + 7 days) @map("expires_at")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("access_tokens")
+}
+
+// ===== পেমেন্ট লগ =====
+model PaymentLog {
+  id          Int      @id @default(autoincrement())
+  orderId     String   @map("order_id")
+  paymentId   String?  @map("payment_id")
+  userId      Int?     @map("user_id")
+  amount      Float
+  status      String
+  createdAt   DateTime @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+  error       String?
+
+  @@map("payment_logs")
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>📚 Premium</h2>
+        <p class="sidebar-sub">Learning Platform</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/dashboard/" class="active">
+          <span>📊</span> Dashboard
+        </a>
+        <a href="/dashboard/my-purchases.html">
+          <span>📥</span> My Purchases
+        </a>
+        <a href="/dashboard/download-history.html">
+          <span>📄</span> Downloads
+        </a>
+        <a href="/dashboard/profile.html">
+          <span>👤</span> Profile
+        </a>
+        <a href="#" onclick="logout()">
+          <span>🚪</span> Logout
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="dashboard-header">
+        <div>
+          <h1>Welcome back, <span id="userName">Student</span>!</h1>
+          <p id="userEmail" class="text-muted">email@example.com</p>
+        </div>
+        <a href="/browse.html" class="btn btn-primary">📚 Browse Notes</a>
+      </header>
+
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📚</div>
+          <div class="stat-info">
+            <h3>Total Purchases</h3>
+            <p id="totalPurchases">0</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📄</div>
+          <div class="stat-info">
+            <h3>Downloads</h3>
+            <p id="totalDownloads">0</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h3>Total Spent</h3>
+            <p id="totalSpent">₹0</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <h3>Active Tokens</h3>
+            <p id="activeTokens">0</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="recent-section">
+        <h2>📥 Recent Purchases</h2>
+        <div id="recentPurchases" class="purchase-list">
+          <p class="empty">No purchases yet. <a href="/browse.html">Browse notes →</a></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

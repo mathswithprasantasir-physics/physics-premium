@@ -1,0 +1,21 @@
+{
+  "id": "magnetic-effects",
+  "title": "🧲 Magnetic Effects of Current",
+  "class": "12",
+  "subject": "physics",
+  "chapter": "4",
+  "price": 49,
+  "excerpt": "Complete chapter with formulas, derivations, and practice questions.",
+  "topics": [
+    "Biot-Savart Law",
+    "Ampere's Circuital Law",
+    "Lorentz Force",
+    "Motion in Perpendicular B",
+    "Force on Current-Carrying Conductor",
+    "Force Between Parallel Wires",
+    "Torque on a Loop",
+    "Moving Coil Galvanometer",
+    "Conversion of Galvanometer"
+  ],
+  "fullContent": "<h1>Magnetic Effects of Current</h1><p>In 1820, Hans Christian Oersted discovered that a compass needle deflects when placed near a current-carrying wire.</p><h2>Biot-Savart Law</h2><p>dB = (μ₀/4π) × (I dl sinθ) / r²</p><h2>Ampere's Circuital Law</h2><p>∮ B·dl = μ₀I</p><h2>Lorentz Force</h2><p>F = qE + q(v × B)</p><h2>Motion in Perpendicular B</h2><p>r = mv/qB</p><p>ν = qB/2πm</p><h2>Force on Current-Carrying Conductor</h2><p>F = ILB sinθ</p><h2>Force Between Parallel Wires</h2><p>F/L = μ₀I₁I₂/2πd</p><h2>Torque on a Loop</h2><p>τ = NIAB sinθ</p><h2>Moving Coil Galvanometer</h2><p>I = (k/NAB)α</p><h2>Conversion of Galvanometer</h2><table><tr><th>Device</th><th>Method</th><th>Formula</th></tr><tr><td>Ammeter</td><td>Shunt (S) in parallel</td><td>S = I<sub>g</sub>G/(I - I<sub>g</sub>)</td></tr><tr><td>Voltmeter</td><td>High resistance (R) in series</td><td>R = V/I<sub>g</sub> - G</td></tr></table>"
+}

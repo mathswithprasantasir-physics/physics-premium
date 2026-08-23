@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "views/**/*.html", "use": "@vercel/static" },
+    { "src": "public/**/*", "use": "@vercel/static" },
+    { "src": "data/**/*", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/views/index.html" },
+    { "src": "/browse", "dest": "/views/browse.html" },
+    { "src": "/browse.html", "dest": "/views/browse.html" },
+    { "src": "/blog/(.*)", "dest": "/views/blog-post.html" },
+    { "src": "/dashboard/(.*)", "dest": "/views/dashboard/$1" },
+    { "src": "/login.html", "dest": "/views/login.html" },
+    { "src": "/register.html", "dest": "/views/register.html" },
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/css/(.*)", "dest": "/public/css/$1" },
+    { "src": "/js/(.*)", "dest": "/public/js/$1" },
+    { "src": "/images/(.*)", "dest": "/public/images/$1" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ]
+}

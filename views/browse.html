@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Notes</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">📚 Physics Premium</a>
+      <div class="nav-links">
+        <a href="/browse.html" class="active">Browse</a>
+        <a href="/dashboard/">Dashboard</a>
+        <a href="/login.html" class="btn btn-sm btn-primary">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>📚 Browse Notes</h1>
+
+    <div class="filters">
+      <select id="classFilter" onchange="loadPosts()">
+        <option value="">All Classes</option>
+        <option value="9">Class 9</option>
+        <option value="10">Class 10</option>
+        <option value="11">Class 11</option>
+        <option value="12">Class 12</option>
+      </select>
+
+      <select id="subjectFilter" onchange="loadPosts()">
+        <option value="">All Subjects</option>
+        <option value="physics">⚛️ Physics</option>
+        <option value="chemistry">🧪 Chemistry</option>
+        <option value="maths">📐 Maths</option>
+      </select>
+
+      <input type="text" id="searchInput" placeholder="🔍 Search notes..." onkeyup="loadPosts()">
+    </div>
+
+    <div class="posts-grid" id="postsGrid">
+      <p>Loading...</p>
+    </div>
+  </div>
+
+  <script>
+    async function loadPosts() {
+      const classFilter = document.getElementById('classFilter').value;
+      const subjectFilter = document.getElementById('subjectFilter').value;
+      const search = document.getElementById('searchInput').value;
+
+      let url = '/api/blog/posts';
+      const params = [];
+      if (classFilter) params.push(`class=${classFilter}`);
+      if (subjectFilter) params.push(`subject=${subjectFilter}`);
+      if (search) params.push(`search=${encodeURIComponent(search)}`);
+      if (params.length) url += '?' + params.join('&');
+
+      try {
+        const response = await fetch(url);
+        const posts = await response.json();
+
+        const grid = document.getElementById('postsGrid');
+        if (posts.length === 0) {
+          grid.innerHTML = '<p class="empty">No posts found.</p>';
+          return;
+        }
+
+        grid.innerHTML = posts.map(post => `
+          <div class="post-card">
+            <span class="badge">${post.class} • ${post.subject}</span>
+            <h3>${post.title}</h3>
+            <p>${post.excerpt || ''}</p>
+            <div class="post-footer">
+              <span class="price">₹${post.price}</span>
+              <a href="/blog/${post.slug}" class="btn btn-sm">Read →</a>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('postsGrid').innerHTML = '<p class="error">Failed to load posts.</p>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPosts);
+  </script>
+</body>
+</html>

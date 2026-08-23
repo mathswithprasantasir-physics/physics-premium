@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+.vercel/
+.DS_Store
+*.log
+*.sqlite
+*.sqlite-journal
+dist/
+build/
+.next/
+out/

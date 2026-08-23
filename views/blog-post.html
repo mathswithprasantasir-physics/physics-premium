@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Blog Post</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">📚 Physics Premium</a>
+      <div class="nav-links">
+        <a href="/browse.html">Browse</a>
+        <a href="/dashboard/">Dashboard</a>
+        <a href="/login.html" class="btn btn-sm btn-primary">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <a href="/browse.html" class="btn btn-secondary btn-sm">← Browse</a>
+
+    <article id="postContainer">
+      <div id="loading">⏳ Loading...</div>
+    </article>
+  </div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    const slug = window.location.pathname.split('/').pop();
+
+    async function loadPost() {
+      try {
+        const response = await fetch(`/api/blog/${slug}`);
+        const post = await response.json();
+
+        document.getElementById('pageTitle').textContent = post.title;
+
+        const container = document.getElementById('postContainer');
+        container.innerHTML = `
+          <div class="post-header">
+            <span class="badge">${post.class} • ${post.subject} • Chapter ${post.chapter}</span>
+            <h1>${post.title}</h1>
+            <p class="price-tag">₹${post.price}</p>
+          </div>
+          <div class="post-content">
+            ${post.freeContent}
+            ${post.hasPaidContent ? `
+              <div class="paywall">
+                <div class="paywall-content">
+                  <h3>🔒 Full Content Locked</h3>
+                  <p>Get complete chapter with all topics, formulas, and practice questions.</p>
+                  <button onclick="initiatePayment('${post.id}')" class="btn btn-primary btn-lg">
+                    ₹${post.price} - Download Full PDF
+                  </button>
+                  <p class="small">✅ Lifetime access • One-time payment</p>
+                </div>
+              </div>
+            ` : `
+              <div class="free-badge">✨ Full content available for free!</div>
+            `}
+          </div>
+        `;
+
+        // Razorpay স্ক্রিপ্ট লোড
+        if (post.hasPaidContent) {
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          document.head.appendChild(script);
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('postContainer').innerHTML = `
+          <h1>Post not found</h1>
+          <a href="/browse.html" class="btn btn-secondary">← Browse</a>
+        `;
+      }
+    }
+
+    async function initiatePayment(postId) {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        alert('Please login first!');
+        window.location.href = '/login.html?redirect=' + window.location.pathname;
+        return;
+      }
+
+      try {
+        const orderRes = await fetch('/api/payment/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ postId })
+        });
+
+        const order = await orderRes.json();
+
+        if (order.error) {
+          alert(order.error);
+          return;
+        }
+
+        const options = {
+          key: 'rzp_test_TSNkvfOF1qshGC',
+          amount: order.amount,
+          currency: order.currency || 'INR',
+          name: 'Physics Premium',
+          description: order.postTitle || 'Premium Content',
+          order_id: order.id,
+          prefill: {
+            email: localStorage.getItem('userEmail') || ''
+          },
+          theme: { color: '#6C63FF' },
+          handler: function(response) {
+            fetch('/api/payment/verify-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                postId: postId
+              })
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                alert('✅ Payment successful! Downloading PDF...');
+                window.location.href = `/api/download?token=${data.token}`;
+              } else {
+                alert('❌ Payment verification failed. Please contact support.');
+              }
+            })
+            .catch(err => {
+              console.error('Error:', err);
+              alert('❌ Something went wrong. Please try again.');
+            });
+          },
+          modal: {
+            ondismiss: function() {
+              // User cancelled
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+
+      } catch (error) {
+        console.error('Payment error:', error);
+        alert('Failed to initiate payment. Please try again.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPost);
+  </script>
+</body>
+</html>
