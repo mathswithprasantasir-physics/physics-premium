@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "npx prisma generate",
+    "vercel-build": "npx prisma generate",
     "deploy": "vercel deploy --prod"
   },
   "dependencies": {
