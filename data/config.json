@@ -1,16 +1,5 @@
 {
-  "siteName": "Physics Premium",
-  "siteDescription": "Premium Learning Notes for Physics & Maths",
   "freeContentPercent": 30,
-  "classes": ["9", "10", "11", "12"],
-  "subjects": {
-    "physics": { "name": "Physics", "icon": "⚛️" },
-    "chemistry": { "name": "Chemistry", "icon": "🧪" },
-    "maths": { "name": "Mathematics", "icon": "📐" }
-  },
-  "pricing": {
-    "single": 49,
-    "package": 199,
-    "allAccess": 499
-  }
+  "siteName": "Physics Premium",
+  "siteDescription": "Premium learning notes and study materials for Physics & Maths"
 }

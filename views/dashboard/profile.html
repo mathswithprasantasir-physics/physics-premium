@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Physics Premium</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>📚 Premium</h2>
+            </div>
+            <div class="sidebar-sub">Physics &amp; Maths Notes</div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard">📊 Dashboard</a>
+                <a href="/dashboard/my-purchases">📥 My Purchases</a>
+                <a href="/dashboard/profile" class="active">👤 Profile</a>
+                <a href="#" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>👤 Student Profile</h1>
+            <p style="color: var(--gray); margin-bottom: 24px;">Manage your account details and learning preferences.</p>
+
+            <div class="card" style="max-width: 600px;">
+                <div class="info-row" style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="color:#666;font-weight:500;">Full Name</span>
+                    <span style="font-weight:600;color:#1A1A2E;" id="profileName">Student</span>
+                </div>
+                <div class="info-row" style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="color:#666;font-weight:500;">Email Address</span>
+                    <span style="font-weight:600;color:#1A1A2E;" id="profileEmail">-</span>
+                </div>
+                <div class="info-row" style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="color:#666;font-weight:500;">User ID</span>
+                    <span style="font-weight:600;color:#1A1A2E;" id="profileId">-</span>
+                </div>
+                <div class="info-row" style="display:flex;justify-content:space-between;padding:14px 0;">
+                    <span style="color:#666;font-weight:500;">Role</span>
+                    <span style="font-weight:600;color:#1A1A2E;" id="profileRole">Student</span>
+                </div>
+                <div style="margin-top: 24px;">
+                    <a href="/browse" class="btn btn-primary">Browse Study Notes</a>
+                    <button onclick="logout()" class="btn btn-secondary" style="margin-left: 8px;">Logout</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/login?redirect=/dashboard/profile';
+                return false;
+            }
+            try {
+                const response = await fetch('/api/auth/verify-session', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!data.valid) {
+                    localStorage.removeItem('authToken');
+                    window.location.href = '/login?redirect=/dashboard/profile';
+                    return false;
+                }
+                return data.user;
+            } catch {
+                return false;
+            }
+        }
+
+        async function loadProfile() {
+            const user = await checkAuth();
+            if (!user) return;
+
+            document.getElementById('profileName').textContent = user.fullName || 'Student';
+            document.getElementById('profileEmail').textContent = user.email || '-';
+            document.getElementById('profileId').textContent = '#' + (user.userId || '1');
+            document.getElementById('profileRole').textContent = user.isAdmin ? 'Admin' : 'Student';
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = '/login';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+</body>
+</html>

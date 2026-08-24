@@ -9,12 +9,12 @@
 <body>
   <nav class="navbar">
     <div class="nav-container">
-      <a href="/" class="logo">📚 Physics Premium</a>
+      <a href="/" class="logo">📚 Physics <span>Premium</span></a>
       <div class="nav-links">
-        <a href="/browse.html">Browse</a>
-        <a href="/dashboard/">Dashboard</a>
-        <a href="/login.html" class="btn btn-sm btn-primary">Login</a>
-        <a href="/register.html" class="btn btn-sm btn-secondary">Register</a>
+        <a href="/browse">Browse</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/login" class="btn btn-sm btn-primary">Login</a>
+        <a href="/register" class="btn btn-sm btn-secondary">Register</a>
       </div>
     </div>
   </nav>
@@ -22,13 +22,13 @@
   <header class="hero">
     <div class="hero-content">
       <h1>📚 Premium Learning Notes</h1>
-      <p>Complete notes, PYQs, and study materials for <strong>Physics & Maths</strong></p>
+      <p>Complete notes, PYQs, and study materials for <strong>Physics &amp; Maths</strong></p>
       <div class="hero-stats">
         <span>✅ 100+ Chapters</span>
         <span>✅ Class 9-12</span>
         <span>✅ ₹1 Only</span>
       </div>
-      <a href="/browse.html" class="btn btn-primary btn-lg">Start Learning →</a>
+      <a href="/browse" class="btn btn-primary btn-lg">Start Learning →</a>
     </div>
   </header>
 
@@ -51,9 +51,11 @@
   </section>
 
   <section class="recent-posts">
-    <h2>📚 Recent Notes</h2>
-    <div class="posts-grid" id="postsGrid">
-      <p>Loading...</p>
+    <div class="container">
+      <h2>📚 Recent Notes</h2>
+      <div class="posts-grid" id="postsGrid">
+        <p>Loading...</p>
+      </div>
     </div>
   </section>
 
@@ -66,16 +68,15 @@
       try {
         const response = await fetch('/api/blog/posts');
         const posts = await response.json();
-
         const grid = document.getElementById('postsGrid');
         grid.innerHTML = posts.slice(0, 6).map(post => `
           <div class="post-card">
-            <span class="badge">${post.class} • ${post.subject}</span>
+            <span class="badge">${post.class || ''} • ${post.subject || ''}</span>
             <h3>${post.title}</h3>
             <p>${post.excerpt || ''}</p>
             <div class="post-footer">
-              <span class="price">₹${post.price}</span>
-              <a href="/blog/${post.slug}" class="btn btn-sm">Read →</a>
+              <span class="price">₹${post.price || 49}</span>
+              <a href="/blog/${post.slug}" class="btn btn-sm btn-primary">Buy Now</a>
             </div>
           </div>
         `).join('');
@@ -83,7 +84,6 @@
         console.error('Error:', error);
       }
     }
-
     document.addEventListener('DOMContentLoaded', loadPosts);
   </script>
 </body>

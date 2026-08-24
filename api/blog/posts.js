@@ -1,20 +1,27 @@
-// api/blog/posts.js
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const POSTS_DIR = path.join(__dirname, '..', '..', 'data', 'posts');
 
 export default async function handler(req, res) {
   const { class: className, subject, search } = req.query;
 
   try {
-    const postsDir = path.join(process.cwd(), 'data', 'posts');
     let allPosts = [];
 
-    const classes = fs.readdirSync(postsDir);
+    if (!fs.existsSync(POSTS_DIR)) {
+      return res.status(200).json([]);
+    }
+
+    const classes = fs.readdirSync(POSTS_DIR);
 
     for (const cls of classes) {
       if (className && cls !== `class-${className}`) continue;
 
-      const classPath = path.join(postsDir, cls);
+      const classPath = path.join(POSTS_DIR, cls);
       if (!fs.statSync(classPath).isDirectory()) continue;
 
       const subjects = fs.readdirSync(classPath);
@@ -26,6 +33,7 @@ export default async function handler(req, res) {
         if (!fs.statSync(subjectPath).isDirectory()) continue;
 
         const files = fs.readdirSync(subjectPath);
+
         for (const file of files) {
           if (!file.endsWith('.json')) continue;
 
@@ -33,22 +41,30 @@ export default async function handler(req, res) {
           const content = fs.readFileSync(filePath, 'utf8');
           const post = JSON.parse(content);
 
-          if (search && !post.title.toLowerCase().includes(search.toLowerCase())) {
-            continue;
+          // Search filter
+          if (search) {
+            const searchLower = search.toLowerCase();
+            const titleMatch = post.title && post.title.toLowerCase().includes(searchLower);
+            const subjectMatch = sub.toLowerCase().includes(searchLower);
+            const excerptMatch = post.excerpt && post.excerpt.toLowerCase().includes(searchLower);
+
+            if (!titleMatch && !subjectMatch && !excerptMatch) {
+              continue;
+            }
           }
 
           allPosts.push({
             ...post,
             class: cls.replace('class-', ''),
             subject: sub,
-            slug: post.id
+            slug: post.id,
           });
         }
       }
     }
 
-    // সাজানো (নতুন থেকে পুরনো)
-    allPosts.sort((a, b) => a.id.localeCompare(b.id));
+    // Sort by date (newest first)
+    allPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     res.status(200).json(allPosts);
 

@@ -1,0 +1,12 @@
+{
+  "id": "electrostatics",
+  "title": "⚡ Electrostatics - Electric Charges and Fields",
+  "class": "12",
+  "subject": "physics",
+  "chapter": "1",
+  "price": 59,
+  "excerpt": "Detailed notes covering Coulomb's Law, Electric Fields, Gauss's Law, and their applications.",
+  "topics": ["Electric Charge", "Coulomb's Law", "Electric Field", "Gauss's Law", "Electric Potential", "Capacitance"],
+  "createdAt": "2025-01-20T10:00:00Z",
+  "fullContent": "<h1>Electrostatics</h1><p>Electrostatics deals with the study of forces, fields, and potentials arising from static charges.</p><h2>Coulomb's Law</h2><p>The electrostatic force between two point charges is directly proportional to the product of their magnitudes and inversely proportional to the square of the distance between them. F = k(q1*q2)/r²</p><h2>Electric Field</h2><p>E = F/q. The electric field due to a point charge is given by E = kq/r²</p><h2>Gauss's Law</h2><p>The total electric flux out of a closed surface is equal to the charge enclosed divided by the permittivity. Φ = Q_enclosed / ε₀</p><h2>Capacitance</h2><p>C = Q/V. For a parallel plate capacitor, C = ε₀A/d.</p>"
+}

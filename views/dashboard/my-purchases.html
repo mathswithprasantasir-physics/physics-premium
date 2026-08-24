@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Purchases - Physics Premium</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>📚 Premium</h2>
+            </div>
+            <div class="sidebar-sub">Physics &amp; Maths Notes</div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard">📊 Dashboard</a>
+                <a href="/dashboard/my-purchases" class="active">📥 My Purchases</a>
+                <a href="/dashboard/profile">👤 Profile</a>
+                <a href="#" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>📥 My Purchased Notes</h1>
+            <p style="color: var(--gray); margin-bottom: 24px;">Access all your unlocked notes and study materials anytime.</p>
+
+            <div id="purchasesList">
+                <p class="empty">Loading purchases...</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/login?redirect=/dashboard/my-purchases';
+                return false;
+            }
+            try {
+                const response = await fetch('/api/auth/verify-session', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!data.valid) {
+                    localStorage.removeItem('authToken');
+                    window.location.href = '/login?redirect=/dashboard/my-purchases';
+                    return false;
+                }
+                return data.user;
+            } catch {
+                return false;
+            }
+        }
+
+        async function loadPurchases() {
+            const user = await checkAuth();
+            if (!user) return;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/dashboard', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                const container = document.getElementById('purchasesList');
+                if (data.recentPurchases && data.recentPurchases.length > 0) {
+                    container.innerHTML = data.recentPurchases.map(p => `
+                        <div class="purchase-item" style="background:#fff;padding:16px 20px;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                            <div>
+                                <h3 style="margin-bottom:4px;">${p.postTitle}</h3>
+                                <span class="badge" style="background:#e0e7ff;color:#4338ca;padding:2px 8px;border-radius:4px;font-size:12px;">
+                                    ${p.postClass ? 'Class ' + p.postClass : ''} ${p.postSubject || ''}
+                                </span>
+                                <span style="font-size:13px;color:#888;margin-left:8px;">Purchased on ${new Date(p.purchasedAt).toLocaleDateString()}</span>
+                            </div>
+                            <div>
+                                <a href="/blog/${p.postId}" class="btn btn-primary btn-sm">Read Notes →</a>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="empty">
+                            <p>You have not purchased any notes yet.</p>
+                            <a href="/browse" class="btn btn-primary" style="margin-top:12px;display:inline-block;">Browse Available Notes →</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Purchases load error:', error);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = '/login';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPurchases);
+    </script>
+</body>
+</html>

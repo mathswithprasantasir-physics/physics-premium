@@ -3,30 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">Blog Post</title>
+  <title>Blog Post - Physics Premium</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-container">
-      <a href="/" class="logo">📚 Physics Premium</a>
+      <a href="/" class="logo">📚 Physics <span>Premium</span></a>
       <div class="nav-links">
-        <a href="/browse.html">Browse</a>
-        <a href="/dashboard/">Dashboard</a>
-        <a href="/login.html" class="btn btn-sm btn-primary">Login</a>
+        <a href="/browse">Browse</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/login" class="btn btn-sm btn-primary">Login</a>
+        <a href="/register" class="btn btn-sm btn-secondary">Register</a>
       </div>
     </div>
   </nav>
 
   <div class="container">
-    <a href="/browse.html" class="btn btn-secondary btn-sm">← Browse</a>
-
+    <a href="/browse" class="btn btn-secondary btn-sm">← Browse</a>
     <article id="postContainer">
       <div id="loading">⏳ Loading...</div>
     </article>
   </div>
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
     const slug = window.location.pathname.split('/').pop();
 
@@ -35,12 +35,12 @@
         const response = await fetch(`/api/blog/${slug}`);
         const post = await response.json();
 
-        document.getElementById('pageTitle').textContent = post.title;
+        document.title = post.title;
 
         const container = document.getElementById('postContainer');
         container.innerHTML = `
           <div class="post-header">
-            <span class="badge">${post.class} • ${post.subject} • Chapter ${post.chapter}</span>
+            <span class="badge">${post.class || ''} • ${post.subject || ''} • Chapter ${post.chapter || ''}</span>
             <h1>${post.title}</h1>
             <p class="price-tag">₹${post.price}</p>
           </div>
@@ -52,29 +52,24 @@
                   <h3>🔒 Full Content Locked</h3>
                   <p>Get complete chapter with all topics, formulas, and practice questions.</p>
                   <button onclick="initiatePayment('${post.id}')" class="btn btn-primary btn-lg">
-                    ₹${post.price} - Download Full PDF
+                    🛒 Buy Now: ₹${post.price} - Download Full PDF
                   </button>
                   <p class="small">✅ Lifetime access • One-time payment</p>
                 </div>
               </div>
             ` : `
-              <div class="free-badge">✨ Full content available for free!</div>
+              <div style="background:#e8f5e9;padding:20px;border-radius:8px;margin:20px 0;">
+                ✨ Full content available for free!
+              </div>
             `}
           </div>
         `;
-
-        // Razorpay স্ক্রিপ্ট লোড
-        if (post.hasPaidContent) {
-          const script = document.createElement('script');
-          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-          document.head.appendChild(script);
-        }
 
       } catch (error) {
         console.error('Error:', error);
         document.getElementById('postContainer').innerHTML = `
           <h1>Post not found</h1>
-          <a href="/browse.html" class="btn btn-secondary">← Browse</a>
+          <a href="/browse" class="btn btn-secondary">← Browse</a>
         `;
       }
     }
@@ -83,7 +78,7 @@
       const token = localStorage.getItem('authToken');
       if (!token) {
         alert('Please login first!');
-        window.location.href = '/login.html?redirect=' + window.location.pathname;
+        window.location.href = '/login?redirect=' + window.location.pathname;
         return;
       }
 
@@ -132,8 +127,8 @@
             .then(res => res.json())
             .then(data => {
               if (data.success) {
-                alert('✅ Payment successful! Downloading PDF...');
-                window.location.href = `/api/download?token=${data.token}`;
+                alert('✅ Payment successful! Downloading content...');
+                window.location.href = data.downloadUrl;
               } else {
                 alert('❌ Payment verification failed. Please contact support.');
               }
@@ -142,11 +137,6 @@
               console.error('Error:', err);
               alert('❌ Something went wrong. Please try again.');
             });
-          },
-          modal: {
-            ondismiss: function() {
-              // User cancelled
-            }
           }
         };
 

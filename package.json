@@ -3,19 +3,35 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "npx prisma generate",
-    "vercel-build": "npx prisma generate",
-    "postinstall": "npx prisma generate",
-    "deploy": "vercel deploy --prod"
+    "dev": "node server.js",
+    "start": "node server.js",
+    "vercel-build": "echo 'Build completed'"
   },
   "dependencies": {
-    "@prisma/client": "^5.8.0",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "razorpay": "^2.8.6"
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "razorpay": "^2.9.8",
+    "uuid": "^11.1.1"
   },
   "devDependencies": {
-    "@vercel/node": "^2.15.10",
-    "prisma": "^5.8.0"
-  }
+    "@vercel/node": "^2.15.10"
+  },
+  "description": "",
+  "main": "server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mathswithprasantasir-physics/physics-premium.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mathswithprasantasir-physics/physics-premium/issues"
+  },
+  "homepage": "https://github.com/mathswithprasantasir-physics/physics-premium#readme"
 }

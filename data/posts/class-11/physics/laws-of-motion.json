@@ -1,0 +1,12 @@
+{
+  "id": "laws-of-motion",
+  "title": "🚀 Laws of Motion",
+  "class": "11",
+  "subject": "physics",
+  "chapter": "5",
+  "price": 39,
+  "excerpt": "Master Newton's Laws, friction, circular motion, and free-body diagrams with solved examples.",
+  "topics": ["Newton's First Law", "Newton's Second Law", "Newton's Third Law", "Conservation of Momentum", "Friction", "Circular Motion"],
+  "createdAt": "2025-01-25T10:00:00Z",
+  "fullContent": "<h1>Laws of Motion</h1><p>Newton's laws of motion are three fundamental physical laws that form the foundation for classical mechanics.</p><h2>First Law</h2><p>An object remains in a state of rest or uniform motion unless acted upon by an external unbalanced force.</p><h2>Second Law</h2><p>The rate of change of momentum is directly proportional to the applied force. F = dp/dt = ma.</p><h2>Third Law</h2><p>For every action, there is an equal and opposite reaction. F_ab = -F_ba.</p><h2>Friction</h2><p>Friction opposes relative motion. f = μN, where μ is the coefficient of friction and N is the normal force.</p><h2>Circular Motion</h2><p>Centripetal force is required for circular motion: F_c = mv²/r.</p>"
+}

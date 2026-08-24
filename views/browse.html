@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Browse Notes</title>
+  <title>Browse Notes - Physics Premium</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-container">
-      <a href="/" class="logo">📚 Physics Premium</a>
+      <a href="/" class="logo">📚 Physics <span>Premium</span></a>
       <div class="nav-links">
-        <a href="/browse.html" class="active">Browse</a>
-        <a href="/dashboard/">Dashboard</a>
-        <a href="/login.html" class="btn btn-sm btn-primary">Login</a>
+        <a href="/browse" class="active">Browse</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/login" class="btn btn-sm btn-primary">Login</a>
+        <a href="/register" class="btn btn-sm btn-secondary">Register</a>
       </div>
     </div>
   </nav>
@@ -37,7 +38,7 @@
         <option value="maths">📐 Maths</option>
       </select>
 
-      <input type="text" id="searchInput" placeholder="🔍 Search notes..." onkeyup="loadPosts()">
+      <input type="text" id="searchInput" placeholder="🔍 Search by chapter, subject, or topic..." onkeyup="loadPosts()">
     </div>
 
     <div class="posts-grid" id="postsGrid">
@@ -70,12 +71,12 @@
 
         grid.innerHTML = posts.map(post => `
           <div class="post-card">
-            <span class="badge">${post.class} • ${post.subject}</span>
+            <span class="badge">${post.class || ''} • ${post.subject || ''}</span>
             <h3>${post.title}</h3>
             <p>${post.excerpt || ''}</p>
             <div class="post-footer">
-              <span class="price">₹${post.price}</span>
-              <a href="/blog/${post.slug}" class="btn btn-sm">Read →</a>
+              <span class="price">₹${post.price || 49}</span>
+              <a href="/blog/${post.slug}" class="btn btn-sm btn-primary">Buy Now</a>
             </div>
           </div>
         `).join('');

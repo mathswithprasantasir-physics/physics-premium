@@ -1,10 +1,8 @@
-// public/js/dashboard.js
-
-// ===== সেশন চেক =====
+// ===== Session Check =====
 async function checkAuth() {
   const token = localStorage.getItem('authToken');
   if (!token) {
-    window.location.href = '/login.html?redirect=/dashboard/';
+    window.location.href = '/login?redirect=/dashboard';
     return false;
   }
 
@@ -16,7 +14,7 @@ async function checkAuth() {
 
     if (!data.valid) {
       localStorage.removeItem('authToken');
-      window.location.href = '/login.html?redirect=/dashboard/';
+      window.location.href = '/login?redirect=/dashboard';
       return false;
     }
 
@@ -26,46 +24,56 @@ async function checkAuth() {
   }
 }
 
-// ===== ড্যাশবোর্ড লোড =====
+// ===== Load Dashboard =====
 async function loadDashboard() {
   const user = await checkAuth();
   if (!user) return;
 
-  document.getElementById('userName').textContent = user.fullName || 'Student';
-  document.getElementById('userEmail').textContent = user.email;
+  // Update user info
+  const userNameEl = document.getElementById('userName');
+  if (userNameEl) userNameEl.textContent = user.fullName || 'Student';
 
   try {
     const token = localStorage.getItem('authToken');
-    const response = await fetch('/api/dashboard/index', {
+    const response = await fetch('/api/dashboard', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
 
-    document.getElementById('totalPurchases').textContent = data.totalPurchases || 0;
-    document.getElementById('totalDownloads').textContent = data.totalDownloads || 0;
-    document.getElementById('totalSpent').textContent = `₹${data.totalSpent || 0}`;
-    document.getElementById('activeTokens').textContent = data.activeTokens || 0;
+    // Update stats
+    const totalPurchases = document.getElementById('totalPurchases');
+    const totalDownloads = document.getElementById('totalDownloads');
+    const totalSpent = document.getElementById('totalSpent');
+    const activeTokens = document.getElementById('activeTokens');
 
+    if (totalPurchases) totalPurchases.textContent = data.totalPurchases || 0;
+    if (totalDownloads) totalDownloads.textContent = data.totalDownloads || 0;
+    if (totalSpent) totalSpent.textContent = `₹${data.totalSpent || 0}`;
+    if (activeTokens) activeTokens.textContent = data.activeTokens || 0;
+
+    // Update recent purchases
     const list = document.getElementById('recentPurchases');
-    if (data.recentPurchases && data.recentPurchases.length > 0) {
-      list.innerHTML = data.recentPurchases.map(p => `
-        <div class="purchase-item">
-          <div>
-            <strong>${p.postTitle}</strong>
-            <span class="badge">${p.postClass} • ${p.postSubject}</span>
+    if (list) {
+      if (data.recentPurchases && data.recentPurchases.length > 0) {
+        list.innerHTML = data.recentPurchases.map(p => `
+          <div class="purchase-item">
+            <div>
+              <strong>${p.postTitle}</strong>
+              <span class="badge">${p.postClass || ''} ${p.postSubject || ''}</span>
+            </div>
+            <div>
+              <span class="price">₹${p.amount}</span>
+              <span class="date">${new Date(p.purchasedAt).toLocaleDateString()}</span>
+            </div>
           </div>
-          <div>
-            <span class="price">₹${p.amount}</span>
-            <span class="date">${new Date(p.purchasedAt).toLocaleDateString()}</span>
-          </div>
-        </div>
-      `).join('');
-    } else {
-      list.innerHTML = '<p class="empty">No purchases yet. <a href="/browse.html">Browse notes →</a></p>';
+        `).join('');
+      } else {
+        list.innerHTML = '<p class="empty">No purchases yet. <a href="/browse">Browse notes →</a></p>';
+      }
     }
 
   } catch (error) {
-    console.error('Dashboard load error:', error);
+    console.error('Dashboard error:', error);
   }
 }
 
@@ -73,7 +81,8 @@ async function loadDashboard() {
 function logout() {
   localStorage.removeItem('authToken');
   localStorage.removeItem('userEmail');
-  window.location.href = '/login.html';
+  window.location.href = '/login';
 }
 
+// ===== Init =====
 document.addEventListener('DOMContentLoaded', loadDashboard);

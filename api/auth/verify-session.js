@@ -1,5 +1,4 @@
-// api/auth/verify-session.js
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '../../lib/auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,17 +20,19 @@ export default async function handler(req, res) {
     }
 
     const token = authHeader.split(' ')[1];
-    const secret = process.env.JWT_SECRET || 'fallback_secret';
+    const decoded = verifyToken(token);
 
-    const decoded = jwt.verify(token, secret);
+    if (!decoded) {
+      return res.status(401).json({ valid: false, error: 'Invalid token' });
+    }
 
     res.status(200).json({
       valid: true,
       user: {
         userId: decoded.userId,
         email: decoded.email,
-        isAdmin: decoded.isAdmin
-      }
+        isAdmin: decoded.isAdmin || false,
+      },
     });
 
   } catch (error) {
