@@ -17,15 +17,7 @@
     { "src": "/images/(.*)", "dest": "/public/images/$1" },
     { "src": "/dashboard/(.*)", "dest": "/views/dashboard/$1" },
     { "src": "/blog/(.*)", "dest": "/views/blog-post.html" },
-    { "src": "/browse", "dest": "/views/browse.html" },
-    { "src": "/login", "dest": "/views/login.html" },
-    { "src": "/register", "dest": "/views/register.html" },
     { "src": "/", "dest": "/views/index.html" },
     { "src": "/(.*)", "dest": "/views/$1" }
-  ],
-  "env": {
-    "JWT_SECRET": "@jwt_secret",
-    "RAZORPAY_KEY_ID": "@razorpay_key_id",
-    "RAZORPAY_KEY_SECRET": "@razorpay_key_secret"
-  }
+  ]
 }
