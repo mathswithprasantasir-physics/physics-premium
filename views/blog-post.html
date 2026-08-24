@@ -100,9 +100,9 @@
         }
 
         const options = {
-          key: 'rzp_test_TSNkvfOF1qshGC',
-          amount: order.amount,
-          currency: order.currency || 'INR',
+  key: order.key_id || 'rzp_test_TSNkvfOF1qshGC',  // ✅ Dynamic
+  amount: order.amount,
+  currency: order.currency || 'INR',
           name: 'Physics Premium',
           description: order.postTitle || 'Premium Content',
           order_id: order.id,

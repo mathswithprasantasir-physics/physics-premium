@@ -21,6 +21,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Email and password required' });
     }
 
+    // ✅ Password validation
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // ✅ Email validation
+    if (!email.includes('@') || !email.includes('.')) {
+      return res.status(400).json({ error: 'Please enter a valid email address' });
+    }
+
     const existing = db.users.findUnique({ email });
     if (existing) {
       return res.status(400).json({ error: 'Email already registered' });
@@ -29,17 +39,22 @@ export default async function handler(req, res) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = db.users.create({
-      email,
+      email: email.toLowerCase().trim(),
       passwordHash,
-      fullName: fullName || '',
-      phone: phone || '',
+      fullName: fullName ? fullName.trim() : '',
+      phone: phone ? phone.trim() : '',
       isAdmin: false,
       isActive: true,
+      lastLogin: null,
     });
 
     res.status(201).json({
       success: true,
-      user: { id: user.id, email: user.email, fullName: user.fullName },
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        fullName: user.fullName 
+      },
       message: 'Registration successful!'
     });
 

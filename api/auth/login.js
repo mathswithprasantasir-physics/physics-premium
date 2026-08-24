@@ -32,17 +32,24 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    // Update last login
     db.users.update({ id: user.id }, { lastLogin: new Date().toISOString() });
 
-    const token = generateToken(user);
+    // Generate token with consistent user ID
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin || false
+    });
 
     res.status(200).json({
       success: true,
       token,
       user: {
         id: user.id,
+        userId: user.id,  // ✅ Added for consistency
         email: user.email,
-        fullName: user.fullName,
+        fullName: user.fullName || '',
         isAdmin: user.isAdmin || false,
       },
     });

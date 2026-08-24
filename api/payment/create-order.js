@@ -86,12 +86,13 @@ export default async function handler(req, res) {
     });
 
     res.status(200).json({
-      id: order.id,
-      amount: order.amount,
-      currency: order.currency || 'INR',
-      postId: postId,
-      postTitle: postData.title,
-    });
+  id: order.id,
+  amount: order.amount,
+  currency: order.currency || 'INR',
+  postId: postId,
+  postTitle: postData.title,
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_TSNkvfOF1qshGC', // ✅ Added
+});
 
   } catch (error) {
     console.error('Order creation error:', error);

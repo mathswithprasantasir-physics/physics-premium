@@ -4,6 +4,7 @@ import { generateToken } from '../../lib/auth.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { v4 as uuidv4 } from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,14 +85,13 @@ export default async function handler(req, res) {
     });
 
     // Create access token (7 days expiry)
-    const token = generateToken({ id: paymentLog.userId, email: 'user' });
     const accessToken = db.accessTokens.create({
-      userId: paymentLog.userId,
-      token: `prem_${Date.now()}_${token.substring(0, 20)}`,
-      postId: postId,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      isActive: true,
-    });
+  userId: paymentLog.userId,
+  token: `prem_${uuidv4().substring(0, 20)}`,  // ✅ Unique token
+  postId: postId,
+  expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  isActive: true,
+});
 
     // Log download
     db.downloads.create({

@@ -2,6 +2,7 @@ import { getUserFromRequest } from '../../lib/auth.js';
 import { db } from '../../lib/db.js';
 
 export default async function handler(req, res) {
+  // ✅ CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
@@ -27,6 +28,11 @@ export default async function handler(req, res) {
       isActive: true 
     });
 
+    // ✅ Check token expiry
+    const validTokens = accessTokens.filter(token => 
+      new Date(token.expiresAt) > new Date()
+    );
+
     const totalSpent = purchases.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
     res.status(200).json({
@@ -34,7 +40,7 @@ export default async function handler(req, res) {
       totalPurchases: purchases.length,
       totalDownloads: downloads.length,
       totalSpent: totalSpent,
-      activeTokens: accessTokens.length,
+      activeTokens: validTokens.length,
       recentPurchases: purchases.slice(0, 10).map(p => ({
         id: p.id,
         postId: p.postId,
