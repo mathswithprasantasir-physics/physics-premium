@@ -102,18 +102,12 @@ app.use((req, res) => {
   res.status(404).send('Page not found');
 });
 
-// Start Server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Physics Premium server running on http://localhost:${PORT}`);
-});
-
 // For Vercel serverless
 export default app;
 
-// For local development
+// For local development (Only run when not in production)
 if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Physics Premium server running on http://localhost:${PORT}`);
   });
 }
