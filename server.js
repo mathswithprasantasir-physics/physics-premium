@@ -37,7 +37,7 @@ function adaptHandler(handler) {
   };
 }
 
-// API Routes
+// ===== API Routes =====
 app.all('/api/auth/login', adaptHandler(loginHandler));
 app.all('/api/auth/register', adaptHandler(registerHandler));
 app.all('/api/auth/verify-session', adaptHandler(verifySessionHandler));
@@ -51,13 +51,12 @@ app.all('/api/payment/create-order', adaptHandler(createOrderHandler));
 app.all('/api/payment/verify-payment', adaptHandler(verifyPaymentHandler));
 app.all('/api/test', adaptHandler(testHandler));
 
-// Static files
+// ===== Static Files =====
 app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
 app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
-app.use(express.static(path.join(__dirname, 'public')));
 
-// HTML Views - All routes
+// ===== HTML Routes =====
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
@@ -78,7 +77,6 @@ app.get('/blog/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'blog-post.html'));
 });
 
-// Dashboard routes
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dashboard', 'index.html'));
 });
@@ -91,15 +89,15 @@ app.get('/dashboard/profile', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dashboard', 'profile.html'));
 });
 
-// 404 handler
+// ===== 404 Handler =====
 app.use((req, res) => {
   res.status(404).send('Page not found');
 });
 
-// For Vercel serverless
+// ===== Export for Vercel =====
 export default app;
 
-// For local development
+// ===== Local Server =====
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Physics Premium server running on http://localhost:${PORT}`);
