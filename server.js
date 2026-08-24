@@ -57,28 +57,23 @@ app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// HTML Views
+// HTML Views - All routes
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
+
 app.get('/browse', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'browse.html'));
 });
-app.get('/browse.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'browse.html'));
-});
+
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
-app.get('/login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'login.html'));
-});
+
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
-app.get('/register.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'register.html'));
-});
+
 app.get('/blog/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'blog-post.html'));
 });
@@ -87,12 +82,11 @@ app.get('/blog/:slug', (req, res) => {
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dashboard', 'index.html'));
 });
-app.get('/dashboard/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'dashboard', 'index.html'));
-});
+
 app.get('/dashboard/my-purchases', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dashboard', 'my-purchases.html'));
 });
+
 app.get('/dashboard/profile', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dashboard', 'profile.html'));
 });
@@ -105,7 +99,7 @@ app.use((req, res) => {
 // For Vercel serverless
 export default app;
 
-// For local development (Only run when not in production)
+// For local development
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Physics Premium server running on http://localhost:${PORT}`);
