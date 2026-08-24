@@ -4,10 +4,6 @@
     {
       "src": "api/**/*.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -18,6 +14,9 @@
     { "src": "/dashboard/(.*)", "dest": "/views/dashboard/$1" },
     { "src": "/blog/(.*)", "dest": "/views/blog-post.html" },
     { "src": "/", "dest": "/views/index.html" },
+    { "src": "/browse", "dest": "/views/browse.html" },
+    { "src": "/login", "dest": "/views/login.html" },
+    { "src": "/register", "dest": "/views/register.html" },
     { "src": "/(.*)", "dest": "/views/$1" }
   ]
 }
