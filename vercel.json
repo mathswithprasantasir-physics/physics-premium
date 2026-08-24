@@ -18,5 +18,6 @@
     { "src": "/login", "dest": "/views/login.html" },
     { "src": "/register", "dest": "/views/register.html" },
     { "src": "/(.*)", "dest": "/views/$1" }
-  ]
+  ],
+  "cleanUrls": true
 }
